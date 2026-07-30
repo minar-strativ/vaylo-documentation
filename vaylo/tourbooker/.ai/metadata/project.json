@@ -1,0 +1,4 @@
+{
+  "source_repo": "/Users/minarmahmudrafi/VAYLO-Project/tourbooker",
+  "_comment": "Absolute path to the tourbooker checkout on THIS machine. source_repo resolves relative to this project's own folder (the one containing .ai/) when not absolute -- given this repo nests three levels deep (vaylo-documentation/vaylo/tourbooker/.ai/), an absolute path is simpler and correct regardless of how deep the project folder sits. Each developer running Canopy locally against this docs repo should point this at their own tourbooker checkout path."
+}

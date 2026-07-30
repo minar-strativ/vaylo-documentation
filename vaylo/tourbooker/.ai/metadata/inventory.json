@@ -1,0 +1,1345 @@
+{
+  "generated_at": "2026-07-29",
+  "anchor_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
+  "features": [
+    {
+      "id": "booking",
+      "name": "Bookings",
+      "summary": "Core booking record: reserve tours/hotels/yachts for passengers with extras, supplements, itinerary, files and financial lines.",
+      "files": [
+        "booking/**"
+      ],
+      "depends_on": [
+        "tours",
+        "passengers",
+        "hotels",
+        "yacht-booking",
+        "custom-tour-offers",
+        "pricing",
+        "payments",
+        "billing"
+      ],
+      "shared_modules": [
+        "currency",
+        "locations",
+        "multi-language",
+        "activity-log"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/booking.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "passengers",
+      "name": "Passengers",
+      "summary": "Passenger and co-passenger records, bulk passenger import.",
+      "files": [
+        "passenger/**",
+        "booking/models/passenger*",
+        "booking/models/co_passenger*"
+      ],
+      "depends_on": [],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/passengers.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "flights-tickets",
+      "name": "Flights & Ticketing (PNR)",
+      "summary": "Flight itineraries, PNR/ticket management, ticket assignment, and error-PNR handling.",
+      "files": [
+        "ticket_management/**",
+        "booking/models/booking_pnr_ticket*",
+        "booking/models/booking_flight_itinerary*"
+      ],
+      "depends_on": [
+        "booking"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/flights-tickets.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "tours",
+      "name": "Tours",
+      "summary": "Tour catalog: tours with pricing, room types, supplements, discounts, pickup locations and vehicles.",
+      "files": [
+        "tour/**"
+      ],
+      "depends_on": [
+        "pricing",
+        "supplements",
+        "locations"
+      ],
+      "shared_modules": [
+        "currency",
+        "multi-language",
+        "locations"
+      ],
+      "existing_docs": [],
+      "status": "completed",
+      "skip_reason": null,
+      "doc": "docs/product/tours.md",
+      "documented_at_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
+      "evidence": {
+        "what_it_does_and_how_it_works": [
+          "tour/services/tour_service.py:create_tour",
+          "tour/services/tour_service.py:repeat_existing_tour",
+          "tour/services/tour_service.py:update_status",
+          "tour/services/tour_service.py:update_draft",
+          "tour/services/tour_service.py:update_tour_departure_status",
+          "tour/services/tour_service.py:remove_tour_reservation",
+          "tour/services/tour_service.py:get_public_tour_queryset"
+        ],
+        "who_uses_it": [
+          "tour/views/tour_view.py:TourAPIViewSet",
+          "tour/views/public_tour_view.py:PublicTourViewSet",
+          "tour/views/tour_view.py:UpdateDepartedTourStatusSchedulerAPIView",
+          "tour/views/tour_view.py:RemoveTourReservationSchedulerAPIView"
+        ],
+        "rules_and_edge_cases": [
+          "tour/services/tour_service.py:validate_standard_price",
+          "tour/services/tour_service.py:update_status",
+          "tour/models/tour_model.py:booking_fee_percent",
+          "tour/models/tour_model.py:cancel_fee_percent",
+          "tour/models/tour_model.py:is_dynamic_cancellation",
+          "tour/services/tour_discount_service.py:TourDiscountHistoryService"
+        ],
+        "related_features": [
+          "tour/services/tour_service.py:update_status",
+          "tour/models/tour_model.py:tour_type",
+          "tour/models/tour_model.py:default_profile"
+        ]
+      },
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "Staff create a tour via TourAPIViewSet (POST); the departure_date, capacity, and standard_price are required at creation, base_standard_price is set equal to standard_price at creation time, and a slug is generated from name + id + departure_date.",
+            "evidence": "tour/views/tour_view.py:TourAPIViewSet"
+          },
+          {
+            "fact": "Creating a tour also creates its passenger-type records, its default-language multilanguage record, applies a default pickup location (and a pickup-request location if the tenant allows requested pickups), sets local prices, and sends an admin new-tour-notification email.",
+            "evidence": "tour/services/tour_service.py:create_tour"
+          },
+          {
+            "fact": "A tour can be created as a 'repeat' of an existing tour (repeat_tour), which copies images, syncs translations, and carries over the source tour's default_profile if none is given.",
+            "evidence": "tour/services/tour_service.py:create_tour"
+          },
+          {
+            "fact": "Activating/deactivating a tour (update_status) is blocked with a specific error if the tour has an active booking, an active waitlist booking, any inactive supplements attached, or assigned tour guides \u2014 staff must resolve each condition first.",
+            "evidence": "tour/services/tour_service.py:update_status"
+          },
+          {
+            "fact": "Deactivating a tour releases its held room types back into general inventory.",
+            "evidence": "tour/services/tour_service.py:update_status"
+          },
+          {
+            "fact": "A scheduled job (UpdateDepartedTourStatusSchedulerAPIView, API-key auth) marks tours with a past departure_date as departed, marks their booked passengers as departed, and applies the tour's tag to those passengers.",
+            "evidence": "tour/views/tour_view.py:UpdateDepartedTourStatusSchedulerAPIView"
+          },
+          {
+            "fact": "A scheduled job (RemoveTourReservationSchedulerAPIView, API-key auth) finds active, non-departed tours whose reservation_expiry_date has passed and clears the reservation hold (is_reserved, reserved_capacity, reservation_expiry_date), then recalculates remaining_capacity.",
+            "evidence": "tour/services/tour_service.py:get_tours_to_remove_reservation"
+          },
+          {
+            "fact": "Draft status can also be toggled via a dedicated API-key-authenticated endpoint (TourDraftUpdateAPIView) independent of the main update flow.",
+            "evidence": "tour/views/tour_view.py:TourDraftUpdateAPIView"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A tour's standard_price must be greater than or equal to its transfer_price (transport cost) \u2014 zero-priced tours are explicitly allowed, but the tour price can never be cheaper than the transfer cost.",
+            "evidence": "tour/services/tour_service.py:validate_standard_price"
+          },
+          {
+            "fact": "When the tenant's 'beetroot_pricing' add-on is active, both base_standard_price and standard_price must fall within the tour's configured min_standard_price/max_standard_price bounds, each checked independently with its own error message.",
+            "evidence": "tour/services/tour_service.py:validate_standard_price"
+          },
+          {
+            "fact": "Setting a tour to draft (is_draft=True) always forces it inactive (is_active=False); taking it out of draft always forces it active \u2014 draft and active status are mutually coupled, both at creation and via the dedicated draft-toggle endpoint.",
+            "evidence": "tour/services/tour_service.py:create_tour"
+          },
+          {
+            "fact": "The default booking fee is 40% of the tour price (booking_fee_percent default), with payment_fee_type deciding whether fees are calculated as a percentage or a fixed amount; a second_payment_percent/second_payment_amount governs the balance-due portion.",
+            "evidence": "tour/models/tour_model.py:booking_fee_percent"
+          },
+          {
+            "fact": "A tour can price its cancellation either as a static cancel_fee/cancel_fee_percent, or opt into dynamic cancellation pricing (is_dynamic_cancellation) \u2014 the dynamic calculation itself is part of the Booking feature's cancellation logic, not the tour record.",
+            "evidence": "tour/models/tour_model.py:cancel_fee"
+          },
+          {
+            "fact": "Public/customer-facing tour listings only show a tour if it has no allowed_hosts restriction (visible on every brand) or the requesting domain is explicitly in its allowed_hosts \u2014 this is the multi-brand visibility gate for the booking widget and public site.",
+            "evidence": "tour/services/tour_service.py:get_public_tour_queryset"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Creating/updating a tour rejects a standard_price below transfer_price with 'Tour Standard price must be greater than or equal to transport cost.'",
+            "evidence": "tour/services/tour_service.py:validate_standard_price"
+          },
+          {
+            "fact": "With beetroot_pricing active, a base_standard_price or standard_price outside the tour's min/max_standard_price bounds is rejected with a distinct message per bound violated (four separate checks: base below min, base above max, price below min, price above max).",
+            "evidence": "tour/services/tour_service.py:validate_standard_price"
+          },
+          {
+            "fact": "Attempting to activate/deactivate a tour with an active booking, active waitlist booking, inactive supplements, or assigned tour guides is rejected with a message naming exactly which condition is blocking it.",
+            "evidence": "tour/services/tour_service.py:update_status"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Staff tour CRUD (TourAPIViewSet) requires authentication plus Django model permissions (add/change/delete_tour) \u2014 standard staff-role gating.",
+            "evidence": "tour/views/tour_view.py:permission_classes"
+          },
+          {
+            "fact": "Public tour browsing (PublicTourViewSet, availability, search, room-type preview) has no authentication requirement \u2014 open to anyone, gated only by the allowed_hosts domain filter above, not by login.",
+            "evidence": "tour/views/public_tour_view.py:PublicTourViewSet"
+          },
+          {
+            "fact": "Scheduled/system operations (departure status rollover, reservation-hold expiry, draft toggling) are gated by API-key authentication rather than a staff login, implying they're driven by a scheduler or external caller rather than the admin UI.",
+            "evidence": "tour/views/tour_view.py:UpdateDepartedTourStatusSchedulerAPIView"
+          },
+          {
+            "fact": "Bulk tour updates (TourBulkUpdateAPIView) require authentication plus Django model permissions, same tier as regular staff CRUD.",
+            "evidence": "tour/views/tour_view.py:permission_classes"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "is_reserved / reserved_capacity / reservation_expiry_date together represent a temporary capacity hold on a tour (e.g. while a booking is in progress) that auto-expires and releases back to remaining_capacity if not confirmed by the expiry date.",
+            "evidence": "tour/models/tour_model.py:is_reserved"
+          },
+          {
+            "fact": "is_departed marks a tour whose departure_date has passed and whose status rollover job has run; it does not mean the tour was deleted or cancelled.",
+            "evidence": "tour/models/tour_model.py:is_departed"
+          },
+          {
+            "fact": "is_allotment_tour marks tours that sell room-type inventory in bulk allotments rather than per-passenger capacity alone (works together with the Hotels/Accommodation room-type inventory).",
+            "evidence": "tour/models/tour_model.py:is_allotment_tour"
+          },
+          {
+            "fact": "default_profile scopes which company/tenant 'profile' (a multi-brand/multi-office concept) a tour belongs to by default when synced or repeated.",
+            "evidence": "tour/models/tour_model.py:default_profile"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A customer browsing the public site or widget sees only tours visible on that domain (per the allowed_hosts rule) with available capacity; opening a tour shows its images, pricing, supplements, pickup locations, room types, discounts, and tags via the public tour endpoint.",
+            "evidence": "tour/views/public_tour_view.py:PublicTourViewSet"
+          },
+          {
+            "fact": "Staff create a tour in the admin, optionally as a repeat of a past tour to save re-entering details; the tour can be left as a draft (invisible/inactive) until ready, then published by clearing draft status.",
+            "evidence": "tour/services/tour_service.py:create_tour"
+          },
+          {
+            "fact": "As departure day passes, the system automatically marks the tour and its passengers departed with no manual step required from staff.",
+            "evidence": "tour/services/tour_service.py:update_tour_departure_status"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Creating a tour triggers an admin email notification, creates passenger-type and multilanguage records for the tour, applies default/requested pickup locations, and sets local prices \u2014 all as part of the same create step.",
+            "evidence": "tour/services/tour_service.py:create_tour"
+          },
+          {
+            "fact": "Deactivating a tour releases its reserved room-type inventory back to the shared pool (cross-references the Hotels/Accommodation feature's room-type inventory).",
+            "evidence": "tour/services/tour_service.py:update_status"
+          },
+          {
+            "fact": "A tour's price and discount changes are tracked in TourDiscountHistory, giving an audit trail of price/discount changes over time.",
+            "evidence": "tour/services/tour_discount_service.py:TourDiscountHistoryService"
+          }
+        ]
+      }
+    },
+    {
+      "id": "tour-types",
+      "name": "Tour Types",
+      "summary": "Reusable tour templates (type, images, vehicles, pickup locations) that tours are built from.",
+      "files": [
+        "tour_type/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [
+        "multi-language"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/tour-types.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "custom-tour-offers",
+      "name": "Custom Tour Offers",
+      "summary": "Bespoke tour offers with Wetu itinerary import, supplements and pickup locations.",
+      "files": [
+        "custom_tour_offer/**"
+      ],
+      "depends_on": [
+        "tours"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/custom-tour-offers.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "hotels",
+      "name": "Hotels & Accommodation",
+      "summary": "Hotels, room types with inventory and pricing, amenities, and room bookings.",
+      "files": [
+        "hotel/**",
+        "accommodation/**"
+      ],
+      "depends_on": [
+        "pricing",
+        "suppliers"
+      ],
+      "shared_modules": [
+        "multi-language",
+        "currency"
+      ],
+      "existing_docs": [],
+      "status": "completed",
+      "skip_reason": null,
+      "doc": "docs/product/hotels.md",
+      "documented_at_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
+      "evidence": {
+        "what_it_does_and_how_it_works": [
+          "hotel/services/hotel_service.py:create",
+          "hotel/services/hotel_service.py:update_status",
+          "hotel/models/room_type_inventory.py:RoomTypeInventory",
+          "hotel/services/room_type_inventory_service.py:increase_booked_rooms",
+          "hotel/services/room_type_inventory_service.py:decrease_booked_rooms",
+          "accommodation/models/accommodation_models.py:Accommodation"
+        ],
+        "who_uses_it": [
+          "hotel/views/hotel_view.py:HotelListCreateAPIView",
+          "hotel/views/hotel_view.py:HotelRetrieveUpdateAPIView",
+          "hotel/views/hotel_view.py:HotelUpdateStatusAPIView",
+          "hotel/views/room_type_view.py:RoomTypeListCreateAPIView",
+          "hotel/views/room_type_view.py:RoomTypeUpdateStatusAPIView"
+        ],
+        "rules_and_edge_cases": [
+          "hotel/services/hotel_service.py:update_status",
+          "hotel/services/hotel_service.py:check_is_used",
+          "hotel/services/room_type_inventory_service.py:validate_inventory",
+          "hotel/services/room_type_inventory_service.py:validate_bulk_inventory"
+        ],
+        "related_features": [
+          "hotel/services/hotel_service.py:add_hotel_availability"
+        ]
+      },
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "A new hotel is always created inactive; staff must explicitly activate it once it's ready, and activation is blocked unless the hotel has at least one room type added.",
+            "evidence": "hotel/services/hotel_service.py:create"
+          },
+          {
+            "fact": "Deactivating a hotel is blocked if any of its room types is currently used as allotment inventory on an active tour \u2014 staff must remove that dependency first.",
+            "evidence": "hotel/services/hotel_service.py:check_is_used"
+          },
+          {
+            "fact": "Room-type inventory is tracked per date, per room type, split into two pools: a Fixed allotment (contracted rooms) and a Call-off allotment (rooms available on request/on-demand) \u2014 each with its own available/booked counts.",
+            "evidence": "hotel/models/room_type_inventory.py:RoomTypeInventory"
+          },
+          {
+            "fact": "When a booking books beds in a room type for a date range, the system books from the Fixed pool first, and only pulls from the Call-off pool once the Fixed pool for that date is exhausted.",
+            "evidence": "hotel/services/room_type_inventory_service.py:increase_booked_rooms"
+          },
+          {
+            "fact": "Releasing a booking (cancellation/change) reverses that same fixed-first, call-off-second order, freeing beds/rooms back to inventory.",
+            "evidence": "hotel/services/room_type_inventory_service.py:decrease_booked_rooms"
+          },
+          {
+            "fact": "A room type can also be temporarily reserved (held) independent of an actual booking, via increase/update_reserved_rooms, and released the same way tours release capacity holds.",
+            "evidence": "hotel/services/room_type_inventory_service.py:increase_reserved_rooms"
+          },
+          {
+            "fact": "Accommodation records (simple lodging: name, address, description, website) are a lighter-weight alternative to full Hotel/RoomType inventory tracking, and are attached directly to a tour rather than going through the inventory/booking-room system.",
+            "evidence": "accommodation/models/accommodation_models.py:Accommodation"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A hotel cannot be activated without at least one room type already added to it.",
+            "evidence": "hotel/services/hotel_service.py:update_status"
+          },
+          {
+            "fact": "A hotel cannot be deactivated while any of its room types is in active use as tour allotment inventory.",
+            "evidence": "hotel/services/hotel_service.py:check_is_used"
+          },
+          {
+            "fact": "A room type's total available rooms (fixed + call-off) can never be set lower than what's already booked plus reserved against it \u2014 validated per date and, for bulk edits, across the whole date range.",
+            "evidence": "hotel/services/room_type_inventory_service.py:validate_inventory"
+          },
+          {
+            "fact": "Fixed available rooms can never be set below fixed booked rooms, and call-off available rooms can never be set below call-off booked rooms \u2014 each pool is validated independently as well as in total.",
+            "evidence": "hotel/services/room_type_inventory_service.py:validate_inventory"
+          },
+          {
+            "fact": "A reserved-rooms adjustment that would push a room type's reserved count negative is rejected outright.",
+            "evidence": "hotel/services/room_type_inventory_service.py:update_reserved_rooms"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Activating a hotel with zero room types is rejected with 'At least one room type should be added to activate hotel.'",
+            "evidence": "hotel/services/hotel_service.py:update_status"
+          },
+          {
+            "fact": "Deactivating a hotel still in use by an active tour is rejected with \"Hotel is used in a tour. You can't deactivate it.\"",
+            "evidence": "hotel/services/hotel_service.py:update_status"
+          },
+          {
+            "fact": "Saving an inventory record whose available rooms would be less than its already-booked-plus-reserved rooms is rejected per date, naming which pool (fixed or call-off) is the problem.",
+            "evidence": "hotel/services/room_type_inventory_service.py:validate_inventory"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "All hotel and room-type management (list/create/update/activate-deactivate) requires authentication plus Django model permissions \u2014 standard staff-role gating, no public access.",
+            "evidence": "hotel/views/hotel_view.py:HotelListCreateAPIView"
+          },
+          {
+            "fact": "Inventory breakdown views require authentication only (no explicit model-permission check beyond being logged in).",
+            "evidence": "hotel/views/room_type_view.py:RoomTypeInventoryBreakdownAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "Fixed allotment = rooms the business has contractually committed to sell regardless of demand; Call-off allotment = additional rooms available on request beyond the fixed commitment. Both are tracked separately for available and booked counts on every inventory date.",
+            "evidence": "hotel/models/room_type_inventory.py:fixed_available_rooms"
+          },
+          {
+            "fact": "reserved_rooms is a temporary hold on room-type inventory (mirroring the Tours feature's capacity hold), separate from an actual confirmed booking.",
+            "evidence": "hotel/models/room_type_inventory.py:reserved_rooms"
+          },
+          {
+            "fact": "total_available_rooms (a computed property) is fixed + call-off available, minus reserved holds and total booked rooms \u2014 the number actually sellable right now for that date.",
+            "evidence": "hotel/models/room_type_inventory.py:total_available_rooms"
+          },
+          {
+            "fact": "price_type on a room type determines whether its price is calculated per person or as a flat room rate.",
+            "evidence": "hotel/models/room_type_model.py:price_type"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "Staff add a hotel (created inactive by default), attach its room types and inventory, then activate it once at least one room type exists \u2014 from then on it's eligible to be used in tour allotments.",
+            "evidence": "hotel/services/hotel_service.py:create"
+          },
+          {
+            "fact": "When a passenger books a room on a tour, availability is drawn first from the hotel's fixed allotment for those dates, then from call-off inventory if fixed is exhausted; cancelling releases it back in the same order.",
+            "evidence": "hotel/services/room_type_inventory_service.py:increase_booked_rooms"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Booking or releasing room-type inventory recalculates fixed_booked_rooms/call_off_booked_rooms across the whole stay's date range in a single bulk update, not one row at a time.",
+            "evidence": "hotel/services/room_type_inventory_service.py:increase_booked_rooms"
+          },
+          {
+            "fact": "A hotel's room-type/inventory data feeds tour-side availability calculations shown to staff and, indirectly, to customers via the Tours feature's allotment tours.",
+            "evidence": "hotel/services/hotel_service.py:add_hotel_availability"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yacht-booking",
+      "name": "Yacht Booking",
+      "summary": "Yacht catalog with bases, seasons, equipment, sailing areas, and yacht pricing.",
+      "files": [
+        "yacht_booking/**"
+      ],
+      "depends_on": [
+        "pricing"
+      ],
+      "shared_modules": [
+        "multi-language",
+        "currency"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/yacht-booking.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "supplements",
+      "name": "Supplements & Add-ons",
+      "summary": "Optional add-on products/supplements with groups, categories and local pricing.",
+      "files": [
+        "supplement/**"
+      ],
+      "depends_on": [
+        "pricing"
+      ],
+      "shared_modules": [
+        "multi-language",
+        "currency"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/supplements.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "products",
+      "name": "Products",
+      "summary": "Generic sellable products with categories, images, files and notes.",
+      "files": [
+        "product/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [
+        "multi-language"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/products.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "pricing",
+      "name": "Pricing & Price Manager",
+      "summary": "Pricing projects, price calculation, pricing webhooks and logs across products.",
+      "files": [
+        "price_manager/**"
+      ],
+      "depends_on": [
+        "currency"
+      ],
+      "shared_modules": [
+        "currency"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/pricing.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "payments",
+      "name": "Payments",
+      "summary": "Payment methods, transactions, settlements, OCR payment import, and provider integrations (AltaPay).",
+      "files": [
+        "payment/**"
+      ],
+      "depends_on": [
+        "booking",
+        "billing"
+      ],
+      "shared_modules": [
+        "currency"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/payments.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "res-pay",
+      "name": "ResPay Payments",
+      "summary": "ResPay payment provider integration and its configuration.",
+      "files": [
+        "res_pay/**"
+      ],
+      "depends_on": [
+        "payments"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/res-pay.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "billing",
+      "name": "Billing & Invoicing",
+      "summary": "Billing lines and account invoices generated from bookings.",
+      "files": [
+        "billing/**"
+      ],
+      "depends_on": [
+        "booking"
+      ],
+      "shared_modules": [
+        "currency",
+        "vat"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/billing.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "coupons",
+      "name": "Coupons",
+      "summary": "Discount coupons with local pricing and usage tracking.",
+      "files": [
+        "coupon/**"
+      ],
+      "depends_on": [
+        "pricing"
+      ],
+      "shared_modules": [
+        "currency"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/coupons.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "gift-cards",
+      "name": "Gift Cards",
+      "summary": "Gift cards with configurable greeting texts, images and usage history.",
+      "files": [
+        "gift_card/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [
+        "multi-language",
+        "currency"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/gift-cards.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "rewards",
+      "name": "Rewards & Loyalty",
+      "summary": "Loyalty point accounts, reward tiers, and a point ledger.",
+      "files": [
+        "reward/**"
+      ],
+      "depends_on": [
+        "booking"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/rewards.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "vat",
+      "name": "VAT & Tax Classes",
+      "summary": "VAT classes, VAT/cost accounts and tax categorisation used in billing.",
+      "files": [
+        "vat_class/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/vat.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "accounting",
+      "name": "Accounting Integration",
+      "summary": "Integration with external accounting providers: projects, VAT codes, customers, cost centers, event sync.",
+      "files": [
+        "accounting_service/**"
+      ],
+      "depends_on": [
+        "billing"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/accounting.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "suppliers",
+      "name": "Suppliers",
+      "summary": "Suppliers, supplier types, supplier invoices and their financial/VAT accounts.",
+      "files": [
+        "supplier/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [
+        "multi-language",
+        "vat"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/suppliers.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "tour-guides",
+      "name": "Tour Guides",
+      "summary": "Tour guides, guide types and their time-slot availability.",
+      "files": [
+        "tour_guide/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/tour-guides.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "transport",
+      "name": "Vehicles, Carriers & Stations",
+      "summary": "Transport logistics: vehicles and types, home bases, carriers and pickup/drop stations.",
+      "files": [
+        "vehicle/**",
+        "carrier/**",
+        "station/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [
+        "locations"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/transport.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "notifications",
+      "name": "Notifications (Email)",
+      "summary": "Email events, templates, scheduled mail, recipients and delivery logs.",
+      "files": [
+        "email_service/**"
+      ],
+      "depends_on": [
+        "booking"
+      ],
+      "shared_modules": [
+        "multi-language"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/notifications.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "surveys",
+      "name": "Surveys",
+      "summary": "Customer surveys with dispatch and dispatch-status tracking.",
+      "files": [
+        "survey/**"
+      ],
+      "depends_on": [
+        "booking",
+        "notifications"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/surveys.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "widget",
+      "name": "Booking Widget",
+      "summary": "Embeddable booking widget search parameters and configuration.",
+      "files": [
+        "widget/**"
+      ],
+      "depends_on": [
+        "tours",
+        "booking"
+      ],
+      "shared_modules": [
+        "multi-language"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/widget.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "dynamic-forms",
+      "name": "Dynamic Forms & Custom Fields",
+      "summary": "Configurable custom form fields, collections/groups and stored responses.",
+      "files": [
+        "dynamic_form/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [
+        "multi-language"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/dynamic-forms.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "user-access",
+      "name": "User & Access Management",
+      "summary": "Users and profiles, roles/permissions, passenger impersonation with audit, and GDPR data anonymisation.",
+      "files": [
+        "user/**",
+        "auth_group/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [
+        "activity-log"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/user-access.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "organizations",
+      "name": "Organizations",
+      "summary": "Organization records grouping users/customers.",
+      "files": [
+        "organization/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/organizations.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "subscription",
+      "name": "Subscription Plans",
+      "summary": "Tenant-facing subscription plans that gate platform capabilities.",
+      "files": [
+        "subscription/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/subscription.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "reporting",
+      "name": "Reporting & Escalation",
+      "summary": "Operational reports and escalation events.",
+      "files": [
+        "report/**"
+      ],
+      "depends_on": [
+        "booking"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/reporting.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "notes-todos",
+      "name": "Notes, Todos & Travel Information",
+      "summary": "Internal notes, to-do items and traveller-facing travel information content.",
+      "files": [
+        "note/**",
+        "todo/**",
+        "travel_information/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [
+        "multi-language"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/notes-todos.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "reservation-service",
+      "name": "Reservation Service Integration",
+      "summary": "Integration with external reservation-service providers and their configuration.",
+      "files": [
+        "reservation_service/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/reservation-service.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [],
+        "journeys": [],
+        "side_effects": []
+      }
+    }
+  ],
+  "shared_modules": [
+    {
+      "id": "currency",
+      "files": [
+        "currency/**"
+      ],
+      "used_by": [
+        "booking",
+        "tours",
+        "hotels",
+        "yacht-booking",
+        "supplements",
+        "pricing",
+        "payments",
+        "billing",
+        "coupons",
+        "gift-cards"
+      ]
+    },
+    {
+      "id": "multi-language",
+      "files": [
+        "language/**",
+        "**/models/*multi_language*",
+        "**/models/*multilanguage*"
+      ],
+      "used_by": [
+        "tours",
+        "tour-types",
+        "hotels",
+        "yacht-booking",
+        "supplements",
+        "products",
+        "gift-cards",
+        "notifications",
+        "suppliers",
+        "widget",
+        "dynamic-forms",
+        "notes-todos"
+      ]
+    },
+    {
+      "id": "locations",
+      "files": [
+        "location/**",
+        "country/**"
+      ],
+      "used_by": [
+        "booking",
+        "tours",
+        "transport"
+      ]
+    },
+    {
+      "id": "activity-log",
+      "files": [
+        "activity_log/**"
+      ],
+      "used_by": [
+        "booking",
+        "user-access"
+      ]
+    },
+    {
+      "id": "taxonomy",
+      "files": [
+        "category/**",
+        "tag/**"
+      ],
+      "used_by": [
+        "tours",
+        "products"
+      ]
+    }
+  ]
+}
