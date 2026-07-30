@@ -17,3 +17,7 @@ Format: **Term** — definition in one or two sentences, primary-reader language
 **Fixed Allotment** — A room-type's contractually committed room inventory for a date, available regardless of demand. Booked before Call-off inventory.
 
 **Call-off Allotment** — Extra room-type inventory available on request for a date, beyond the Fixed allotment. Only booked once Fixed is exhausted.
+
+**Booking Client** — The one passenger on a booking designated as the primary contact. Every booking must have exactly one.
+
+**Waitlist** — A booking held against a full tour/room, promoted to a confirmed booking once inventory frees up and re-availability is confirmed.

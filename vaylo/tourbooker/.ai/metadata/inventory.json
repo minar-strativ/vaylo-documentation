@@ -26,21 +26,164 @@
         "activity-log"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/booking.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "what_it_does_and_how_it_works": [
+          "booking/booking_validators/rules.py:BookingClientRequiredRule",
+          "booking/services/booking_waitlist_service.py:update_waitlist_status",
+          "booking/services/booking_cancel_service.py:cancel_booking",
+          "booking/services/booking_service.py:update_reservation_status"
+        ],
+        "who_uses_it": [
+          "booking/views/booking_public_view.py:TourBookingCreatePublicAPIView",
+          "booking/views/booking_view.py:TourBookingCreateAPIView",
+          "booking/views/booking_public_view.py:ExternalFITBookingAPIView"
+        ],
+        "rules_and_edge_cases": [
+          "booking/booking_validators/rules.py:BookingClientRequiredRule",
+          "booking/booking_validators/rules.py:LeastOnePassengerRequiredRule",
+          "booking/services/booking_service.py:check_amount_is_valid",
+          "booking/services/booking_service.py:check_is_valid_for_total_payment",
+          "booking/services/booking_service.py:check_amount_is_valid_for_refund",
+          "booking/models/booking.py:booking_fee_percent",
+          "booking/models/booking.py:is_dynamic_cancellation"
+        ],
+        "related_features": [
+          "booking/services/booking_cancel_service.py:cancel_booking"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "A booking reserves a tour, hotel room, or yacht for one or more passengers, one of whom must be marked as the booking client (the primary contact) \u2014 exactly one, never zero or more than one.",
+            "evidence": "booking/booking_validators/rules.py:BookingClientRequiredRule"
+          },
+          {
+            "fact": "A booking must have at least one traveling passenger; a booking without a tour must use the dedicated 'booking without tour' type.",
+            "evidence": "booking/booking_validators/rules.py:LeastOnePassengerRequiredRule"
+          },
+          {
+            "fact": "Customers can create bookings directly from the public site/widget with no login required; staff create bookings from the admin; external partners can create FIT bookings via a company auth token integration.",
+            "evidence": "booking/views/booking_public_view.py:TourBookingCreatePublicAPIView"
+          },
+          {
+            "fact": "A booking can be placed on a Waitlist when the tour/room is full; accepting a waitlist booking re-checks room inventory availability, consumes the inventory/pickup-location/vehicle seats, applies any coupon, and moves the booking to Booked \u2014 rejecting waitlist acceptance if inventory is no longer available. Rejecting a waitlist booking cancels it outright.",
+            "evidence": "booking/services/booking_waitlist_service.py:update_waitlist_status"
+          },
+          {
+            "fact": "Cancelling a booking releases the tour's passenger capacity, pickup-location seats, room-type inventory, assigned vehicle seats, and any held room slots; deletes ticket assignments; processes a refund of whatever was paid minus the cancellation fee (if that's a positive amount); and emails both the customer and staff.",
+            "evidence": "booking/services/booking_cancel_service.py:cancel_booking"
+          },
+          {
+            "fact": "A yacht booking (not manually added) is also cancelled/confirmed in the external yacht reservation source (one of two supported providers) as part of the booking's cancel/payment-confirmation flow.",
+            "evidence": "booking/services/booking_cancel_service.py:_cancel_booking_in_yacht_source"
+          },
+          {
+            "fact": "Once payment is received, a Pending booking automatically transitions to Booked.",
+            "evidence": "booking/services/booking_service.py:update_reservation_status"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A booking's departure and arrival locations must differ from each other (when both are set).",
+            "evidence": "booking/booking_validators/rules.py:DepartureArrivalDifferRule"
+          },
+          {
+            "fact": "A payment amount is only accepted if the booking still has a balance due, the amount doesn't exceed that balance, and the amount is greater than zero.",
+            "evidence": "booking/services/booking_service.py:check_amount_is_valid"
+          },
+          {
+            "fact": "A refund amount is only accepted if the booking has any payment recorded, the amount doesn't exceed the total paid, and the amount is greater than zero.",
+            "evidence": "booking/services/booking_service.py:check_amount_is_valid_for_refund"
+          },
+          {
+            "fact": "A booking carries its own booking fee percentage (defaulting to 40%, mirroring the tour's default), a second/balance payment portion, and a cancellation fee percentage \u2014 each can override the tour-level defaults per booking.",
+            "evidence": "booking/models/booking.py:booking_fee_percent"
+          },
+          {
+            "fact": "A booking can be flagged for dynamic cancellation pricing instead of a flat cancellation fee \u2014 mirroring the same option on the Tours feature.",
+            "evidence": "booking/models/booking.py:is_dynamic_cancellation"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Creating a booking with more than one passenger marked as the booking client is rejected with 'Multiple booking clients found. Only one client is allowed.'; zero is rejected with 'Client not found in booking.'",
+            "evidence": "booking/booking_validators/rules.py:BookingClientRequiredRule"
+          },
+          {
+            "fact": "A booking with no traveling passenger is rejected with 'At least one traveling passenger is required.'",
+            "evidence": "booking/booking_validators/rules.py:LeastOnePassengerRequiredRule"
+          },
+          {
+            "fact": "A payment is rejected if the booking has nothing due ('The booking fee has already been paid.'), if it exceeds the remaining balance ('The amount exceeds the total cost of the tour.'), or if it isn't a positive amount.",
+            "evidence": "booking/services/booking_service.py:check_amount_is_valid"
+          },
+          {
+            "fact": "Marking a booking fully paid is rejected if it's already fully paid, or if it's only partially paid (staff must record the remaining balance as a partial payment instead).",
+            "evidence": "booking/services/booking_service.py:check_is_valid_for_total_payment"
+          },
+          {
+            "fact": "A refund is rejected if the booking has no payment on record, exceeds what was actually paid, or isn't a positive amount.",
+            "evidence": "booking/services/booking_service.py:check_amount_is_valid_for_refund"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Staff booking management (list, view, create, update, cancel, transfer, coupon application, payment deadline updates) requires authentication plus Django model permissions.",
+            "evidence": "booking/views/booking_view.py:BookingListAPIView"
+          },
+          {
+            "fact": "Public booking creation requires no authentication at all, open to any customer.",
+            "evidence": "booking/views/booking_public_view.py:TourBookingCreatePublicAPIView"
+          },
+          {
+            "fact": "External FIT bookings (a B2B integration) authenticate via a dedicated company auth token, not a staff login.",
+            "evidence": "booking/views/booking_public_view.py:ExternalFITBookingAPIView"
+          },
+          {
+            "fact": "Admin sync operations use API-key authentication rather than a staff login, implying a system/scheduled caller.",
+            "evidence": "booking/views/booking_view.py:AdminBookingAPIViewSet"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "booking_status distinguishes Booked, Cancelled, Pending, Quote Cancelled, and Waitlist \u2014 Waitlist bookings reuse the quote-status field to track their acceptance/rejection since they follow the same flow as a quote once accepted.",
+            "evidence": "booking/constants.py:BookingStatus"
+          },
+          {
+            "fact": "due is the remaining balance still owed on a booking; total_payment is what's actually been paid so far; grand_total is the final price after discounts.",
+            "evidence": "booking/models/booking.py:due"
+          },
+          {
+            "fact": "is_draft marks a booking that hasn't been finalized/confirmed yet, distinct from its booking_status.",
+            "evidence": "booking/models/booking.py:is_draft"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A customer books a tour, hotel room, or yacht on the public site with no account required, naming exactly one of the travelling passengers as the booking contact; if capacity is full they're placed on a waitlist and notified if/when a spot opens.",
+            "evidence": "booking/views/booking_public_view.py:TourBookingCreatePublicAPIView"
+          },
+          {
+            "fact": "A customer or staff member cancels a booking; the customer receives a cancellation email, staff are notified internally, and whatever was paid (minus any cancellation fee) is automatically queued for refund.",
+            "evidence": "booking/services/booking_cancel_service.py:cancel_booking"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Cancelling a booking touches five other features' state in one step: Tours (capacity), Hotels (room-type inventory), pickup locations, vehicle assignment, and ticketing (assigned tickets deleted).",
+            "evidence": "booking/services/booking_cancel_service.py:cancel_booking"
+          },
+          {
+            "fact": "Accepting a waitlisted booking applies any attached coupon's usage tracking and creates the booking confirmation voucher/email, same as a normal booking confirmation.",
+            "evidence": "booking/services/booking_waitlist_service.py:update_waitlist_status"
+          }
+        ]
       }
     },
     {

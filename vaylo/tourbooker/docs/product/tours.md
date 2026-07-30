@@ -57,7 +57,7 @@ Until a tour is ready to sell, staff can leave it as a **Draft** — invisible t
 
 ## Related Features
 
-- Bookings — a tour's active/waitlist bookings block certain tour changes, and dynamic cancellation pricing is calculated there. (link pending — not yet documented in this run)
+- [Bookings](booking.md) — a tour's active/waitlist bookings block certain tour changes, and dynamic cancellation pricing is calculated there.
 - [Hotels & Accommodation](hotels.md) — room-type inventory reserved by a tour is released back here when the tour is deactivated.
 - Tour Types — a tour can be based on a reusable tour type, from which it inherits its default images. (not in this run's scope)
 - Pricing & Price Manager — the minimum/maximum price bounds enforced on a tour come from this feature's configuration. (not in this run's scope)

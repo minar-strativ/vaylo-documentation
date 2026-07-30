@@ -1,12 +1,12 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 features discovered total; 2 documented so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 features discovered total; 3 documented so far.
 
 ## Bookings & Catalog
 
 - [Tours](tours.md) — The catalog listing customers browse and book: dates, capacity, pricing, drafts, and multi-brand visibility.
 - [Hotels & Accommodation](hotels.md) — Room-type inventory tours draw from when selling accommodation, plus simple lodging references.
-- Bookings — Core booking record: reserve tours/hotels/yachts for passengers with extras, supplements, itinerary, files and financial lines. *(pending)*
+- [Bookings](booking.md) — Core booking record: reserve tours/hotels/yachts for passengers, payment/cancellation handling, waitlisting.
 - Passengers — Passenger and co-passenger records, bulk passenger import. *(pending)*
 - Flights & Ticketing (PNR) — Flight itineraries, PNR/ticket management, ticket assignment, and error-PNR handling. *(pending)*
 - Tour Types — Reusable tour templates (type, images, vehicles, pickup locations) that tours are built from. *(pending)*
@@ -48,4 +48,4 @@ Generated and maintained by Canopy. One page per business capability — see eac
 
 ## Not yet documented
 
-The 29 features marked *(pending)* above are still queued — run `/doc-create` to continue documenting them, in the same dependency order recorded in `.ai/metadata/inventory.json`.
+The 28 features marked *(pending)* above are still queued — run `/doc-create` to continue documenting them, in the same dependency order recorded in `.ai/metadata/inventory.json`.
