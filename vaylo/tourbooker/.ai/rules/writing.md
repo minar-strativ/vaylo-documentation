@@ -14,8 +14,14 @@ Exactly one primary reader, always. "Written for everyone" is readable by no one
 Topics that must NOT appear in docs (commercial terms, security internals, unreleased plans):
 
 ```yaml
-denylist: []
-# example: ["margin calculations", "fraud detection thresholds"]
+denylist:
+  - "agent commission"
+  - "supplier margins/markup"
+  - "price-summary internals"
+  - "payment/fraud internals"
+  - "tenant DB routing/creds"
+  - "keys/tokens"
+  - "unreleased plans"
 ```
 
 ## Style rules
