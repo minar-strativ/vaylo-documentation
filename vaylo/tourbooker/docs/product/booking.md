@@ -52,7 +52,7 @@ A booking ties together a departure (tour, hotel room, or yacht), the passengers
 
 - [Tours](tours.md) — a booking reserves tour capacity and can inherit its cancellation/fee defaults from the tour.
 - [Hotels & Accommodation](hotels.md) — a booking reserves and releases room-type inventory here.
-- Payments — booking payment/refund processing happens there; this feature only validates whether an amount is allowed. (link pending — not yet documented in this run)
+- [Payments](payments.md) — booking payment/refund processing happens there; this feature only validates whether an amount is allowed.
 - [Billing & Invoicing](billing.md) — invoices are generated from booking financial lines.
 
 ## FAQ

@@ -804,21 +804,117 @@
         "currency"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/payments.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "what_it_does_and_how_it_works": [
+          "payment/handlers/registry.py:PaymentHandlerRegistry",
+          "payment/handlers/booking_handler.py:process_payment",
+          "payment/handlers/booking_handler.py:post_payment_actions",
+          "payment/services/refund/refund_payment_service.py:create_refund_payment_transaction",
+          "payment/views/manual_payment_views.py:ManualPaymentAPIView"
+        ],
+        "who_uses_it": [
+          "payment/views/transaction_views.py:TransactionAPIView",
+          "payment/views/manual_payment_views.py:ManualPaymentAPIView",
+          "payment/views/public_payment_info_view.py:PublicPaymentInfoAPIView"
+        ],
+        "rules_and_edge_cases": [
+          "payment/services/refund/refund_payment_service.py:create_refund_payment_transaction",
+          "payment/models/transaction_model.py:status",
+          "payment/models/transaction_model.py:pending_amount"
+        ],
+        "related_features": [
+          "payment/handlers/booking_handler.py:process_payment"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "A payment can be applied to a booking, a ResPay account, an invoice, or a gift card \u2014 each routed to its own handler, but all recorded as a Transaction.",
+            "evidence": "payment/handlers/registry.py:PaymentHandlerRegistry"
+          },
+          {
+            "fact": "A successful booking payment updates the booking's paid amount, cancels any pending payment-reminder emails for it, and finalizes the booking if it was still a draft.",
+            "evidence": "payment/handlers/booking_handler.py:process_payment"
+          },
+          {
+            "fact": "Once a booking payment is processed, it can be pushed to the tenant's connected accounting system if that hasn't happened yet.",
+            "evidence": "payment/handlers/booking_handler.py:post_payment_actions"
+          },
+          {
+            "fact": "A refund creates its own transaction record (using a dedicated refund payment method) rather than reversing the original payment record, and reduces the booking's recorded paid amount by the refunded amount.",
+            "evidence": "payment/services/refund/refund_payment_service.py:create_refund_payment_transaction"
+          },
+          {
+            "fact": "Staff can record a manual payment directly (e.g. bank transfer, cash) as an admin-only action, separate from the automated provider payment flows.",
+            "evidence": "payment/views/manual_payment_views.py:ManualPaymentAPIView"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A refund can't be processed through a payment method that isn't configured for the tenant \u2014 except when the refund is being triggered automatically as part of cancelling a booking, which is allowed regardless.",
+            "evidence": "payment/services/refund/refund_payment_service.py:create_refund_payment_transaction"
+          },
+          {
+            "fact": "Every transaction tracks both a payment status (pending/success/failed) and a separate settlement status, since a payment succeeding and that payment being settled/reconciled with accounting are tracked as two different states.",
+            "evidence": "payment/models/transaction_model.py:status"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Attempting a refund through an unconfigured payment method is rejected with 'Payment Method is not configured.' (except for cancellation-triggered refunds).",
+            "evidence": "payment/services/refund/refund_payment_service.py:create_refund_payment_transaction"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Viewing/managing transactions requires staff authentication plus Django model permissions.",
+            "evidence": "payment/views/transaction_views.py:TransactionAPIView"
+          },
+          {
+            "fact": "Recording a manual payment is restricted to admin users specifically, not just any authenticated staff member.",
+            "evidence": "payment/views/manual_payment_views.py:ManualPaymentAPIView"
+          },
+          {
+            "fact": "A passenger can view their own transaction history (or, for staff impersonating a passenger, a read-only view of it); public payment status lookup requires no authentication at all.",
+            "evidence": "payment/views/transaction_views.py:PassengerTransactionListAPIView"
+          },
+          {
+            "fact": "Public-facing payment status information requires no authentication.",
+            "evidence": "payment/views/public_payment_info_view.py:PublicPaymentInfoAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A Transaction's amount is what the transaction covers; pending_amount tracks how much of it is still awaiting completion (relevant for payment methods that don't settle instantly).",
+            "evidence": "payment/models/transaction_model.py:pending_amount"
+          },
+          {
+            "fact": "A transaction can be linked to a booking, a ResPay account, a billing invoice, or a gift card \u2014 which one it's linked to determines what business impact processing it has.",
+            "evidence": "payment/models/transaction_model.py:booking"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A customer pays for their booking online through one of the tenant's supported payment options; on success, the booking's balance updates immediately and any pending payment reminder for it is cancelled.",
+            "evidence": "payment/handlers/booking_handler.py:process_payment"
+          },
+          {
+            "fact": "When a booking is cancelled, any refund owed is created and processed automatically as part of the cancellation, without a separate manual refund step.",
+            "evidence": "payment/services/refund/refund_payment_service.py:create_refund_payment_transaction"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Payments and refunds both interact with the tenant's connected accounting system, marking a transaction as sent once that sync succeeds.",
+            "evidence": "payment/handlers/booking_handler.py:post_payment_actions"
+          }
+        ]
       }
     },
     {

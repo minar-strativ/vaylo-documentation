@@ -1,6 +1,6 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 features discovered total; 4 documented so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 features discovered total; 5 documented so far.
 
 ## Bookings & Catalog
 
@@ -21,7 +21,7 @@ Generated and maintained by Canopy. One page per business capability — see eac
 ## Pricing & Payments
 
 - Pricing & Price Manager — Pricing projects, price calculation, pricing webhooks and logs across products. *(pending)*
-- Payments — Payment methods, transactions, settlements, OCR payment import, and provider integrations (AltaPay). *(pending)*
+- [Payments](payments.md) — Payment/refund transactions against bookings, invoices, and gift cards; manual payment recording.
 - ResPay Payments — ResPay payment provider integration and its configuration. *(pending)*
 - [Billing & Invoicing](billing.md) — Billing lines and account invoices generated from bookings, invoice issue/void/credit lifecycle.
 - Coupons — Discount coupons with local pricing and usage tracking. *(pending)*
@@ -48,4 +48,4 @@ Generated and maintained by Canopy. One page per business capability — see eac
 
 ## Not yet documented
 
-The 27 features marked *(pending)* above are still queued — run `/doc-create` to continue documenting them, in the same dependency order recorded in `.ai/metadata/inventory.json`.
+The 26 features marked *(pending)* above are still queued — run `/doc-create` to continue documenting them, in the same dependency order recorded in `.ai/metadata/inventory.json`.

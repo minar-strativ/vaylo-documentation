@@ -25,3 +25,5 @@ Format: **Term** — definition in one or two sentences, primary-reader language
 **Billing Line** — A single charge (tour price, supplement, extra, fee) recorded against a booking, grouped onto an invoice.
 
 **Account Invoice** — The formal billing document grouping a booking's billing lines, progressing through Draft, Issued, and Void/Credited states.
+
+**Transaction** — A single recorded payment or refund, linked to a booking, invoice, gift card, or account.

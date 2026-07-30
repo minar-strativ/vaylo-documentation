@@ -48,7 +48,7 @@ Every chargeable item on a booking becomes a **Billing Line** — one line per c
 
 - [Bookings](booking.md) — a booking's charges become this feature's billing lines.
 - [Tours](tours.md) — tour pricing feeds into a booking's billing lines.
-- Payments — payments recorded against a booking are what move an invoice from Unpaid toward Paid. (link pending — not yet documented in this run)
+- [Payments](payments.md) — payments recorded against a booking are what move an invoice from Unpaid toward Paid.
 - Coupons — coupon discounts appear as adjustments on billing lines. (not in this run's scope)
 
 ## FAQ
