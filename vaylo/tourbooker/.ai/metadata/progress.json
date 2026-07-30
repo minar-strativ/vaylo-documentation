@@ -2,7 +2,7 @@
   "mode": "create",
   "run_started_at": "2026-07-29",
   "run_anchor_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
-  "current_feature": "billing",
+  "current_feature": "payments",
   "current_step": "analyze",
   "scope_this_run": [
     "tours",
@@ -11,6 +11,6 @@
     "billing",
     "payments"
   ],
-  "notes": "Pilot run: tours, hotels, booking completed (3/5 scoped). Continuing scope tours -> hotels -> booking -> billing -> payments. run_processed_count=3.",
-  "run_processed_count": 3
+  "notes": "Pilot run: tours, hotels, booking, billing completed (4/5 scoped). Continuing scope tours -> hotels -> booking -> billing -> payments. run_processed_count=4.",
+  "run_processed_count": 4
 }

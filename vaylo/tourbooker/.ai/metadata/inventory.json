@@ -865,21 +865,139 @@
         "vat"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/billing.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "what_it_does_and_how_it_works": [
+          "billing/models/billing_line_model.py:BillingLine",
+          "billing/services/invoice_service.py:issue_invoice",
+          "billing/services/invoice_service.py:void_invoice",
+          "billing/services/invoice_service.py:credit_invoice"
+        ],
+        "who_uses_it": [
+          "billing/views/account_invoice_views.py:AccountInvoiceListCreateAPIView"
+        ],
+        "rules_and_edge_cases": [
+          "billing/services/invoice_service.py:issue_invoice",
+          "billing/services/invoice_service.py:void_invoice",
+          "billing/services/invoice_service.py:credit_invoice",
+          "billing/models/account_invoice_model.py:status"
+        ],
+        "related_features": [
+          "billing/models/billing_line_model.py:BillingLine"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "A booking's charges (tour price, supplements, extras, fees) accumulate as Billing Lines, which get grouped onto an Account Invoice for that booking.",
+            "evidence": "billing/models/billing_line_model.py:BillingLine"
+          },
+          {
+            "fact": "An invoice starts as a Draft and is editable in that state; issuing it locks it (no longer editable), assigns it a permanent invoice number and a payment reference number, and \u2014 if the tenant has accounting integration enabled \u2014 sends it there.",
+            "evidence": "billing/services/invoice_service.py:issue_invoice"
+          },
+          {
+            "fact": "Issuing an invoice for a booking still in Quote status automatically accepts that quote as part of the same step.",
+            "evidence": "billing/services/invoice_service.py:issue_invoice"
+          },
+          {
+            "fact": "An issued invoice can be voided (unlinking its billing lines and marking it void) or credited (generating a credit note that reverses its billing lines) \u2014 both only apply to invoices that are actually in Issued status.",
+            "evidence": "billing/services/invoice_service.py:void_invoice"
+          },
+          {
+            "fact": "Voiding an invoice that's already been booked in the connected accounting system is blocked, since undoing it there isn't possible from this side.",
+            "evidence": "billing/services/invoice_service.py:void_invoice"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "An invoice cannot be issued twice \u2014 issuing an already-issued invoice is rejected outright.",
+            "evidence": "billing/services/invoice_service.py:issue_invoice"
+          },
+          {
+            "fact": "An invoice with no billing lines cannot be issued.",
+            "evidence": "billing/services/invoice_service.py:issue_invoice"
+          },
+          {
+            "fact": "An invoice can only be voided if it's currently Issued, and only if it hasn't been paid or partially paid \u2014 a paid invoice must be credited, not voided.",
+            "evidence": "billing/services/invoice_service.py:void_invoice"
+          },
+          {
+            "fact": "An invoice can only be credited if it's currently Issued.",
+            "evidence": "billing/services/invoice_service.py:credit_invoice"
+          },
+          {
+            "fact": "Every billing line carries its own VAT percentage and VAT amount, calculated per line rather than once for the whole invoice.",
+            "evidence": "billing/models/billing_line_model.py:BillingLine"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Issuing an already-issued invoice is rejected with 'Cannot issue an already issued invoice.'",
+            "evidence": "billing/services/invoice_service.py:issue_invoice"
+          },
+          {
+            "fact": "Issuing an invoice with no billing lines is rejected with 'Cannot issue an invoice with no billing lines.'",
+            "evidence": "billing/services/invoice_service.py:issue_invoice"
+          },
+          {
+            "fact": "Voiding a non-issued invoice is rejected with 'Cannot void a non-issued invoice.'; voiding a paid or partially-paid one is rejected with 'Cannot void a paid invoice.'",
+            "evidence": "billing/services/invoice_service.py:void_invoice"
+          },
+          {
+            "fact": "Voiding an invoice already booked in the connected accounting system is rejected with 'Cannot void an invoice that is already booked in the accounting service.'",
+            "evidence": "billing/services/invoice_service.py:void_invoice"
+          },
+          {
+            "fact": "Crediting a non-issued invoice is rejected with 'This invoice cannot be credited as it is not issued.'",
+            "evidence": "billing/services/invoice_service.py:credit_invoice"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "All invoice and billing-line operations (view, create, issue, void, credit, delete, download, email) require staff authentication.",
+            "evidence": "billing/views/account_invoice_views.py:AccountInvoiceListCreateAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "An invoice's status (Draft, Issued, Void) is separate from its payment status (Unpaid, Partially Paid, Paid) \u2014 an invoice can be Issued and still Unpaid, or Issued and fully Paid.",
+            "evidence": "billing/models/account_invoice_model.py:status"
+          },
+          {
+            "fact": "A billing line can belong to more than one kind of source (a booking's tour price, a supplement, an extra, a supplier charge) via a generic content-type link, letting one invoice combine charges from different parts of a booking.",
+            "evidence": "billing/models/billing_line_model.py:content_type"
+          },
+          {
+            "fact": "An invoice is only editable while it's in Draft status \u2014 once issued, its content is locked.",
+            "evidence": "billing/models/account_invoice_model.py:is_editable"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "Staff review a booking's accumulated billing lines, generate a draft invoice, and issue it once it's correct \u2014 issuing locks the invoice, generates its final numbering, and (if enabled) pushes it to the connected accounting system.",
+            "evidence": "billing/services/invoice_service.py:issue_invoice"
+          },
+          {
+            "fact": "If an issued invoice turns out to be wrong before any payment, staff void it; if it's already been paid, staff issue a credit note against it instead.",
+            "evidence": "billing/services/invoice_service.py:void_invoice"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Issuing an invoice updates every billing line on it to reflect that it's now part of an issued invoice, and can trigger sending the invoice to the tenant's connected accounting system.",
+            "evidence": "billing/services/invoice_service.py:update_billing_and_financial_lines"
+          },
+          {
+            "fact": "Voiding an invoice snapshots its billing lines onto the invoice record itself before unlinking them, preserving a record of what the invoice contained.",
+            "evidence": "billing/services/invoice_service.py:void_invoice"
+          }
+        ]
       }
     },
     {

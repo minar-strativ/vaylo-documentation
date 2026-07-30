@@ -21,3 +21,7 @@ Format: **Term** — definition in one or two sentences, primary-reader language
 **Booking Client** — The one passenger on a booking designated as the primary contact. Every booking must have exactly one.
 
 **Waitlist** — A booking held against a full tour/room, promoted to a confirmed booking once inventory frees up and re-availability is confirmed.
+
+**Billing Line** — A single charge (tour price, supplement, extra, fee) recorded against a booking, grouped onto an invoice.
+
+**Account Invoice** — The formal billing document grouping a booking's billing lines, progressing through Draft, Issued, and Void/Credited states.
