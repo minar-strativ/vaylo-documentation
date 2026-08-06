@@ -2,9 +2,9 @@
   "mode": "create",
   "run_started_at": "2026-07-29",
   "run_anchor_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
-  "current_feature": "supplements",
+  "current_feature": "products",
   "current_step": "analyze",
   "scope_this_run": [],
-  "notes": "Continuing full backlog. yacht-booking (split into overview/catalog-pricing/booking-reservation) documented (7 of 26 remaining). Next: supplements.",
-  "run_processed_count": 12
+  "notes": "Continuing full backlog. supplements documented (8 of 26 remaining). Next: products.",
+  "run_processed_count": 13
 }

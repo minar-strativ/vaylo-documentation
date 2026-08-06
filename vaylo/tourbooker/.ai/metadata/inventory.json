@@ -2736,21 +2736,241 @@
         "currency"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/supplements.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "what_it_does": [
+          "supplement/models/supplement.py"
+        ],
+        "how_it_works": [
+          "supplement/services/supplement_service.py:SupplementService.create",
+          "supplement/services/supplement_category_service.py:SupplementCategoryService.create",
+          "supplement/services/supplement_local_price_service.py:update_supplement_local_price",
+          "supplement/services/supplement_service.py:update_status"
+        ],
+        "rules_and_edge_cases": [
+          "supplement/models/supplement.py:Supplement.unit_type",
+          "supplement/services/supplement_local_price_service.py:add_to_local_price",
+          "supplement/services/supplement_service.py:check_this_supplement_used_in_any_active_booking/tour/custom_tour"
+        ],
+        "limitations": [
+          "supplement/views/supplement_views.py:SupplementAPIViewSet.http_method_names"
+        ],
+        "related_features": [
+          "supplement/services/supplement_service.py:check_this_supplement_used_in_any_active_booking/tour/custom_tour"
+        ],
+        "faq": [
+          "supplement/services/supplement_service.py:update_status",
+          "supplement/services/supplement_service.py:set_local_price_to_all"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "Staff create a supplement (an optional add-on) with a name, description, price, pricing unit, and category; if no tax class is chosen, the system defaults it to \"No VAT\".",
+            "evidence": "supplement/services/supplement_service.py:SupplementService.create"
+          },
+          {
+            "fact": "Creating or editing a supplement automatically creates or updates a translation of it in the tenant's default language, and generates a converted price for every active currency the tenant supports.",
+            "evidence": "supplement/services/supplement_service.py:SupplementService.create; supplement/services/supplement_local_price_service.py"
+          },
+          {
+            "fact": "Staff organize supplements into categories, which can themselves be nested under a parent category.",
+            "evidence": "supplement/services/supplement_category_service.py:SupplementCategoryService.create"
+          },
+          {
+            "fact": "Staff can override a supplement's automatically-converted price for one specific currency without touching its base price.",
+            "evidence": "supplement/services/supplement_local_price_service.py:update_supplement_local_price"
+          },
+          {
+            "fact": "Staff add further translations of a supplement or category one language at a time; requesting a translation that doesn't exist yet returns an empty result rather than an error.",
+            "evidence": "supplement/views/supplement_multi_language.py:SupplementMultiLanguageAPIView"
+          },
+          {
+            "fact": "Staff can upload, replace, or delete a promotional image on a supplement.",
+            "evidence": "supplement/views/supplement_views.py:SupplementImageUpdateAPIView/SupplementImageDeleteAPIView"
+          },
+          {
+            "fact": "Staff deactivate a supplement rather than deleting it outright \u2014 there's no delete action available for supplements or categories, only status toggling.",
+            "evidence": "supplement/views/supplement_views.py:SupplementAPIViewSet.http_method_names"
+          },
+          {
+            "fact": "When a new currency is turned on for the tenant, every active supplement automatically gets a price generated in that currency.",
+            "evidence": "supplement/services/supplement_service.py:SupplementService.set_local_price_to_all"
+          },
+          {
+            "fact": "A separate central-administration process (not a regular staff login) can manage the supplement catalog across all tenants.",
+            "evidence": "supplement/views/admin_views.py"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A supplement category's name must be unique \u2014 a duplicate is rejected outright rather than merged or overwritten.",
+            "evidence": "supplement/services/supplement_category_service.py:SupplementCategoryService.create"
+          },
+          {
+            "fact": "A supplement can only be priced in one of eight ways: once per booking, per day, per week, or per night, each either as a flat charge or multiplied by the number of passengers.",
+            "evidence": "supplement/models/supplement.py:Supplement.unit_type"
+          },
+          {
+            "fact": "The default pricing basis for a new supplement is once per person per booking.",
+            "evidence": "supplement/models/supplement.py:Supplement.unit_type"
+          },
+          {
+            "fact": "A supplement can be marked as not contributing to the total price even though it's still listed \u2014 useful for informational or already-included items.",
+            "evidence": "supplement/services/supplement_service.py:get_supplements_with_price"
+          },
+          {
+            "fact": "If no tax class is set on a supplement, it defaults to \"No VAT\".",
+            "evidence": "supplement/services/supplement_service.py:SupplementService.create"
+          },
+          {
+            "fact": "Only tags belonging to the supplement category can be attached to a supplement.",
+            "evidence": "supplement/services/supplement_service.py:SupplementService.create"
+          },
+          {
+            "fact": "A converted price in a foreign currency is rounded to the nearest 5 units; a price shown in the tenant's own base currency is just rounded normally.",
+            "evidence": "supplement/services/supplement_local_price_service.py:add_to_local_price"
+          },
+          {
+            "fact": "A supplement can't be deactivated while it's attached to any currently active booking, active tour, or active custom tour offer.",
+            "evidence": "supplement/services/supplement_service.py:check_this_supplement_used_in_any_active_booking/tour/custom_tour"
+          },
+          {
+            "fact": "Supplements can be grouped so customers pick just one option from a set (like a meal choice) or several, and a group can be marked as requiring a selection.",
+            "evidence": "supplement/models/supplement_group.py:SupplementGroup"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Creating a supplement category with a name that already exists returns \"{Category} with this name already exists.\"",
+            "evidence": "supplement/services/supplement_category_service.py:SupplementCategoryService.create"
+          },
+          {
+            "fact": "Requesting a translation without specifying which language returns \"Language code is required\".",
+            "evidence": "supplement/views/supplement_multi_language.py:SupplementMultiLanguageAPIView.get"
+          },
+          {
+            "fact": "Adding a translation in an inactive language returns \"Language is not valid.\"",
+            "evidence": "supplement/serializers/supplement_multi_language_serializer.py:validate_language"
+          },
+          {
+            "fact": "Requesting or setting a price in a currency that isn't recognized returns \"currency not found\".",
+            "evidence": "supplement/serializers/supplement_multi_currency_serializer.py:SupplementUpdateSerializer.validate"
+          },
+          {
+            "fact": "Trying to deactivate a supplement still in use by an active booking, tour, or custom tour offer returns \"This supplement is used in active tour, booking or custom tour.\"",
+            "evidence": "supplement/services/supplement_service.py:update_status"
+          },
+          {
+            "fact": "Uploaded images are checked for file size and image type; invalid ones are rejected.",
+            "evidence": "supplement/models/supplement.py:Supplement.image"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Creating, editing, categorizing, pricing, and translating supplements all require staff to be logged in and hold the corresponding permission.",
+            "evidence": "supplement/views/supplement_views.py:SupplementAPIViewSet; supplement/views/supplement_category_views.py"
+          },
+          {
+            "fact": "Uploading or deleting a supplement image only requires being logged in.",
+            "evidence": "supplement/views/supplement_views.py:SupplementImageUpdateAPIView/SupplementImageDeleteAPIView"
+          },
+          {
+            "fact": "Managing the supplement catalog from the platform's central administration console uses a separate system-level authorization, not a normal staff login.",
+            "evidence": "supplement/views/admin_views.py"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "Name / Description \u2014 the display name and detail text for the add-on.",
+            "evidence": "supplement/models/supplement.py"
+          },
+          {
+            "fact": "Price \u2014 the supplement's base price in the tenant's own currency, from which all other currency prices are derived.",
+            "evidence": "supplement/models/supplement.py"
+          },
+          {
+            "fact": "Pricing Unit \u2014 how the supplement is charged: once per booking, per day, per week, or per night, each either flat or multiplied by passenger count.",
+            "evidence": "supplement/models/supplement.py:Supplement.unit_type"
+          },
+          {
+            "fact": "Mandatory \u2014 whether the supplement must always be included wherever it's offered, with no option to remove it.",
+            "evidence": "supplement/models/supplement.py"
+          },
+          {
+            "fact": "Contributes to Total \u2014 whether the supplement's price is counted in the overall total, even when it's still shown to the customer.",
+            "evidence": "supplement/models/supplement.py"
+          },
+          {
+            "fact": "Complimentary \u2014 marks the supplement as free of charge.",
+            "evidence": "supplement/models/supplement.py"
+          },
+          {
+            "fact": "Sales Cut-Off \u2014 an optional rule limiting how close to departure the supplement can still be sold.",
+            "evidence": "supplement/models/supplement.py"
+          },
+          {
+            "fact": "Category \u2014 the catalog grouping this supplement belongs to, which can itself sit under a parent category.",
+            "evidence": "supplement/models/supplement_category.py"
+          },
+          {
+            "fact": "Supplier \u2014 the external supplier who provides or fulfills this add-on, if any.",
+            "evidence": "supplement/models/supplement.py"
+          },
+          {
+            "fact": "Tax Class \u2014 the tax rule applied to this supplement's price; defaults to \"No VAT\" if not set.",
+            "evidence": "supplement/models/supplement.py"
+          },
+          {
+            "fact": "Supplement Group (Single/Multiple Choice, Required) \u2014 a cluster of related supplements presented together, either as a single choice or multiple choices, optionally required.",
+            "evidence": "supplement/models/supplement_group.py"
+          },
+          {
+            "fact": "Translation (Name, Description) \u2014 the supplement's or category's content shown to customers in a specific language.",
+            "evidence": "supplement/models/supplement_multi_language.py; supplement/models/supplement_category_multi_language.py"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "To add a new add-on: staff enter its name, price, pricing unit, and category; the system fills in a default-language translation and prices in every supported currency automatically, without extra steps.",
+            "evidence": "supplement/services/supplement_service.py:SupplementService.create"
+          },
+          {
+            "fact": "To organize the catalog: staff set up categories (optionally nested) before assigning supplements to them; a duplicate category name is rejected immediately.",
+            "evidence": "supplement/services/supplement_category_service.py:SupplementCategoryService.create"
+          },
+          {
+            "fact": "To adjust pricing for a specific market: staff override the auto-converted price for one currency directly, without changing the supplement's base price.",
+            "evidence": "supplement/services/supplement_local_price_service.py:update_supplement_local_price"
+          },
+          {
+            "fact": "To make a supplement available in more languages: staff add one translation per language; a language that isn't active can't be used for a translation.",
+            "evidence": "supplement/serializers/supplement_multi_language_serializer.py:validate_language"
+          },
+          {
+            "fact": "To retire a supplement: staff deactivate it, which is blocked while it's still attached to any active booking, tour, or custom tour offer \u2014 those need to be resolved first.",
+            "evidence": "supplement/services/supplement_service.py:update_status"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "A supplement's catalog entry is shared across features \u2014 it's referenced from Tours, Bookings, and Custom Tour Offers, which is exactly why deactivating an in-use supplement is blocked.",
+            "evidence": "supplement/services/supplement_service.py:check_this_supplement_used_in_any_active_booking/tour/custom_tour"
+          },
+          {
+            "fact": "Turning on a new currency for the tenant automatically prices every active supplement in that currency.",
+            "evidence": "supplement/services/supplement_service.py:set_local_price_to_all"
+          },
+          {
+            "fact": "A supplement's price calculation (for a given trip's dates and passenger count) is shared logic other features draw on when attaching a supplement to a booking.",
+            "evidence": "supplement/services/supplement_service.py:get_supplements_with_price"
+          }
+        ]
       }
     },
     {
