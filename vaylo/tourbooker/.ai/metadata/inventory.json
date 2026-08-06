@@ -2985,21 +2985,212 @@
         "multi-language"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/products.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "what_it_does": [
+          "product/models/product.py"
+        ],
+        "how_it_works": [
+          "product/services/product_service.py:ProductService.create",
+          "product/services/product_category_service.py:ProductCategoryService.create",
+          "product/serializers/product_serializers.py:ProductImageUploadSerializer",
+          "product/services/product_service.py:ProductService.update"
+        ],
+        "rules_and_edge_cases": [
+          "product/serializers/product_serializers.py:ProductMultilanguageSerializer.validate",
+          "product/models/product.py:ProductFile.file"
+        ],
+        "limitations": [
+          "product/models/product.py"
+        ],
+        "related_features": [
+          "product/models/product.py"
+        ],
+        "faq": [
+          "product/models/product.py",
+          "product/services/product_multilanguage_service.py:create_with_default_language"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "Staff create a product with its name, supplier(s), location/address, and contact details.",
+            "evidence": "product/services/product_service.py:ProductService.create"
+          },
+          {
+            "fact": "Creating a product automatically creates a matching translation in the tenant's default language.",
+            "evidence": "product/services/product_multilanguage_service.py:create_with_default_language"
+          },
+          {
+            "fact": "Staff organize a product into categories, each scoped to that one product rather than shared across the whole catalog.",
+            "evidence": "product/services/product_category_service.py:ProductCategoryService.create"
+          },
+          {
+            "fact": "Staff upload a gallery of images to a product, optionally marking one as the primary image, and add alt text for accessibility.",
+            "evidence": "product/serializers/product_serializers.py:ProductImageUploadSerializer"
+          },
+          {
+            "fact": "Staff upload a single representative image to a category.",
+            "evidence": "product/views/product_category_views.py:ProductCategoryImageUploadAPIView"
+          },
+          {
+            "fact": "Staff attach documents (contracts, spec sheets, etc.) to a product, giving each one a display name.",
+            "evidence": "product/serializers/product_serializers.py:ProductFileUploadSerializer"
+          },
+          {
+            "fact": "Staff add free-text internal notes to a product, shown newest first, each attributed to the staff member who wrote it.",
+            "evidence": "product/views/product_note_views.py:ProductNoteListCreateAPIView.get"
+          },
+          {
+            "fact": "Staff add translations of a product or category one language at a time.",
+            "evidence": "product/serializers/product_serializers.py:ProductMultilanguageSerializer"
+          },
+          {
+            "fact": "Editing a product's name while working in a specific language updates that language's translation, not the original default-language name.",
+            "evidence": "product/services/product_service.py:ProductService.update"
+          },
+          {
+            "fact": "Staff deactivate a product or category as a separate action from editing its content.",
+            "evidence": "product/serializers/product_serializers.py:ProductUpdateStatusSerializer"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A product or category can only have one translation per language \u2014 a duplicate is rejected.",
+            "evidence": "product/serializers/product_serializers.py:ProductMultilanguageSerializer.validate"
+          },
+          {
+            "fact": "Every new product and category automatically gets a translation created in the tenant's default language, with no separate step required.",
+            "evidence": "product/services/product_multilanguage_service.py:create_with_default_language"
+          },
+          {
+            "fact": "A translation can only be added in a language that's currently active.",
+            "evidence": "product/serializers/product_serializers.py:ProductMultilanguageSerializer.validate_language"
+          },
+          {
+            "fact": "Attached files must be under 10 MB and one of a limited set of file types (images, PDF, plain text, Word documents).",
+            "evidence": "product/models/product.py:ProductFile.file"
+          },
+          {
+            "fact": "A product's active/inactive status can only be changed through its dedicated status action, not through the general edit form.",
+            "evidence": "product/serializers/product_serializers.py:ProductSerializer"
+          },
+          {
+            "fact": "Searching the product or category list matches either the base name or its translated name in whichever language is being viewed.",
+            "evidence": "product/filters.py:ProductFilter.filter_by_name"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Changing a product's or category's status without specifying active/inactive returns \"'is_active' field is required.\"",
+            "evidence": "product/serializers/product_serializers.py:ProductUpdateStatusSerializer.validate"
+          },
+          {
+            "fact": "Adding a translation in an inactive language returns \"Language is not active.\"",
+            "evidence": "product/serializers/product_serializers.py:ProductMultilanguageSerializer.validate_language"
+          },
+          {
+            "fact": "Adding a second translation for a language that already has one returns \"A multilanguage entry for this product and language already exists.\" (or the equivalent for a category).",
+            "evidence": "product/serializers/product_serializers.py:ProductMultilanguageSerializer.validate"
+          },
+          {
+            "fact": "Requesting a product's translation without specifying which language returns \"language_code query parameter or Accept-Language header is required.\"",
+            "evidence": "product/views/product_multilanguage_views.py:ProductMultilanguageRetrieveCreateAPIView.get"
+          },
+          {
+            "fact": "Uploading a file of an unsupported type is rejected, naming which file types are actually allowed.",
+            "evidence": "product/models/product.py:ProductFile.file"
+          },
+          {
+            "fact": "Uploading a file over 10 MB is rejected.",
+            "evidence": "product/models/product.py:ProductFile.file"
+          },
+          {
+            "fact": "Attaching a file without giving it a name is rejected \u2014 a name is required alongside the file.",
+            "evidence": "product/serializers/product_serializers.py:ProductFileUploadSerializer"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Creating, editing, categorizing, uploading images/files, adding notes, and translating products all require staff to be logged in and hold the corresponding permission.",
+            "evidence": "product/views/product_views.py:ProductListCreateAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "Name / Description / Remarks \u2014 the product's display name, customer-facing description, and internal notes text (Remarks is separate from the internal Notes list).",
+            "evidence": "product/models/product.py"
+          },
+          {
+            "fact": "Supplier Type / Supplier \u2014 the kind of vendor this product comes from, and the actual vendor(s) fulfilling it; a product can be linked to more than one supplier.",
+            "evidence": "product/models/product.py"
+          },
+          {
+            "fact": "Contact Person Name / Email \u2014 the point of contact at the supplier or location for this product.",
+            "evidence": "product/models/product.py"
+          },
+          {
+            "fact": "Location, Territory, Address \u2014 where the product is physically located or delivered from.",
+            "evidence": "product/models/product.py"
+          },
+          {
+            "fact": "Map URL \u2014 a link to an external map pinpointing the product's location.",
+            "evidence": "product/models/product.py"
+          },
+          {
+            "fact": "Image / Primary Image \u2014 a picture in the product's gallery, with one optionally marked as the main image.",
+            "evidence": "product/models/product.py:ProductImage"
+          },
+          {
+            "fact": "File / File Name \u2014 a downloadable document attached to the product, such as a contract or spec sheet.",
+            "evidence": "product/models/product.py:ProductFile"
+          },
+          {
+            "fact": "Note \u2014 a free-text internal comment about the product, visible only to staff.",
+            "evidence": "product/models/product.py:ProductNote"
+          },
+          {
+            "fact": "Category \u2014 a grouping under one specific product, used to organize what's sellable under it; each category belongs to exactly one product.",
+            "evidence": "product/models/product_category.py"
+          },
+          {
+            "fact": "Active/Inactive \u2014 whether the product or category is currently published, toggled only through its dedicated status action.",
+            "evidence": "product/models/product.py"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "To list a new product: staff enter its name, supplier(s), location, and contact details; a translation in the tenant's default language is created automatically.",
+            "evidence": "product/services/product_service.py:ProductService.create"
+          },
+          {
+            "fact": "To organize it: staff add categories scoped to that product, each with its own name, description, and image.",
+            "evidence": "product/services/product_category_service.py:ProductCategoryService.create"
+          },
+          {
+            "fact": "To flesh it out: staff upload a gallery of images (with one as the main image), attach relevant documents, and leave internal notes for other staff.",
+            "evidence": "product/serializers/product_serializers.py:ProductImageUploadSerializer"
+          },
+          {
+            "fact": "To support more markets: staff add a translation per additional language needed.",
+            "evidence": "product/serializers/product_serializers.py:ProductMultilanguageSerializer"
+          },
+          {
+            "fact": "To take it offline: staff deactivate it as a distinct action from editing its content.",
+            "evidence": "product/serializers/product_serializers.py:ProductUpdateStatusSerializer"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "A product exists purely as a standalone catalog/directory entry \u2014 it does not attach to bookings, tours, hotels, yacht charters, or custom tour offers, and has no pricing or tax configuration of its own.",
+            "evidence": "product/models/product.py"
+          }
+        ]
       }
     },
     {

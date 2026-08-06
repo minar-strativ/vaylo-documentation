@@ -22,3 +22,4 @@ Append-only. One line per event:
 2026-08-06 | yacht-booking/catalog-and-pricing | created | 6 of 26 remaining features | 20675c05c
 2026-08-06 | yacht-booking/booking-and-reservation | created | 7 of 26 remaining features | 20675c05c
 2026-08-06 | supplements | created | 8 of 26 remaining features | 20675c05c
+2026-08-06 | products | created | 9 of 26 remaining features | 20675c05c
