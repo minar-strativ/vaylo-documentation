@@ -1389,21 +1389,301 @@
         "multi-language"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/tour-types.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "what_it_does": [
+          "tour_type/models/tour_type_model.py"
+        ],
+        "how_it_works": [
+          "tour_type/services/tour_type_services.py:TourTypeService.create/update",
+          "tour_type/services/tour_type_image_service.py:create_tour_type_image/delete_tour_type_image/update_main_image_status",
+          "tour_type/services/tour_type_multi_language_service.py:create_or_update_tour_type_multilanguage_with_default_language",
+          "tour_type/services/tour_type_vehicle_services.py:create_or_update_tour_type_vehicle"
+        ],
+        "rules_and_edge_cases": [
+          "tour_type/services/tour_type_services.py:prepare_data",
+          "tour_type/serializers/tour_type_serializer.py:TourTypeSerializer.validate_pickup_locations",
+          "tour_type/services/tour_type_pickup_location_service.py"
+        ],
+        "limitations": [
+          "tour_type/services/tour_type_services.py:update_status"
+        ],
+        "related_features": [
+          "tour_type/services/tour_type_services.py:check_if_tour_type_is_used_in_any_active_tour"
+        ],
+        "faq": [
+          "tour_type/services/tour_type_services.py:TourTypeService.create",
+          "tour_type/services/tour_type_pickup_location_service.py:update_tour_type_pickup_locations"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "Staff create a Tour Type template with core commercial details (name, price, duration, capacity, currency, territory/location, fee structure), plus optional pickup locations, vehicle assignments, and images, all in one submission.",
+            "evidence": "tour_type/views/tour_type_view.py:TourTypeAPIViewSet.create"
+          },
+          {
+            "fact": "Creating a tour type automatically adds a default pickup location, and also a 'request pickup' option if the tenant allows pickup requests.",
+            "evidence": "tour_type/services/tour_type_services.py:TourTypeService.create"
+          },
+          {
+            "fact": "Creating or editing a tour type automatically creates or updates a matching translation record in the tenant's default language, mirroring the name, description, and tour information just entered.",
+            "evidence": "tour_type/services/tour_type_multi_language_service.py:create_or_update_tour_type_multilanguage_with_default_language"
+          },
+          {
+            "fact": "Staff can upload images to a tour type after it's created; the very first image uploaded automatically becomes the main/cover image.",
+            "evidence": "tour_type/services/tour_type_image_service.py:create_tour_type_image"
+          },
+          {
+            "fact": "Staff can delete an image; if it was the main image, another remaining image is automatically promoted to take its place.",
+            "evidence": "tour_type/services/tour_type_image_service.py:delete_tour_type_image"
+          },
+          {
+            "fact": "Staff can explicitly set which image is the main/cover image for a tour type.",
+            "evidence": "tour_type/services/tour_type_image_service.py:update_main_image_status"
+          },
+          {
+            "fact": "Staff can add translations of a tour type one language at a time; requesting a translation for a language that hasn't been added yet returns an empty result rather than an error.",
+            "evidence": "tour_type/views/tour_type_multi_language.py"
+          },
+          {
+            "fact": "Staff can assign specific vehicles to a tour type with their own per-vehicle seat capacity, separate from a simpler general vehicle list; any vehicle previously assigned but left out of a later update is removed.",
+            "evidence": "tour_type/services/tour_type_vehicle_services.py:create_or_update_tour_type_vehicle"
+          },
+          {
+            "fact": "Staff can retire a specific vehicle assignment on a tour type without deleting it outright.",
+            "evidence": "tour_type/views/tour_type_vehicle_views.py"
+          },
+          {
+            "fact": "Editing an existing tour type recalculates its fees and re-validates pickup-location capacity, and removes any pickup location or vehicle assignment no longer included in the update.",
+            "evidence": "tour_type/services/tour_type_services.py:update"
+          },
+          {
+            "fact": "A tour type can't be deactivated while any active Tour is still built from it.",
+            "evidence": "tour_type/services/tour_type_services.py:update_status"
+          },
+          {
+            "fact": "A separate central-administration process (not a regular staff login) can also manage tour types system-wide, for platform-level configuration.",
+            "evidence": "tour_type/views/admin_tour_type_view.py:AdminTourTypeAPIViewSet"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "The standard price must be greater than or equal to the transfer (transport) price.",
+            "evidence": "tour_type/services/tour_type_services.py:TourTypeService.create"
+          },
+          {
+            "fact": "Fees can be calculated as a percentage of the standard price, a fixed flat amount, or a fixed amount per passenger; percentage is the default, and the default booking fee is 40% of the standard price.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "When fees are percentage-based, the booking fee, second payment, cancellation fee, and travel insurance fee are each calculated from the standard price and rounded to a whole number; when a flat fee type is used instead, those amounts are taken directly as entered.",
+            "evidence": "tour_type/services/tour_type_services.py:prepare_data"
+          },
+          {
+            "fact": "If no VAT class is specified, tour types default to \"No VAT\".",
+            "evidence": "tour_type/services/tour_type_services.py:TourTypeService.create"
+          },
+          {
+            "fact": "The total seats assigned across all of a tour type's pickup locations can't exceed the tour type's overall capacity \u2014 for example, a tour type with a capacity of 20 can't have pickup locations adding up to 25 seats.",
+            "evidence": "tour_type/serializers/tour_type_serializer.py:TourTypeSerializer.validate_pickup_locations"
+          },
+          {
+            "fact": "Each pickup location on a tour type starts out with all of its seats available; saving the tour type's pickup-location configuration again resets availability back to the full seat count for every pickup location.",
+            "evidence": "tour_type/services/tour_type_pickup_location_service.py"
+          },
+          {
+            "fact": "A vehicle can only be assigned once to a given tour type, and a translation can only be added once per language per tour type.",
+            "evidence": "tour_type/models/tour_type_vehicle.py; tour_type/models/tour_type_multi_language.py"
+          },
+          {
+            "fact": "Leaving a vehicle assignment's seat capacity at 0 means it inherits the vehicle's own default capacity rather than literally offering zero seats.",
+            "evidence": "tour_type/services/tour_type_vehicle_services.py:create_or_update_tour_type_vehicle"
+          },
+          {
+            "fact": "Supplements, vehicles, and accommodations assigned to a tour type must all be active \u2014 inactive ones are rejected.",
+            "evidence": "tour_type/serializers/tour_type_serializer.py:TourTypeSerializer.validate_supplements/validate_vehicles/validate_accommodations"
+          },
+          {
+            "fact": "Only one image per tour type can be the main/cover image at any time.",
+            "evidence": "tour_type/services/tour_type_image_service.py:update_main_image_status"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Creating a tour type without its core details returns \"No meta_data provided.\"",
+            "evidence": "tour_type/views/tour_type_view.py:TourTypeAPIViewSet.create"
+          },
+          {
+            "fact": "A standard price lower than the transfer price returns \"Standard price must be greater than or equal to transport cost.\"",
+            "evidence": "tour_type/services/tour_type_services.py:TourTypeService.create"
+          },
+          {
+            "fact": "Assigning an inactive supplement, vehicle, or accommodation returns \"Supplement must be active!\", \"Vehicle must be active!\", or \"Accommodation must be active!\" respectively.",
+            "evidence": "tour_type/serializers/tour_type_serializer.py:TourTypeSerializer.validate_supplements/validate_vehicles/validate_accommodations"
+          },
+          {
+            "fact": "An inactive pickup location, a negative pickup-location price, or a negative pickup-location seat count are each rejected with a specific message naming the problem.",
+            "evidence": "tour_type/serializers/tour_type_serializer.py:TourTypePickupLocationsCreateSerializer"
+          },
+          {
+            "fact": "Pickup-location seats adding up to more than the tour type's capacity returns \"Pickup Location total seats assigned ({total}) exceeds capacity ({capacity}).\"",
+            "evidence": "tour_type/serializers/tour_type_serializer.py:TourTypeSerializer.validate_pickup_locations"
+          },
+          {
+            "fact": "Adding a translation in an inactive language returns \"Language is not valid.\"",
+            "evidence": "tour_type/serializers/tour_type_multi_language_serializer.py:validate_language"
+          },
+          {
+            "fact": "Requesting a translation without specifying which language returns \"Language code is required\".",
+            "evidence": "tour_type/views/tour_type_multi_language.py"
+          },
+          {
+            "fact": "Uploading an image to a deactivated tour type returns \"Invalid Tour-type\".",
+            "evidence": "tour_type/views/tour_type_image_views.py:TourTypeImageListCreateAPIView.post"
+          },
+          {
+            "fact": "Trying to delete an image through the wrong tour type's page returns \"This image is from another tour-type.\"",
+            "evidence": "tour_type/views/tour_type_image_views.py:TourTypeImageRetrieveDeleteAPIView.delete"
+          },
+          {
+            "fact": "Trying to deactivate a tour type still used by an active Tour returns \"This template is used in active tour.\"",
+            "evidence": "tour_type/services/tour_type_services.py:update_status"
+          },
+          {
+            "fact": "Uploaded images are checked for file size and image type; an oversized or invalid image file is rejected.",
+            "evidence": "tour_type/models/tour_type_model.py:TourTypeImage"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Creating, viewing, and editing tour types, their translations, and their vehicle assignments all require the staff member to be logged in and hold the corresponding permission; tour types can't be deleted outright, only deactivated.",
+            "evidence": "tour_type/views/tour_type_view.py:TourTypeAPIViewSet; tour_type/views/tour_type_multi_language.py; tour_type/views/tour_type_vehicle_views.py"
+          },
+          {
+            "fact": "A public, unauthenticated listing exists that shows only active tour types with minimal public-facing details, for use on customer-facing pages.",
+            "evidence": "tour_type/views/tour_type_view.py:PublicTourTypeAPIView"
+          },
+          {
+            "fact": "Managing tour types from the platform's central administration console uses a separate system-level authorization, not a normal staff login.",
+            "evidence": "tour_type/views/admin_tour_type_view.py:AdminTourTypeAPIViewSet"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "Name / Description / Tour Information \u2014 the tour template's default-language display name, description, and operational information shown to staff and customers.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "Duration \u2014 the length of the tour.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "Capacity \u2014 the maximum total number of passengers this tour template supports, used to cap how many pickup-location seats can be assigned.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "Standard Price / Transfer Price \u2014 the base price for the tour, and the portion of that price allocated to transport; the standard price can never be lower than the transfer price.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "Fee Type \u2014 whether booking, second-payment, cancellation, and travel-insurance fees are calculated as a percentage of the price or as flat amounts.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "Booking Fee, Second Payment, Cancellation Fee, Travel Insurance Fee \u2014 the calculated deposit, balance payment, cancellation charge, and insurance charge for tours built from this template.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "Territory / Country / Location \u2014 where the tour operates geographically.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "Supplements \u2014 optional paid add-ons customers can book alongside a tour of this type.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "Accommodations \u2014 hotel/lodging options linked to this tour type.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "VAT Class \u2014 the tax classification applied to this tour type's pricing; defaults to \"No VAT\" if not set.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "Allowed Hosts \u2014 which whitelabel sites/domains are permitted to show and sell this tour type.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "Tour Description URL \u2014 an external web page with more marketing detail about the tour.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "Pickup Location, Price, Seats, Remaining Seats \u2014 a specific pickup point available for the tour, any extra price for choosing it, how many seats are allocated there, and how many are still available.",
+            "evidence": "tour_type/models/tour_type_pickup_locations.py"
+          },
+          {
+            "fact": "Vehicle Assignment (Capacity, Active) \u2014 a specific vehicle usable for this tour type, how many seats it provides, and whether the assignment is currently in use.",
+            "evidence": "tour_type/models/tour_type_vehicle.py"
+          },
+          {
+            "fact": "Translation (Name, Description, Tour Information) \u2014 the tour type's content shown to customers in a specific language.",
+            "evidence": "tour_type/models/tour_type_multi_language.py"
+          },
+          {
+            "fact": "Cost Center / Accounting Project \u2014 which internal accounting bucket this tour type's costs and revenue are attributed to.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "To set up a new tour type: staff enter its commercial details (price, capacity, fees, territory) in one go, optionally listing pickup locations, vehicles, and images at the same time; the system fills in a default pickup location automatically and creates a default-language translation entry ready to be translated further.",
+            "evidence": "tour_type/services/tour_type_services.py:TourTypeService.create"
+          },
+          {
+            "fact": "To build out a tour type's presentation: staff add images afterward \u2014 the first one becomes the cover image automatically \u2014 and can change the cover image or delete images at any time.",
+            "evidence": "tour_type/services/tour_type_image_service.py:create_tour_type_image"
+          },
+          {
+            "fact": "To make a tour type available in more languages: staff add one translation per language; if a language hasn't been translated yet, viewing it simply comes back empty rather than erroring.",
+            "evidence": "tour_type/views/tour_type_multi_language.py"
+          },
+          {
+            "fact": "To adjust which vehicles serve a tour type: staff assign vehicles with their own seat capacity, and can deactivate a specific vehicle's assignment without removing its configuration entirely.",
+            "evidence": "tour_type/services/tour_type_vehicle_services.py:create_or_update_tour_type_vehicle"
+          },
+          {
+            "fact": "To retire a tour type: staff deactivate it, which is blocked while any active Tour is still built from that template \u2014 the template first needs its dependent tours addressed.",
+            "evidence": "tour_type/services/tour_type_services.py:update_status"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "A tour type's pricing and fee configuration is recalculated every time it's saved, which is the source new Tours built from that template draw their defaults from.",
+            "evidence": "tour_type/services/tour_type_services.py:prepare_data"
+          },
+          {
+            "fact": "Resaving a tour type's pickup-location list removes any pickup location no longer included, and resets remaining seats to full for the ones that stay \u2014 so previously consumed seat counts are not preserved across an update.",
+            "evidence": "tour_type/services/tour_type_pickup_location_service.py:update_tour_type_pickup_locations"
+          },
+          {
+            "fact": "A tour type ties into accounting through its cost center and accounting project fields, connecting it to the platform's financial reporting.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "A tour type can be linked to a custom-fields configuration that determines what information is collected during booking and for each passenger.",
+            "evidence": "tour_type/models/tour_type_model.py"
+          },
+          {
+            "fact": "Deactivating a tour type is blocked while it's still used by an active Tour, protecting live bookings from losing their underlying template.",
+            "evidence": "tour_type/services/tour_type_services.py:update_status"
+          }
+        ]
       }
     },
     {

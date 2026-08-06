@@ -2,9 +2,9 @@
   "mode": "create",
   "run_started_at": "2026-07-29",
   "run_anchor_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
-  "current_feature": "tour-types",
+  "current_feature": "custom-tour-offers",
   "current_step": "analyze",
   "scope_this_run": [],
-  "notes": "Resumed full backlog. passengers + flights-tickets (split into overview/pnr-tickets/booking-assignment) documented (3 of 26 remaining). Next: tour-types.",
-  "run_processed_count": 8
+  "notes": "Continuing full backlog without pausing per user instruction. tour-types documented (4 of 26 remaining). Next: custom-tour-offers.",
+  "run_processed_count": 9
 }
