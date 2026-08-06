@@ -1698,21 +1698,311 @@
       ],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/custom-tour-offers.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "what_it_does": [
+          "custom_tour_offer/models/custom_tour_offer_models.py"
+        ],
+        "how_it_works": [
+          "custom_tour_offer/services/wetu_itinerary_service.py:create_custom_tour_offer_from_wetu_itinerary",
+          "custom_tour_offer/services/custom_tour_offer_service.py:create/update",
+          "custom_tour_offer/services/custom_tour_offer_cost_preview_service.py:get_cost_previews_rows",
+          "custom_tour_offer/services/custom_tour_offer_service.py:send_custom_tour_offer_to_requested_user",
+          "custom_tour_offer/services/custom_tour_offer_service.py:create_tour_from_custom_tour_offer/create_booking_from_custom_tour_offer",
+          "custom_tour_offer/services/custom_tour_offer_service.py:duplicate_custom_tour_offer"
+        ],
+        "rules_and_edge_cases": [
+          "custom_tour_offer/services/custom_tour_offer_service.py:create",
+          "custom_tour_offer/serializers/custom_tour_offer_serializers.py:validate_pickup_locations",
+          "custom_tour_offer/services/wetu_itinerary_service.py:create_custom_tour_offer_from_wetu_itinerary"
+        ],
+        "limitations": [
+          "custom_tour_offer/services/custom_tour_offer_service.py:duplicate_custom_tour_offer"
+        ],
+        "related_features": [
+          "custom_tour_offer/services/custom_tour_offer_service.py:create_tour_from_custom_tour_offer"
+        ],
+        "faq": [
+          "custom_tour_offer/services/custom_tour_offer_service.py:create_tour_from_custom_tour_offer",
+          "custom_tour_offer/services/custom_tour_offer_note_service.py:update"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "Staff can import a client's itinerary from Wetu (a third-party itinerary tool), either fetching the full list of booked itineraries at once or refreshing a single one by its identifier.",
+            "evidence": "custom_tour_offer/views/wetu_itinerary_views.py:WetuItineraryListAPIView.get/WetuItineraryAPIView.post"
+          },
+          {
+            "fact": "Staff convert a Wetu itinerary into a Custom Tour Offer in one action, adding the pricing/territory/VAT context Wetu itself doesn't carry; a Wetu itinerary can only be converted once.",
+            "evidence": "custom_tour_offer/services/wetu_itinerary_service.py:create_custom_tour_offer_from_wetu_itinerary"
+          },
+          {
+            "fact": "Staff can also create a custom offer from scratch without importing anything from Wetu.",
+            "evidence": "custom_tour_offer/views/custom_tour_offer_views.py:CustomTourOfferListCreateAPIView.post"
+          },
+          {
+            "fact": "Creating an offer automatically links or creates a customer account for the prospective client using their name and email.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:get_or_create_user"
+          },
+          {
+            "fact": "Creating an offer automatically adds a default pickup location, and a 'request pickup' option too if the tenant allows pickup requests.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create"
+          },
+          {
+            "fact": "Staff can preview the full cost breakdown of an offer at any time \u2014 either using an offer that's already saved, or with raw pricing/capacity/supplement figures before anything is saved at all.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_cost_preview_service.py:get_cost_previews_rows"
+          },
+          {
+            "fact": "Staff can add internal notes to an offer to track context on the deal; each edit to a note keeps a history of what it said before.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_note_service.py:update"
+          },
+          {
+            "fact": "Staff send the offer to the customer as a branded PDF by email, or just download the PDF without emailing it; sending can also happen automatically as part of saving the offer.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:send_custom_tour_offer_to_requested_user"
+          },
+          {
+            "fact": "Once the customer accepts, staff convert the offer into a real Tour and Booking in one action; this can only be done once per offer.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create_tour_from_custom_tour_offer/create_booking_from_custom_tour_offer"
+          },
+          {
+            "fact": "Staff can duplicate an existing offer to use as a starting point for a similar deal; the copy always starts as an inactive draft.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:duplicate_custom_tour_offer"
+          },
+          {
+            "fact": "Customers view their own custom tour offers through the customer portal, scoped only to offers made out to them.",
+            "evidence": "custom_tour_offer/views/passenger_portal_custom_tour_offer_view.py"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "An offer's standard price must be greater than or equal to its transfer price.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create"
+          },
+          {
+            "fact": "The total seats assigned across an offer's pickup locations can't exceed its overall capacity.",
+            "evidence": "custom_tour_offer/serializers/custom_tour_offer_serializers.py:CustomTourOfferSerializer.validate_pickup_locations"
+          },
+          {
+            "fact": "The number of passengers taking the paid transfer/pickup can't exceed the offer's total capacity.",
+            "evidence": "custom_tour_offer/serializers/custom_tour_offer_cost_preview_serializer.py:validate_number_of_passenger_took_transfer"
+          },
+          {
+            "fact": "The default booking fee is 40% of the standard price unless changed.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
+          },
+          {
+            "fact": "If no VAT class is set, an offer defaults to \"No VAT\".",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create"
+          },
+          {
+            "fact": "An offer can only be converted into a Tour and Booking once; converting it deactivates the offer so it can't be converted again.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create_tour_from_custom_tour_offer"
+          },
+          {
+            "fact": "Only an active offer can be converted into a booking \u2014 a deactivated, expired, or already-converted offer can't be.",
+            "evidence": "custom_tour_offer/views/custom_tour_offer_views.py:BookingCreateFromCustomTourOfferAPIView.post"
+          },
+          {
+            "fact": "A discount on the offer is only applied at conversion if the offer is marked as discounted, and can be a flat amount or a percentage of the total price; the applied amount is never less than zero.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create_booking_from_custom_tour_offer"
+          },
+          {
+            "fact": "A Wetu itinerary can only be converted into a custom offer if it's in \"Booked\" status in Wetu, and hasn't already been converted.",
+            "evidence": "custom_tour_offer/services/wetu_itinerary_service.py:create_custom_tour_offer_from_wetu_itinerary"
+          },
+          {
+            "fact": "Only the staff member who created an internal note can edit it later \u2014 anyone else attempting to edit it is refused.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_note_service.py:update"
+          },
+          {
+            "fact": "Duplicating an offer always produces an inactive draft, regardless of the original offer's status.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:duplicate_custom_tour_offer"
+          },
+          {
+            "fact": "If the offer's price is quoted in a different currency than what the customer is billed in, all prices shown to the customer are converted using the offer's exchange rate.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:get_custom_tour_offer_pdf"
+          },
+          {
+            "fact": "Only one pickup location of each specific pickup point can be added per offer.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_pickup_locations.py"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "A standard price lower than the transfer price returns \"Tour Standard price must be greater than or equal to transport cost.\"",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create"
+          },
+          {
+            "fact": "Pickup-location seats adding up to more than capacity returns \"Pickup Locations total seats assigned ({total}) exceeds capacity ({capacity})\".",
+            "evidence": "custom_tour_offer/serializers/custom_tour_offer_serializers.py:validate_pickup_locations"
+          },
+          {
+            "fact": "An inactive pickup location, negative price, or negative seats on a pickup location are each rejected with a specific message.",
+            "evidence": "custom_tour_offer/serializers/custom_tour_offer_serializers.py:CustomTourOfferPickupLocationsCreateSerializer"
+          },
+          {
+            "fact": "An inactive supplement added to an offer returns \"Supplement must be active!\"",
+            "evidence": "custom_tour_offer/serializers/custom_tour_offer_supplement_serializer.py:CustomTourOfferSupplementCreateSerializer.validate_supplement"
+          },
+          {
+            "fact": "Requesting a cost preview for transfer passengers exceeding total capacity returns \"Passenger transfer count cannot exceed total capacity.\"",
+            "evidence": "custom_tour_offer/serializers/custom_tour_offer_cost_preview_serializer.py:validate_number_of_passenger_took_transfer"
+          },
+          {
+            "fact": "Editing a note as anyone other than its creator returns \"Only note creator can update a note.\"",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_note_service.py:update"
+          },
+          {
+            "fact": "Trying to convert an offer that's already been converted returns \"Tour and booking is already created for this custom tour offer\".",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create_tour_from_custom_tour_offer"
+          },
+          {
+            "fact": "Trying to convert a Wetu itinerary that's already been converted, or isn't in Booked status, is rejected with a message naming which condition failed.",
+            "evidence": "custom_tour_offer/services/wetu_itinerary_service.py:create_custom_tour_offer_from_wetu_itinerary"
+          },
+          {
+            "fact": "Converting a Wetu itinerary whose customer name can't be split into a first and last name returns \"Customer Name is not compatible for create booking. Please provide firstname and lastname.\"",
+            "evidence": "custom_tour_offer/services/wetu_itinerary_service.py:create_custom_tour_offer_from_wetu_itinerary"
+          },
+          {
+            "fact": "Converting a Wetu itinerary whose computed price works out to zero or less returns \"Standard price must be greater than 0.\"",
+            "evidence": "custom_tour_offer/services/wetu_itinerary_service.py:create_custom_tour_offer_from_wetu_itinerary"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Creating, editing, listing, converting-to-booking, and status-updating custom tour offers all require staff to be logged in and hold the corresponding permission.",
+            "evidence": "custom_tour_offer/views/custom_tour_offer_views.py:CustomTourOfferListCreateAPIView/CustomTourOfferRetrieveUpdateAPIView/BookingCreateFromCustomTourOfferAPIView"
+          },
+          {
+            "fact": "Duplicating an offer and previewing its cost only require being logged in, without a specific permission check.",
+            "evidence": "custom_tour_offer/views/custom_tour_offer_views.py:CustomTourOfferDuplicateAPIView; custom_tour_offer/views/custom_tour_offer_cost_preview.py"
+          },
+          {
+            "fact": "Importing and converting Wetu itineraries is only available to tenants whose subscription plan includes the Wetu integration feature.",
+            "evidence": "custom_tour_offer/views/wetu_itinerary_views.py"
+          },
+          {
+            "fact": "Customers can only see custom tour offers made out to them personally through the customer portal; if a staff member is viewing on a customer's behalf, that view is read-only.",
+            "evidence": "custom_tour_offer/views/passenger_portal_custom_tour_offer_view.py"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "Tour Name / Description / Tour Information \u2014 the display name, description, and detailed information about the bespoke tour package shown to the customer.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
+          },
+          {
+            "fact": "Duration / Capacity / Departure & Return Date \u2014 the trip length in days, how many passengers it's sized for, and the trip's start/end dates.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
+          },
+          {
+            "fact": "Standard Price / Transfer Price \u2014 the base per-person tour price and the per-person cost of the pickup/transfer option.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
+          },
+          {
+            "fact": "Booking Currency / Conversion Rate \u2014 the currency the customer is actually charged in, and the exchange rate used to convert the offer's base price into that currency.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
+          },
+          {
+            "fact": "Discounted / Discount Type / Discount Amount \u2014 whether a discount applies, whether it's a flat amount or a percentage, and its value.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_models.py; custom_tour_offer/constants.py"
+          },
+          {
+            "fact": "Grand Total \u2014 the final calculated total price of the offer after supplements, pickup, transfer, and discount, in the customer's billing currency.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
+          },
+          {
+            "fact": "Offer Origin \u2014 whether the offer was created directly by staff or generated from an imported Wetu itinerary.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
+          },
+          {
+            "fact": "Draft / Active \u2014 whether the offer is still being worked on (draft) and whether it's currently usable/convertible (active); an offer is automatically deactivated once converted into a booking.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
+          },
+          {
+            "fact": "Tour and Booking Created \u2014 whether this offer has already been turned into a real Tour and Booking.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
+          },
+          {
+            "fact": "Email Sent \u2014 whether the offer has been emailed to the customer at least once.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
+          },
+          {
+            "fact": "Duplicated From \u2014 a reference back to the original offer this one was copied from, if it's a duplicate.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
+          },
+          {
+            "fact": "Note / Edit History \u2014 an internal staff comment on the offer, along with a record of everything it said before each edit.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_note.py"
+          },
+          {
+            "fact": "Pickup Location, Price, Seats, Remaining Seats \u2014 a specific pickup point offered with this deal, any extra price for it, and how many seats are allotted/available there.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_pickup_locations.py"
+          },
+          {
+            "fact": "Supplement, Price, Quantity, Mandatory \u2014 an add-on included in the offer (e.g. a flight or hotel), its price and quantity, and whether it's required as part of the deal.",
+            "evidence": "custom_tour_offer/models/custom_tour_offer_supplement.py"
+          },
+          {
+            "fact": "Wetu Itinerary Status \u2014 the booking status of the itinerary as recorded in Wetu; only an itinerary marked \"Booked\" there can become a custom tour offer.",
+            "evidence": "custom_tour_offer/models/wetu_model.py"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "Staff building a custom deal typically start by importing the client's itinerary from Wetu if one exists, then convert it into a custom tour offer, adding pricing, territory, and tax details Wetu doesn't provide.",
+            "evidence": "custom_tour_offer/services/wetu_itinerary_service.py:create_custom_tour_offer_from_wetu_itinerary"
+          },
+          {
+            "fact": "Staff configure the offer's pricing, pickup locations, and supplements (flights, hotels, extras), checking the running cost total at any point before committing.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_cost_preview_service.py:get_cost_previews_rows"
+          },
+          {
+            "fact": "Staff send the finished offer to the customer as a branded PDF by email, or download it to share another way.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:send_custom_tour_offer_to_requested_user"
+          },
+          {
+            "fact": "Once the customer accepts, staff convert the offer directly into a real Tour and Booking in one action \u2014 after which the offer itself is locked and can't be converted again.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create_tour_from_custom_tour_offer"
+          },
+          {
+            "fact": "For a similar future deal, staff can duplicate an existing offer as a starting point rather than rebuilding it from scratch.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:duplicate_custom_tour_offer"
+          },
+          {
+            "fact": "The customer can log into their own portal at any time to see the offers made out to them.",
+            "evidence": "custom_tour_offer/views/passenger_portal_custom_tour_offer_view.py"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Converting an offer creates a real, privately-listed Tour carrying over its name, description, dates, capacity, pricing, pickup locations, and supplements.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create_tour_from_custom_tour_offer"
+          },
+          {
+            "fact": "Converting an offer also creates the actual Booking on that new tour, with the offer's customer as the primary passenger and any discount applied.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create_booking_from_custom_tour_offer"
+          },
+          {
+            "fact": "Creating an offer can create a brand-new customer account, or upgrade an existing account to have customer-portal access.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:get_or_create_user"
+          },
+          {
+            "fact": "Sending an offer dispatches a branded email with a PDF attachment, using the tenant's own logo, colors, and contact details.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:get_custom_tour_offer_pdf"
+          },
+          {
+            "fact": "The offer's cost preview draws on the same tax/VAT calculations used for bookings, so quoted totals match what an actual booking would charge.",
+            "evidence": "custom_tour_offer/services/custom_tour_offer_cost_preview_service.py:get_cost_previews_rows"
+          }
+        ]
       }
     },
     {

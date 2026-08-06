@@ -17,3 +17,4 @@ Append-only. One line per event:
 2026-08-06 | flights-tickets/pnr-tickets | created | 2 of 26 remaining features | 20675c05c
 2026-08-06 | flights-tickets/booking-assignment | created | 3 of 26 remaining features | 20675c05c
 2026-08-06 | tour-types | created | 4 of 26 remaining features | 20675c05c
+2026-08-06 | custom-tour-offers | created | 5 of 26 remaining features | 20675c05c
