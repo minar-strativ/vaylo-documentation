@@ -2,9 +2,9 @@
   "mode": "create",
   "run_started_at": "2026-07-29",
   "run_anchor_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
-  "current_feature": "yacht-booking",
+  "current_feature": "supplements",
   "current_step": "analyze",
   "scope_this_run": [],
-  "notes": "Continuing full backlog. custom-tour-offers documented (5 of 26 remaining). Next: yacht-booking.",
-  "run_processed_count": 10
+  "notes": "Continuing full backlog. yacht-booking (split into overview/catalog-pricing/booking-reservation) documented (7 of 26 remaining). Next: supplements.",
+  "run_processed_count": 12
 }

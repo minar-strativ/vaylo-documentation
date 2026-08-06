@@ -1,6 +1,6 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (33 docs, since Flights & Ticketing splits into a parent + 2 child docs); 10 documented so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (36 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs); 12 documented so far.
 
 ## Bookings & Catalog
 
@@ -13,7 +13,9 @@ Generated and maintained by Canopy. One page per business capability — see eac
   - [Booking Flight Assignment](flights-tickets-booking-assignment.md) — Reserving and assigning PNR seats to bookings and passengers.
 - [Tour Types](tour-types.md) — Reusable tour templates (type, images, vehicles, pickup locations) that tours are built from.
 - [Custom Tour Offers](custom-tour-offers.md) — Bespoke tour offers with Wetu itinerary import, supplements and pickup locations.
-- Yacht Booking — Yacht catalog with bases, seasons, equipment, sailing areas, and yacht pricing. *(pending)*
+- [Yacht Booking](yacht-booking.md) — Yacht catalog with bases, seasons, equipment, sailing areas, and yacht pricing.
+  - [Yacht Catalog & Pricing](yacht-booking-catalog-and-pricing.md) — Catalog sync, manual boats, price sheets and discounts.
+  - [Yacht Search, Booking & Reservation](yacht-booking-booking-and-reservation.md) — Customer search/booking flow and reservation lifecycle with the charter provider.
 - Supplements & Add-ons — Optional add-on products/supplements with groups, categories and local pricing. *(pending)*
 - Products — Generic sellable products with categories, images, files and notes. *(pending)*
 - Tour Guides — Tour guides, guide types and their time-slot availability. *(pending)*

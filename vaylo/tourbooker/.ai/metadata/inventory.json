@@ -2173,8 +2173,8 @@
     },
     {
       "id": "yacht-booking",
-      "name": "Yacht Booking",
-      "summary": "Yacht catalog with bases, seasons, equipment, sailing areas, and yacht pricing.",
+      "name": "Yacht Booking \u2014 Overview",
+      "summary": "Overview of the yacht charter catalog and booking flow; see child docs for detail.",
       "files": [
         "yacht_booking/**"
       ],
@@ -2186,21 +2186,539 @@
         "currency"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/yacht-booking.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "overview": [
+          "yacht_booking/models/yacht_models.py:Yacht"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
+        "workflows": [
+          {
+            "fact": "Yachts are synced in from external charter providers, priced per week, and made available for customers to search and book.",
+            "evidence": "yacht_booking/services/sync/yacht.py; yacht_booking/services/booking.py"
+          }
+        ],
         "rules": [],
         "validations": [],
         "permissions": [],
-        "field_meanings": [],
+        "field_meanings": [
+          {
+            "fact": "A Yacht is a single chartered boat listed in the catalog, either synced from an external provider or added manually by staff.",
+            "evidence": "yacht_booking/models/yacht_models.py:Yacht"
+          }
+        ],
         "journeys": [],
         "side_effects": []
+      }
+    },
+    {
+      "id": "yacht-booking/catalog-and-pricing",
+      "name": "Yacht Catalog & Pricing",
+      "summary": "The yacht charter catalog (yachts, companies, countries, sailing areas, shipyards), manual boat entries, and per-week pricing/discount management, synced from external charter providers.",
+      "files": [
+        "yacht_booking/models/**",
+        "yacht_booking/services/sync/**",
+        "yacht_booking/services/yacht.py",
+        "yacht_booking/services/yacht_price.py",
+        "yacht_booking/manual_boat/**",
+        "yacht_booking/views/yacht.py",
+        "yacht_booking/views/company.py",
+        "yacht_booking/views/price_sheet.py"
+      ],
+      "depends_on": [],
+      "shared_modules": [
+        "multi-language",
+        "currency"
+      ],
+      "existing_docs": [],
+      "status": "completed",
+      "skip_reason": null,
+      "doc": "docs/product/yacht-booking-catalog-and-pricing.md",
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "what_it_does": [
+          "yacht_booking/models/yacht_models.py"
+        ],
+        "how_it_works": [
+          "yacht_booking/services/sync/generic.py:GenericSyncService.sync_multiple",
+          "yacht_booking/manual_boat/manual_boat_views/yachts.py:CreateManualYachtAPIView",
+          "yacht_booking/views/price_sheet.py:YachtPriceSheetAPIView",
+          "yacht_booking/views/yacht.py:YachtIsActiveView.patch"
+        ],
+        "rules_and_edge_cases": [
+          "yacht_booking/services/sync/generic.py:GenericSyncService.sync_multiple",
+          "yacht_booking/views/price_sheet.py:YachtPriceSheetCompanyListAPIView",
+          "yacht_booking/services/yacht.py:YachtVATClassService"
+        ],
+        "limitations": [
+          "yacht_booking/manual_boat/manual_boat_views/yachts.py:CreateManualYachtAPIView"
+        ],
+        "related_features": [
+          "yacht_booking/services/booking.py"
+        ],
+        "faq": [
+          "yacht_booking/services/sync/generic.py:GenericSyncService.sync_multiple",
+          "yacht_booking/views/price_sheet.py:YachtUpdateDiscountAPIView"
+        ]
+      },
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "Yacht catalog data (yachts, companies, countries, world regions, sailing areas, shipyards, equipment) is regularly synced in from external charter providers rather than entered by hand.",
+            "evidence": "yacht_booking/services/sync/generic.py:GenericSyncService.sync_multiple"
+          },
+          {
+            "fact": "Staff can browse the yacht catalog, filter by provider, and drill into a single yacht to see its full specs, images, add-ons, pickup locations, and finance settings.",
+            "evidence": "yacht_booking/views/yacht.py:YachtListView/YachtRetrieveUpdateView"
+          },
+          {
+            "fact": "Staff manage reference data (world regions, sailing areas, shipyards, countries, companies, equipment) \u2014 viewing lists, toggling active/inactive, and triggering a re-sync from the provider.",
+            "evidence": "yacht_booking/views/world_region.py; yacht_booking/views/sailing_area.py; yacht_booking/views/shipyard.py; yacht_booking/views/company.py"
+          },
+          {
+            "fact": "Staff can add a yacht manually by picking an existing catalog yacht and cloning it into a separate, staff-managed listing that catalog sync will never touch or remove.",
+            "evidence": "yacht_booking/manual_boat/manual_boat_views/yachts.py:CreateManualYachtAPIView"
+          },
+          {
+            "fact": "Staff view a price sheet for a chartering company, showing each yacht's per-week price and discount for a chosen date range and currency, and can adjust the discount for one yacht or in bulk across a date range.",
+            "evidence": "yacht_booking/views/price_sheet.py:YachtPriceSheetAPIView/YachtUpdateDiscountAPIView/YachtBulkUpdateDiscountAPIView"
+          },
+          {
+            "fact": "Pricing and availability are synced in weekly blocks from the external provider, and prices are automatically converted into every active currency the tenant supports.",
+            "evidence": "yacht_booking/services/sync/yacht_price.py:YachtPriceSyncService.by_company_id; yacht_booking/services/yacht_price.py:YachtPriceService.sync_local_price_with_company_id"
+          },
+          {
+            "fact": "Staff can edit a yacht's add-on supplements and pickup locations directly, along with its finance/tax settings.",
+            "evidence": "yacht_booking/views/yacht.py:YachtRetrieveUpdateView.patch"
+          },
+          {
+            "fact": "Turning a yacht on updates its listing on the public-facing site immediately and refreshes its availability for the current year right away.",
+            "evidence": "yacht_booking/views/yacht.py:YachtIsActiveView.patch"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A full catalog sync automatically deactivates any yacht (or other catalog entry) from that provider that's no longer present in the latest sync, unless it was added manually by staff \u2014 manually added entries are never touched by sync.",
+            "evidence": "yacht_booking/services/sync/generic.py:GenericSyncService.sync_multiple"
+          },
+          {
+            "fact": "Pricing and availability are always synced in whole-week blocks (Saturday to Saturday).",
+            "evidence": "yacht_booking/services/sync/yacht_price.py:YachtPriceSyncService._preprocess_from_date/_preprocess_to_date"
+          },
+          {
+            "fact": "The price sheet only lists chartering companies that have at least one active yacht, and only shows active, non-manually-added yachts.",
+            "evidence": "yacht_booking/views/price_sheet.py:YachtPriceSheetCompanyListAPIView/YachtPriceSheetAPIView"
+          },
+          {
+            "fact": "Some catalog reference data \u2014 pricing measurement units, seasons, and services \u2014 is only available through one of the two charter providers; requesting it from the other is rejected outright.",
+            "evidence": "yacht_booking/views/yacht.py:YachtPriceMeasurementListAPIView/YachtSeasonListAPIView/YachtServiceListAPIView"
+          },
+          {
+            "fact": "A yacht without a tax classification is automatically given a default one, so no yacht can go unbilled for lack of tax setup.",
+            "evidence": "yacht_booking/services/yacht.py:YachtVATClassService.get_yacht_default_vat_class/get_pickup_location_default_vat_class"
+          },
+          {
+            "fact": "Availability syncing skips any yacht that's inactive, manually added, or has been removed from the provider's feed.",
+            "evidence": "yacht_booking/services/sync/yacht_availability.py:sync_availability_by_company_id"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Viewing the manually-added yachts list without specifying a currency returns \"Missing required query parameter(s): currency\".",
+            "evidence": "yacht_booking/manual_boat/manual_boat_views/yachts.py:ManualYachtListAPIView._validate_request_params"
+          },
+          {
+            "fact": "Editing a yacht's supplement without a price, or with a negative price, or with an inactive supplement, is each rejected with a specific message.",
+            "evidence": "yacht_booking/serializers/yacht.py:YachtSupplementUpdateSerializer.validate"
+          },
+          {
+            "fact": "Editing a yacht's pickup location with a negative price or a negative seat count is rejected with a specific message.",
+            "evidence": "yacht_booking/serializers/yacht.py:YachtPickupLocationUpdateSerializer.validate"
+          },
+          {
+            "fact": "Requesting price measurements, seasons, services, or yacht models from a provider that doesn't support them returns a message naming exactly what isn't supported.",
+            "evidence": "yacht_booking/views/yacht.py:YachtPriceMeasurementListAPIView.get_queryset"
+          },
+          {
+            "fact": "Triggering a sync with an unrecognized data source returns a message listing which sources are actually supported.",
+            "evidence": "yacht_booking/views/common.py:BaseSyncView.get_sync_callable"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Viewing and managing the yacht catalog, reference data, manual boats, and price sheets all require staff to be logged in and hold the relevant permission.",
+            "evidence": "yacht_booking/views/yacht.py; yacht_booking/manual_boat/manual_boat_views/yachts.py"
+          },
+          {
+            "fact": "Listing a yacht's pickup locations only requires being logged in, without a specific permission check.",
+            "evidence": "yacht_booking/views/yacht_pickup_location_views.py:YachtPickupLocationListAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "Name, Model, Build Year, Shipyard \u2014 the yacht's identifying details and who built it.",
+            "evidence": "yacht_booking/models/yacht_models.py"
+          },
+          {
+            "fact": "Kind (Yacht Type) \u2014 the category of yacht, such as sailing yacht or catamaran.",
+            "evidence": "yacht_booking/models/yacht_models.py"
+          },
+          {
+            "fact": "Home Base, Chartering Company \u2014 the marina the yacht departs/returns from, and the operating company that owns/manages it.",
+            "evidence": "yacht_booking/models/yacht_models.py"
+          },
+          {
+            "fact": "Cabins, Berths, Toilets \u2014 the yacht's sleeping and washroom capacity.",
+            "evidence": "yacht_booking/models/yacht_models.py"
+          },
+          {
+            "fact": "Maximum People On Board \u2014 the total passenger capacity cap for the yacht.",
+            "evidence": "yacht_booking/models/yacht_models.py"
+          },
+          {
+            "fact": "Minimum/Maximum Charter Duration \u2014 the shortest and longest booking length the yacht allows.",
+            "evidence": "yacht_booking/models/yacht_models.py"
+          },
+          {
+            "fact": "Standard Check-In Day/Time and Check-Out Time \u2014 the yacht's usual charter turnover schedule.",
+            "evidence": "yacht_booking/models/yacht_models.py"
+          },
+          {
+            "fact": "Equipment \u2014 the onboard equipment and amenities available on the yacht.",
+            "evidence": "yacht_booking/models/yacht_models.py"
+          },
+          {
+            "fact": "Manually Added \u2014 marks a yacht that staff added by hand rather than one kept in sync with an external provider; such yachts are never auto-deactivated or overwritten by sync.",
+            "evidence": "yacht_booking/models/yacht_models.py"
+          },
+          {
+            "fact": "Removed \u2014 marks a yacht that's disappeared from the external provider's feed.",
+            "evidence": "yacht_booking/models/yacht_models.py"
+          },
+          {
+            "fact": "World Region, Country, Sailing Area, Shipyard \u2014 the geographic and manufacturer classification used to browse and filter the catalog.",
+            "evidence": "yacht_booking/models/world_region_models.py; yacht_booking/models/country_models.py; yacht_booking/models/sailing_area_models.py; yacht_booking/models/shipyard_models.py"
+          },
+          {
+            "fact": "Price, Provider Discount, Staff Discount \u2014 a yacht's listed price for a given week, any discount the provider already applied, and an additional discount staff can layer on top.",
+            "evidence": "yacht_booking/models/yacht_price_models.py"
+          },
+          {
+            "fact": "Available \u2014 whether the yacht is actually bookable for a given week, tracked separately from its price.",
+            "evidence": "yacht_booking/models/yacht_price_models.py"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "Staff browse the synced catalog to see which yachts, companies, and reference data are available, filtering by provider and toggling entries active/inactive as needed.",
+            "evidence": "yacht_booking/views/yacht.py:YachtListView"
+          },
+          {
+            "fact": "To offer a yacht outside the normal synced catalog, staff clone it into a manually-added listing that stays under their own control and won't be touched by future syncs.",
+            "evidence": "yacht_booking/manual_boat/manual_boat_views/yachts.py:CreateManualYachtAPIView"
+          },
+          {
+            "fact": "To set pricing, staff open the price sheet for a chartering company, review each yacht's weekly price and discount for a date range, and adjust the discount for one yacht or across many yachts at once.",
+            "evidence": "yacht_booking/views/price_sheet.py:YachtPriceSheetAPIView"
+          },
+          {
+            "fact": "Staff fine-tune a yacht's supplements, pickup locations, and tax settings directly on its detail page.",
+            "evidence": "yacht_booking/views/yacht.py:YachtRetrieveUpdateView.patch"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Any catalog sync also refreshes the yacht's listing on the external public-facing site, so changes show up there without a separate manual step.",
+            "evidence": "yacht_booking/services/sync/yacht.py:YachtSyncService._update_data_on_cms"
+          },
+          {
+            "fact": "Any pricing sync regenerates prices in every active currency the tenant supports, which is what the booking search and price sheet actually display.",
+            "evidence": "yacht_booking/services/sync/yacht_price.py:YachtPriceSyncService._sync_yacht_local_price"
+          },
+          {
+            "fact": "Syncing bases, countries, and yacht types also refreshes their translated names used elsewhere on the storefront.",
+            "evidence": "yacht_booking/services/sync/base.py:BaseSyncService.all"
+          },
+          {
+            "fact": "Every yacht is automatically given a tax classification if it doesn't already have one, so pricing always has a valid tax basis for billing.",
+            "evidence": "yacht_booking/services/sync/yacht.py:YachtSyncService._update_default_vat_class"
+          }
+        ]
+      }
+    },
+    {
+      "id": "yacht-booking/booking-and-reservation",
+      "name": "Yacht Search, Booking & Reservation",
+      "summary": "Customer yacht search and booking, cost preview, staff booking management, and confirming/cancelling the reservation with the external charter provider.",
+      "files": [
+        "yacht_booking/services/booking.py",
+        "yacht_booking/public/**",
+        "yacht_booking/scheduler/**",
+        "yacht_booking/nausys/**",
+        "yacht_booking/views/booking.py"
+      ],
+      "depends_on": [
+        "yacht-booking/catalog-and-pricing",
+        "booking"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "completed",
+      "skip_reason": null,
+      "doc": "docs/product/yacht-booking-booking-and-reservation.md",
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "what_it_does": [
+          "yacht_booking/services/booking.py:YachtBookingService"
+        ],
+        "how_it_works": [
+          "yacht_booking/public/public_views/booking.py:YachtPublicBookingAPIView",
+          "yacht_booking/services/booking.py:YachtBookingService.create/confirm_booking",
+          "yacht_booking/services/booking.py:cancel_pending_booking/make_booking_departed",
+          "yacht_booking/services/booking.py:YachtBookingService.create (manual)"
+        ],
+        "rules_and_edge_cases": [
+          "yacht_booking/services/booking.py:_check_yacht_availability",
+          "yacht_booking/serializers/booking.py:YachtBookingCreateSerializer.validate_passengers",
+          "yacht_booking/public/public_serializers/booking.py:YachtPublicBookingCreateSerializer.validate_passengers",
+          "yacht_booking/services/booking.py:_set_payment_deadline_dates"
+        ],
+        "limitations": [
+          "yacht_booking/services/booking.py:YachtBookingService.create"
+        ],
+        "related_features": [
+          "yacht_booking/services/booking.py:YachtBookingService"
+        ],
+        "faq": [
+          "yacht_booking/services/booking.py:_check_yacht_availability",
+          "yacht_booking/services/booking.py:cancel_pending_booking"
+        ]
+      },
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "A customer searches for yachts by destination, date, and currency on the public site, sees per-yacht pricing for the searched dates, and can view full details of a single yacht.",
+            "evidence": "yacht_booking/public/public_views/yacht_search.py:PublicYachtSearchAPIView"
+          },
+          {
+            "fact": "A customer requests a cost preview showing the itemized price breakdown, discount, tax, and total due before committing to a booking.",
+            "evidence": "yacht_booking/services/booking.py:YachtBookingCostPreviewService.get_cost_preview"
+          },
+          {
+            "fact": "A customer submits the booking directly on the public site without needing an account, or staff create one internally on the customer's behalf.",
+            "evidence": "yacht_booking/public/public_views/booking.py:YachtPublicBookingAPIView; yacht_booking/views/booking.py:YachtBookingCreateAPIView"
+          },
+          {
+            "fact": "Before a booking is placed, the system checks live availability with the external charter provider for the exact dates requested; if unavailable, the booking is rejected.",
+            "evidence": "yacht_booking/services/booking.py:YachtBookingService._check_yacht_availability"
+          },
+          {
+            "fact": "Placing a booking opens a reservation with the actual charter provider; if that fails, the booking is automatically cancelled instead of being left in a broken state.",
+            "evidence": "yacht_booking/services/booking.py:YachtBookingService._create_yacht_source_reservation/_cancel_failed_booking"
+          },
+          {
+            "fact": "Staff explicitly confirm a pending booking, which confirms the reservation with the charter provider and marks the booking as booked.",
+            "evidence": "yacht_booking/services/booking.py:YachtBookingService.confirm_booking"
+          },
+          {
+            "fact": "Staff can edit an existing pending or booked yacht booking's passengers, add-ons, and pricing.",
+            "evidence": "yacht_booking/views/booking.py:YachtBookingUpdateAPIView"
+          },
+          {
+            "fact": "Cancelling a yacht booking also cancels the reservation held with the charter provider, unless the booking was entered manually.",
+            "evidence": "booking/services/booking_cancel_service.py:cancel_booking"
+          },
+          {
+            "fact": "A pending booking is automatically cancelled if the customer misses the first payment deadline.",
+            "evidence": "yacht_booking/services/booking.py:cancel_pending_booking"
+          },
+          {
+            "fact": "Once a booking's departure date arrives, it's automatically marked as departed and a financial record is sent for accounting.",
+            "evidence": "yacht_booking/services/booking.py:make_booking_departed"
+          },
+          {
+            "fact": "For yachts crewed through one of the providers, crew is automatically assigned to a booking roughly a day before departure.",
+            "evidence": "yacht_booking/services/booking.py:assign_mmk_crew_before_departure"
+          },
+          {
+            "fact": "Staff can book a yacht that was added manually (not synced from a provider), skipping the live availability check and the external reservation step entirely, using a staff-entered price instead.",
+            "evidence": "yacht_booking/services/booking.py:YachtBookingService.create"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A booking can't be placed unless the exact requested date range is confirmed available with the charter provider \u2014 unless it's a manually-entered booking, which skips this check.",
+            "evidence": "yacht_booking/services/booking.py:YachtBookingService._check_yacht_availability"
+          },
+          {
+            "fact": "A manually-entered booking must have its price entered by staff \u2014 it isn't calculated automatically.",
+            "evidence": "yacht_booking/serializers/booking.py:YachtBookingCostPreviewSerializer.validate"
+          },
+          {
+            "fact": "The number of passengers must be greater than zero, and how many took the paid transfer can't exceed the total passenger count.",
+            "evidence": "yacht_booking/serializers/booking.py:YachtBookingCostPreviewSerializer.validate"
+          },
+          {
+            "fact": "A booking must list at least one passenger, and no more passengers than the declared total; each passenger's email must be unique within the booking.",
+            "evidence": "yacht_booking/serializers/booking.py:YachtBookingCreateSerializer.validate_passengers"
+          },
+          {
+            "fact": "A public (customer-submitted) booking must have exactly one passenger marked as the primary contact, and that passenger must have a valid email.",
+            "evidence": "yacht_booking/public/public_serializers/booking.py:YachtPublicBookingCreateSerializer.validate_passengers"
+          },
+          {
+            "fact": "Only supplements that are currently active can be added to a booking.",
+            "evidence": "yacht_booking/serializers/validators.py:validate_supplement_active"
+          },
+          {
+            "fact": "A booking's passenger count can never be reduced below the number of passengers already registered on it.",
+            "evidence": "yacht_booking/views/booking.py:YachtBookingUpdateAPIView.patch"
+          },
+          {
+            "fact": "A booking moves from Pending to Booked only once staff explicitly confirm it with the charter provider; it moves to Cancelled if the reservation fails, the payment deadline is missed, or it's cancelled outright.",
+            "evidence": "yacht_booking/services/booking.py:YachtBookingService.create/confirm_booking/_cancel_failed_booking"
+          },
+          {
+            "fact": "Payment due dates for a booking come directly from the charter provider's own payment schedule for that reservation.",
+            "evidence": "yacht_booking/services/booking.py:_set_payment_deadline_dates"
+          },
+          {
+            "fact": "If a booking's total changes after an edit, both the customer and the accounting system are notified of the increase or decrease.",
+            "evidence": "yacht_booking/services/booking.py:update_booking"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "A cost preview or booking with zero or fewer passengers returns \"Number of passengers must be greater than zero.\"",
+            "evidence": "yacht_booking/serializers/booking.py:YachtBookingCostPreviewSerializer.validate"
+          },
+          {
+            "fact": "A transfer passenger count higher than the total passenger count returns a message naming the mismatch.",
+            "evidence": "yacht_booking/serializers/validators.py:validate_transfer_count"
+          },
+          {
+            "fact": "A manual booking submitted without a price returns \"Price must be provided for manual booking.\"",
+            "evidence": "yacht_booking/serializers/booking.py:YachtBookingCostPreviewSerializer.validate"
+          },
+          {
+            "fact": "A booking with no passengers listed returns \"Booking must include at least one passenger.\"; more passengers listed than declared returns a message naming the mismatch; a duplicate passenger email returns \"Passenger must have a unique email address.\"",
+            "evidence": "yacht_booking/serializers/booking.py:YachtBookingCreateSerializer.validate_passengers"
+          },
+          {
+            "fact": "A public booking missing a single clear primary passenger, or whose primary passenger has no valid email, is rejected with a message naming the problem.",
+            "evidence": "yacht_booking/public/public_serializers/booking.py:YachtPublicBookingCreateSerializer.validate_passengers"
+          },
+          {
+            "fact": "Assigning more passengers a real pickup location than the number who opted into transfer returns a message stating exactly how many were scheduled versus how many were selected.",
+            "evidence": "yacht_booking/public/public_serializers/booking.py:YachtPublicBookingCreateSerializer.validate_passengers"
+          },
+          {
+            "fact": "Requesting the yacht search page without both a currency and a start date returns a message listing which required parameters are missing.",
+            "evidence": "yacht_booking/public/public_views/yacht_search.py:PublicYachtSearchAPIView._validate_request_params"
+          },
+          {
+            "fact": "Reducing a booking's passenger count below the number already registered on it returns \"Number of passengers must be greater than or equal to added passengers!\"",
+            "evidence": "yacht_booking/views/booking.py:YachtBookingUpdateAPIView.patch"
+          },
+          {
+            "fact": "Attempting to book a yacht that isn't available for the exact requested dates returns \"Yacht is not available for the selected date range.\"",
+            "evidence": "yacht_booking/services/booking.py:YachtBookingService._check_yacht_availability"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Searching for yachts, viewing details, getting a cost preview, and submitting a booking on the public site are all open to anyone, without needing an account.",
+            "evidence": "yacht_booking/public/public_views/yacht_search.py; yacht_booking/public/public_views/booking.py"
+          },
+          {
+            "fact": "Creating, editing, and confirming a booking internally all require staff to be logged in and hold the relevant permission.",
+            "evidence": "yacht_booking/views/booking.py"
+          },
+          {
+            "fact": "Automated background processes (cancelling overdue pending bookings, marking departed bookings, sending them to accounting, assigning crew) run on a system-level schedule rather than through a staff-operated screen.",
+            "evidence": "yacht_booking/scheduler/scheduler_views/booking.py"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "Number of Passengers / Number Who Took Transfer \u2014 how many people are traveling on the booking, and how many of them opted into the paid pickup/transfer service.",
+            "evidence": "yacht_booking/services/booking.py:prepare_data"
+          },
+          {
+            "fact": "Sub Total / Discount / Grand Total / Due \u2014 the total price before any discount, the combined discount applied, the final payable total, and how much is still owed.",
+            "evidence": "yacht_booking/services/booking.py:prepare_data"
+          },
+          {
+            "fact": "First Payment Deadline / Remaining Balance Deadline \u2014 the dates by which the deposit and the remaining balance are due, set from the charter provider's own payment schedule.",
+            "evidence": "yacht_booking/services/booking.py:_set_payment_deadline_dates"
+          },
+          {
+            "fact": "Manually Added Booking \u2014 a booking for a yacht entered by staff outside the normal provider catalog, which skips live availability checks and uses a staff-entered price instead of a calculated one.",
+            "evidence": "yacht_booking/services/booking.py:YachtBookingService.create"
+          },
+          {
+            "fact": "Departed \u2014 marks a booking whose trip start date has passed, set automatically once that date arrives.",
+            "evidence": "yacht_booking/services/booking.py:make_booking_departed"
+          },
+          {
+            "fact": "Booking Status (Pending, Booked, Cancelled) \u2014 a yacht booking starts Pending, becomes Booked once staff confirm the reservation with the charter provider, and becomes Cancelled if the reservation fails, the payment deadline passes, or it's cancelled outright.",
+            "evidence": "yacht_booking/services/booking.py:create/confirm_booking"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A customer searches available yachts by destination and date, views full details of one, adds passengers/extras/supplements, previews the full cost, and submits the booking themselves without needing to create an account first.",
+            "evidence": "yacht_booking/public/public_views/yacht_search.py; yacht_booking/public/public_views/booking.py:YachtPublicBookingAPIView"
+          },
+          {
+            "fact": "Behind the scenes, the booking is placed as pending, a reservation is opened with the actual charter provider, and confirmation emails go out to both the customer and staff; if the reservation can't be opened, the booking is automatically cancelled instead of being left incomplete.",
+            "evidence": "yacht_booking/services/booking.py:YachtBookingService.create/create_booking"
+          },
+          {
+            "fact": "Staff review a pending booking and explicitly confirm it, which locks in the reservation with the charter provider and marks the booking as booked.",
+            "evidence": "yacht_booking/services/booking.py:YachtBookingService.confirm_booking"
+          },
+          {
+            "fact": "Staff can also create or edit a booking directly, including for yachts added manually outside the usual provider catalog.",
+            "evidence": "yacht_booking/views/booking.py:YachtBookingCreateAPIView/YachtBookingUpdateAPIView"
+          },
+          {
+            "fact": "If a customer doesn't pay their deposit in time, the booking is automatically cancelled without staff needing to intervene.",
+            "evidence": "yacht_booking/services/booking.py:cancel_pending_booking"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Placing, confirming, updating, cancelling, and completing a yacht booking each notify the accounting system so the platform's financial records stay current.",
+            "evidence": "yacht_booking/services/booking.py:create_booking/update_booking/make_booking_departed"
+          },
+          {
+            "fact": "A yacht booking uses the same underlying booking record as tour and hotel bookings, so it shows up alongside them wherever bookings are managed.",
+            "evidence": "yacht_booking/services/booking.py:YachtBookingService"
+          },
+          {
+            "fact": "Booking creation and cancellation update any coupon's usage record if a coupon was applied.",
+            "evidence": "yacht_booking/services/booking.py:create"
+          },
+          {
+            "fact": "Confirmation and update emails are sent automatically to the customer at the relevant points in the booking's lifecycle.",
+            "evidence": "yacht_booking/services/booking.py:create_booking/update_booking"
+          },
+          {
+            "fact": "For crewed yachts, crew is automatically assigned to a booking shortly before departure without a separate staff action.",
+            "evidence": "yacht_booking/services/booking.py:assign_mmk_crew_before_departure"
+          }
+        ]
       }
     },
     {

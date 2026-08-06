@@ -18,3 +18,6 @@ Append-only. One line per event:
 2026-08-06 | flights-tickets/booking-assignment | created | 3 of 26 remaining features | 20675c05c
 2026-08-06 | tour-types | created | 4 of 26 remaining features | 20675c05c
 2026-08-06 | custom-tour-offers | created | 5 of 26 remaining features | 20675c05c
+2026-08-06 | yacht-booking | split | analysis revealed >7 workflows across two distinct areas (~16.5k lines, two external providers); split into parent overview + yacht-booking/catalog-and-pricing + yacht-booking/booking-and-reservation | 20675c05c
+2026-08-06 | yacht-booking/catalog-and-pricing | created | 6 of 26 remaining features | 20675c05c
+2026-08-06 | yacht-booking/booking-and-reservation | created | 7 of 26 remaining features | 20675c05c
