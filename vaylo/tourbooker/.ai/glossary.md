@@ -29,3 +29,7 @@ Format: **Term** — definition in one or two sentences, primary-reader language
 **Transaction** — A single recorded payment or refund, linked to a booking, invoice, gift card, or account.
 
 **Co-Passenger** — A personal, reusable "known traveler" contact saved under one customer's account, automatically created from past booking companions; distinct from the master Passenger client record.
+
+**PNR** — A flight-ticket booking record (from an airline/GDS reservation system, or entered manually), holding a fixed number of seats that can be reserved and assigned to passengers on one or more bookings.
+
+**Group PNR** — A PNR representing a block booking of shared seats, rather than individually named passenger tickets.

@@ -1,6 +1,6 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 features discovered total; 6 documented so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (33 docs, since Flights & Ticketing splits into a parent + 2 child docs); 8 documented so far.
 
 ## Bookings & Catalog
 
@@ -8,7 +8,9 @@ Generated and maintained by Canopy. One page per business capability — see eac
 - [Hotels & Accommodation](hotels.md) — Room-type inventory tours draw from when selling accommodation, plus simple lodging references.
 - [Bookings](booking.md) — Core booking record: reserve tours/hotels/yachts for passengers, payment/cancellation handling, waitlisting.
 - [Passengers](passengers.md) — Passenger and co-passenger records, bulk passenger import.
-- Flights & Ticketing (PNR) — Flight itineraries, PNR/ticket management, ticket assignment, and error-PNR handling. *(pending)*
+- [Flights & Ticketing (PNR)](flights-tickets.md) — Flight itineraries, PNR/ticket management, ticket assignment, and error-PNR handling.
+  - [PNR & Ticket Records](flights-tickets-pnr-tickets.md) — Creating/importing/syncing PNRs, deadlines, error PNRs, flight reports.
+  - [Booking Flight Assignment](flights-tickets-booking-assignment.md) — Reserving and assigning PNR seats to bookings and passengers.
 - Tour Types — Reusable tour templates (type, images, vehicles, pickup locations) that tours are built from. *(pending)*
 - Custom Tour Offers — Bespoke tour offers with Wetu itinerary import, supplements and pickup locations. *(pending)*
 - Yacht Booking — Yacht catalog with bases, seasons, equipment, sailing areas, and yacht pricing. *(pending)*

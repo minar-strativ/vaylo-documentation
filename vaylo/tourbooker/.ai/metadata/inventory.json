@@ -570,8 +570,8 @@
     },
     {
       "id": "flights-tickets",
-      "name": "Flights & Ticketing (PNR)",
-      "summary": "Flight itineraries, PNR/ticket management, ticket assignment, and error-PNR handling.",
+      "name": "Flights & Ticketing (PNR) \u2014 Overview",
+      "summary": "Overview of PNR/flight-ticket records and how they get linked to bookings; see child docs for detail.",
       "files": [
         "ticket_management/**",
         "booking/models/booking_pnr_ticket*",
@@ -582,21 +582,604 @@
       ],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/flights-tickets.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "overview": [
+          "ticket_management/models/ticket_model.py:Pnr"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
+        "workflows": [
+          {
+            "fact": "A PNR/flight-ticket record is created, imported, or synced independently of any booking, then linked to a booking to reserve and assign seats to passengers.",
+            "evidence": "ticket_management/services/pnr_service.py; booking/services/booking_flight_itinerary_service.py"
+          }
+        ],
         "rules": [],
         "validations": [],
         "permissions": [],
-        "field_meanings": [],
+        "field_meanings": [
+          {
+            "fact": "PNR \u2014 a single flight-ticket booking reference (from an airline/GDS or entered manually) that can be linked to one or more bookings.",
+            "evidence": "ticket_management/models/ticket_model.py:Pnr"
+          }
+        ],
         "journeys": [],
         "side_effects": []
+      }
+    },
+    {
+      "id": "flights-tickets/pnr-tickets",
+      "name": "PNR & Ticket Records",
+      "summary": "Creating and maintaining flight PNRs/tickets: manual entry, bulk Excel import, GDS sync, deadlines/reminders, duplicate merging, error PNRs, and flight arrivals/departures reports.",
+      "files": [
+        "ticket_management/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "completed",
+      "skip_reason": null,
+      "doc": "docs/product/flights-tickets-pnr-tickets.md",
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "what_it_does": [
+          "ticket_management/models/ticket_model.py"
+        ],
+        "how_it_works": [
+          "ticket_management/services/pnr_service.py:PNRService.create/update/merge_duplicate_tickets",
+          "ticket_management/services/ticket_file_services.py:TicketsFileService.create",
+          "ticket_management/views/error_pnr_views.py:PnrErrorListAPIView.get_queryset",
+          "ticket_management/services/ticket_reminder_services.py:TicketReminderEmailDataService",
+          "ticket_management/services/flight_arrivals_report_service.py:FlightArrivalsReportService",
+          "ticket_management/services/ticket_supplier_service.py:TicketSupplierService"
+        ],
+        "rules_and_edge_cases": [
+          "ticket_management/serializers/ticket_file_serializers.py:TicketsFileSerializers",
+          "ticket_management/services/ticket_file_services.py:TicketsFileService._validate_pnr_data",
+          "ticket_management/services/pnr_ticket_service.py:PnrTicketService.change_ticket_status",
+          "ticket_management/models/error_pnr_model.py"
+        ],
+        "limitations": [
+          "ticket_management/views/error_pnr_views.py:PnrErrorListAPIView"
+        ],
+        "related_features": [
+          "booking/services/booking_flight_itinerary_service.py"
+        ],
+        "faq": [
+          "ticket_management/services/pnr_service.py:PNRService.update",
+          "ticket_management/services/pnr_ticket_service.py:PnrTicketService.change_ticket_status"
+        ]
+      },
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "Staff upload an Excel file of flight bookings; the system creates or updates the PNR and its flight segments in one pass, and schedules a deadline-reminder email if the PNR has reminder settings.",
+            "evidence": "ticket_management/services/ticket_file_services.py:TicketsFileService.create"
+          },
+          {
+            "fact": "A bad upload (missing required columns, missing values, bad time format, inconsistent PNR data across rows, or an unknown billing supplier) is rejected with a message naming the exact problem, and none of that file's data is saved.",
+            "evidence": "ticket_management/services/ticket_file_services.py:TicketsFileService.validate_rows/_validate_pnr_data/_validate_billing_supplier"
+          },
+          {
+            "fact": "Staff can create or edit a PNR manually (not via Excel), entering flight segments, named passengers, and individual ticket lines directly.",
+            "evidence": "ticket_management/services/pnr_service.py:PNRService.create"
+          },
+          {
+            "fact": "A PNR that originated from an automatic GDS sync can only have its deadline and flight-segment remarks edited manually; every other field is locked because the GDS feed owns it.",
+            "evidence": "ticket_management/services/pnr_service.py:PNRService.update"
+          },
+          {
+            "fact": "If a newly created or updated PNR turns out to duplicate another PNR with the same reference code and identical flight segments, the system merges them automatically: ticket counts are combined, any bookings using the duplicate are repointed to the surviving PNR, and the duplicate is removed.",
+            "evidence": "ticket_management/services/pnr_service.py:PNRService.get_duplicate_pnrs/merge_duplicate_tickets"
+          },
+          {
+            "fact": "When an automatic sync from the airline/GDS system fails, the failure is recorded as an error PNR that staff can review.",
+            "evidence": "ticket_management/services/error_pnr_service.py:PnrErrorService.upsert_error_pnrs"
+          },
+          {
+            "fact": "Staff view a list of error PNRs; by default only unresolved ones are shown, but filtering by any status (including resolved) switches to showing every error PNR regardless of status.",
+            "evidence": "ticket_management/views/error_pnr_views.py:PnrErrorListAPIView.get_queryset"
+          },
+          {
+            "fact": "Staff can run a flight arrivals or departures report for chosen airports and a date range, downloaded as an Excel file listing every affected passenger.",
+            "evidence": "ticket_management/services/flight_arrivals_report_service.py:FlightArrivalsReportService.generate_flight_excel_report"
+          },
+          {
+            "fact": "Staff can download a ready-made Excel template for bulk PNR upload, with example data and an instructions sheet.",
+            "evidence": "ticket_management/services/pnr_template_service.py:PNRTemplateService.get_template_columns"
+          },
+          {
+            "fact": "Staff manage the list of ticket suppliers (airlines) and can deactivate one, unless it's still tied to an active flight segment.",
+            "evidence": "ticket_management/services/ticket_supplier_service.py:TicketSupplierService.update_status"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "Bulk-uploaded ticket files must be under 5 MB.",
+            "evidence": "ticket_management/serializers/ticket_file_serializers.py:TicketsFileSerializers.MAX_FILE_SIZE_BYTES"
+          },
+          {
+            "fact": "A bulk-import row needs values for PNR reference, whether it's a group PNR, passenger count, departure and destination, departure/arrival dates, and departure/arrival times, plus the supplier \u2014 all of these are mandatory.",
+            "evidence": "ticket_management/services/ticket_file_services.py:TicketsFileService.validate_rows"
+          },
+          {
+            "fact": "Within one PNR's uploaded rows, the group-PNR flag, passenger count, supplier, and deadline-days value must all match across every row for that PNR, or the upload is rejected.",
+            "evidence": "ticket_management/services/ticket_file_services.py:TicketsFileService._validate_pnr_data"
+          },
+          {
+            "fact": "A deadline reminder email is only scheduled if the PNR has all three of a reminder-days value, a deadline date, and a reminder email address set.",
+            "evidence": "ticket_management/services/ticket_file_services.py:TicketsFileService.create_scheduled_reminder_email"
+          },
+          {
+            "fact": "The reminder is sent reminder-days before the deadline; if that date has already passed, it's sent on the deadline date instead.",
+            "evidence": "ticket_management/services/ticket_reminder_services.py:TicketReminderEmailDataService.get_scheduled_email_data"
+          },
+          {
+            "fact": "Setting a reminder requires a deadline to already be set, and the computed reminder date can't be in the past.",
+            "evidence": "ticket_management/serializers/ticket_serializers.py:TicketReminderSerializer.validate_reminder_days"
+          },
+          {
+            "fact": "A ticket can be Issued, Void, or Refunded; voiding only changes the status, and refunding one ticket line automatically marks every other line sharing the same PNR and ticket number as Refunded too.",
+            "evidence": "ticket_management/services/pnr_ticket_service.py:PnrTicketService.create_or_update_pnr_tickets_gds/change_ticket_status"
+          },
+          {
+            "fact": "Seat/ticket counts never go negative \u2014 reducing an allocation below zero is floored at zero instead of erroring.",
+            "evidence": "ticket_management/services/pnr_service.py:PNRService.reduce_number_of_allocated_tickets_quantity"
+          },
+          {
+            "fact": "A ticket supplier's name must be unique, and a URL-friendly identifier is generated for it automatically from the name.",
+            "evidence": "ticket_management/services/ticket_supplier_service.py:TicketSupplierService.prepare_data"
+          },
+          {
+            "fact": "A ticket supplier can't be deactivated while any active flight segment on an active ticket still uses it.",
+            "evidence": "ticket_management/services/ticket_supplier_service.py:TicketSupplierService.check_this_ticket_supplier_has_active_ticket"
+          },
+          {
+            "fact": "An error PNR is tracked separately per combination of PNR reference, source system, and status \u2014 so the same PNR can have more than one open error if it fails for different reasons or from different systems.",
+            "evidence": "ticket_management/models/error_pnr_model.py"
+          },
+          {
+            "fact": "An error PNR's status is one of: failed to retrieve, in the error queue, or resolved; the source system is either Amadeus or Sabre.",
+            "evidence": "ticket_management/constant.py"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "No file, or a missing file name, on upload returns \"This field is required.\"",
+            "evidence": "ticket_management/serializers/ticket_file_serializers.py:TicketsFileSerializers.validate"
+          },
+          {
+            "fact": "A file over the size limit returns \"File too large. Maximum allowed size is 5MB.\"",
+            "evidence": "ticket_management/serializers/ticket_file_serializers.py:TicketsFileSerializers.validate"
+          },
+          {
+            "fact": "A sheet missing a required column returns \"Missing required columns: {list}\"; an empty sheet returns \"No rows found\"; a row missing a required value returns \"Missing required values in column: {column}\".",
+            "evidence": "ticket_management/services/ticket_file_services.py:TicketsFileService.validate_rows"
+          },
+          {
+            "fact": "A badly formatted departure/arrival time returns \"Invalid time format in column '{column}' at row {row}.\"",
+            "evidence": "ticket_management/services/ticket_file_services.py:TicketsFileService._validate_time_columns"
+          },
+          {
+            "fact": "Inconsistent group/passenger-count/supplier/deadline data across a PNR's rows returns \"Inconsistent PNR data for PNR: {pnr}...\"",
+            "evidence": "ticket_management/services/ticket_file_services.py:TicketsFileService._validate_pnr_data"
+          },
+          {
+            "fact": "A billing supplier that doesn't already exist in the system returns \"Supplier '{name}' does not exist. Please create it first.\"",
+            "evidence": "ticket_management/services/ticket_file_services.py:TicketsFileService._validate_billing_supplier"
+          },
+          {
+            "fact": "Manually entering a flight segment without a departure or arrival time returns \"Departure time is required.\" / \"Arrival time is required.\"",
+            "evidence": "ticket_management/services/itinerary_service.py:ItineraryService._validate_time_field"
+          },
+          {
+            "fact": "Setting the same location as both departure and destination on a segment returns \"You cannot select the same location as both the departure and destination.\"",
+            "evidence": "ticket_management/services/itinerary_service.py:ItineraryService.prepare_data"
+          },
+          {
+            "fact": "Attempting to set a reminder with no deadline yet on the ticket returns \"Please Update Ticket Deadline.\"; a reminder date in the past returns \"Reminder emails cannot be set before today's date.\"",
+            "evidence": "ticket_management/serializers/ticket_serializers.py:TicketReminderSerializer.validate_reminder_days"
+          },
+          {
+            "fact": "Trying to deactivate a ticket supplier still linked to an active flight segment returns \"This ticket supplier has active ticket\".",
+            "evidence": "ticket_management/services/ticket_supplier_service.py:TicketSupplierService.update_status"
+          },
+          {
+            "fact": "Choosing an arrivals/departures report date range where the end date is before the start date is rejected (\"...date from cannot be after...date to.\").",
+            "evidence": "ticket_management/serializers/ticket_serializers.py:FlightArrivalsQuerySerializer.validate"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Uploading a bulk ticket Excel file only requires being logged in \u2014 no specific ticket-management permission is checked.",
+            "evidence": "ticket_management/views/ticket_file_views.py:TicketsFileViewSet"
+          },
+          {
+            "fact": "Viewing the PNR list and the error-PNR list requires being logged in and holding the corresponding view permission.",
+            "evidence": "ticket_management/views/itinerary_tab_pnr_views.py:BookingFlightPnrListAPIView; ticket_management/views/error_pnr_views.py:PnrErrorListAPIView"
+          },
+          {
+            "fact": "Downloading the bulk-import template only requires being logged in.",
+            "evidence": "ticket_management/views/pnr_template_download_view.py:PNRTemplateDownloadView"
+          },
+          {
+            "fact": "Managing ticket suppliers requires being logged in and holding the corresponding add/change permission; deleting a supplier isn't offered at all (only deactivating one is).",
+            "evidence": "ticket_management/views/ticket_supplier_views.py:TicketSupplierAPIViewSet"
+          },
+          {
+            "fact": "Ticket types can only be viewed by regular staff \u2014 creating or editing them is only possible from the platform's central administration console.",
+            "evidence": "ticket_management/views/ticket_type_views.py:TicketTypeAPIViewSet; ticket_management/views/admin_ticket_type_views.py"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "PNR Reference \u2014 the airline/GDS booking reference code for this ticket record.",
+            "evidence": "ticket_management/models/ticket_model.py:Pnr.pnr"
+          },
+          {
+            "fact": "Source \u2014 whether the PNR was synced automatically from the airline/GDS system or entered manually by staff.",
+            "evidence": "ticket_management/models/ticket_model.py:Pnr.ticket_source_type"
+          },
+          {
+            "fact": "Upload Method \u2014 how the PNR entered the system: bulk Excel upload, manual entry, or automatic GDS sync.",
+            "evidence": "ticket_management/constant.py:TicketUploadType"
+          },
+          {
+            "fact": "Total Tickets / Allocated Tickets \u2014 how many seats the PNR holds in total, and how many of those are already reserved against bookings; the remainder is what's still available.",
+            "evidence": "ticket_management/models/ticket_model.py:Pnr.number_of_tickets/number_of_allocated_tickets"
+          },
+          {
+            "fact": "Group PNR \u2014 marks a PNR as a block/group booking of shared seats rather than individually tracked passenger tickets.",
+            "evidence": "ticket_management/models/ticket_model.py:Pnr.is_group_pnr"
+          },
+          {
+            "fact": "Deadline, Reminder Days, Reminder Email \u2014 when action (e.g. ticketing) is due, how many days beforehand to send a reminder, and who receives it.",
+            "evidence": "ticket_management/models/ticket_model.py:Pnr.deadline/reminder_days/reminder_email"
+          },
+          {
+            "fact": "Departure/Destination \u2014 the overall trip's starting and final point, worked out automatically from the individual flight segments.",
+            "evidence": "ticket_management/services/pnr_service.py:TicketDestinationService.get_destination_from_round_trip_itineraries"
+          },
+          {
+            "fact": "Flight Segment (Itinerary) fields \u2014 flight number, departure/arrival airport, date and time, carrier, cabin class, number of stops, and aircraft type for one leg of the trip.",
+            "evidence": "ticket_management/models/ticket_model.py:Itinerary"
+          },
+          {
+            "fact": "Named Passenger (PNR Passenger) \u2014 a traveler's name, type (e.g. adult/child), date of birth, and how many tickets they hold on this PNR.",
+            "evidence": "ticket_management/models/ticket_model.py:PnrPassenger"
+          },
+          {
+            "fact": "Ticket Line (PNR Ticket) \u2014 one issued e-ticket: ticket number, traveler name, fare amounts, carrier, issue date, and its status (Issued, Void, or Refund).",
+            "evidence": "ticket_management/models/ticket_model.py:PnrTicket"
+          },
+          {
+            "fact": "Ticket Supplier \u2014 the airline or ticketing supplier a flight segment's ticket was bought through.",
+            "evidence": "ticket_management/models/ticket_supplier_model.py:TicketSupplier"
+          },
+          {
+            "fact": "Error PNR status \u2014 Failed to Retrieve (the initial automatic fetch didn't work), In Error Queue (waiting on retry), or Resolved.",
+            "evidence": "ticket_management/constant.py"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "To bulk-import flights: staff download the template (English headers, an example row to delete, and an instructions sheet), fill in the required columns, and upload it; a bad file is rejected up front with a message pointing at the exact problem, otherwise the PNRs and their flight segments are created or updated, and any deadline reminders are scheduled automatically.",
+            "evidence": "ticket_management/services/pnr_template_service.py:PNRTemplateService.get_template_columns; ticket_management/services/ticket_file_services.py:TicketsFileService.create"
+          },
+          {
+            "fact": "To enter a PNR by hand: staff fill in the flight segments, passengers, and ticket details directly; if it turns out to duplicate an existing PNR with the same reference and identical flights, the system quietly merges them so no duplicate record is left behind.",
+            "evidence": "ticket_management/services/pnr_service.py:PNRService.create"
+          },
+          {
+            "fact": "For a PNR that came from an automatic GDS sync, staff can only adjust its deadline and add remarks to its flight segments \u2014 everything else stays under GDS control.",
+            "evidence": "ticket_management/services/pnr_service.py:PNRService.update"
+          },
+          {
+            "fact": "When an automatic sync fails, staff see it appear in the error-PNR list (unresolved ones shown by default) so it can be investigated.",
+            "evidence": "ticket_management/views/error_pnr_views.py:PnrErrorListAPIView.get_queryset"
+          },
+          {
+            "fact": "To check who's arriving or departing on a given day: staff pick airports and a date range and download an Excel report listing every affected passenger, whether their flight came from a synced PNR or was added manually.",
+            "evidence": "ticket_management/services/flight_arrivals_report_service.py:FlightArrivalsReportService.generate_flight_excel_report"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Deactivating a PNR (soft-deleting it) also cancels any scheduled deadline-reminder email tied to it.",
+            "evidence": "ticket_management/services/pnr_service.py:PNRService.soft_delete"
+          },
+          {
+            "fact": "Merging a duplicate PNR repoints any bookings that had reserved seats on the duplicate over to the surviving PNR, so no booking loses its flight reservation.",
+            "evidence": "ticket_management/services/pnr_service.py:PNRService.merge_duplicate_tickets"
+          },
+          {
+            "fact": "Bulk Excel import can automatically create a new ticket supplier record if the airline name in the file isn't recognized yet.",
+            "evidence": "ticket_management/services/ticket_file_services.py:TicketsFileService.extract_itineraries"
+          },
+          {
+            "fact": "A PNR's billing supplier is used to determine who to bill for its ticket cost.",
+            "evidence": "ticket_management/services/ticket_file_services.py:TicketsFileService._validate_billing_supplier"
+          },
+          {
+            "fact": "Updating a manually-entered (non-GDS) PNR pushes the new flight-segment data into every booking that has reserved seats on it, keeping each booking's own itinerary display in sync.",
+            "evidence": "ticket_management/services/pnr_service.py:PNRService.update"
+          }
+        ]
+      }
+    },
+    {
+      "id": "flights-tickets/booking-assignment",
+      "name": "Booking Flight Assignment",
+      "summary": "Linking a PNR to a booking, reserving and assigning seats to passengers, keeping a booking's flight segments in sync with its PNR, and removing a PNR from a booking.",
+      "files": [
+        "booking/models/booking_pnr_ticket*",
+        "booking/models/booking_flight_itinerary*",
+        "booking/services/booking_flight_itinerary_service.py"
+      ],
+      "depends_on": [
+        "booking",
+        "flights-tickets/pnr-tickets"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "completed",
+      "skip_reason": null,
+      "doc": "docs/product/flights-tickets-booking-assignment.md",
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "what_it_does": [
+          "booking/models/booking_flight_itinerary_model.py",
+          "ticket_management/models/assign_ticket_model.py"
+        ],
+        "how_it_works": [
+          "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.link_pnr_booking_passengers",
+          "ticket_management/serializers/assigned_ticket_serializes.py:AssignTicketCreateSerializer/GroupAssignTicketSerializer",
+          "ticket_management/services/assigned_ticket_services.py:AssignedTicketService.update/delete_assign_ticket",
+          "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.sync_booking_flight_itineraries/resync_booking_itineraries",
+          "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.delete_booking_itinerary_pnr"
+        ],
+        "rules_and_edge_cases": [
+          "ticket_management/serializers/booking_ticket_serializers.py:BookingTicketCreateSerializer",
+          "ticket_management/services/assigned_ticket_services.py:AssignedTicketService.create",
+          "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.validate_segments_financial_lines_before_deletion",
+          "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.update_booking_calculations_for_flight_financial"
+        ],
+        "limitations": [
+          "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.delete_booking_itinerary_pnr"
+        ],
+        "related_features": [
+          "booking/services/booking_flight_itinerary_service.py"
+        ],
+        "faq": [
+          "ticket_management/services/booking_ticket_services.py:BookingTicketService.create",
+          "ticket_management/services/assigned_ticket_services.py:AssignedTicketService.create"
+        ]
+      },
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "Staff reserve a number of seats from a PNR against a confirmed booking; this only works while the booking is in Booked status, the PNR is active, and there are enough unreserved seats and transport-needing passengers to cover the request.",
+            "evidence": "ticket_management/serializers/booking_ticket_serializers.py:BookingTicketCreateSerializer.validate_booking/validate_ticket/validate_number_of_tickets"
+          },
+          {
+            "fact": "Reserving seats on a booking also copies the PNR's current flight segments onto the booking so its own itinerary display is populated immediately.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.link_pnr_booking_passengers"
+          },
+          {
+            "fact": "Staff assign one reserved seat to a specific traveling passenger on the booking; a passenger can only be assigned once per reservation, and a passenger not on that booking can't be picked.",
+            "evidence": "ticket_management/serializers/assigned_ticket_serializes.py:AssignTicketCreateSerializer"
+          },
+          {
+            "fact": "Staff can reassign an already-assigned seat to a different passenger, or unassign it outright; both actions keep the reservation's assigned-seat count accurate.",
+            "evidence": "ticket_management/services/assigned_ticket_services.py:AssignedTicketService.update/delete_assign_ticket"
+          },
+          {
+            "fact": "When a reservation's seat count exactly matches the booking's passenger count, staff can assign every traveling passenger in one action instead of one at a time.",
+            "evidence": "ticket_management/serializers/assigned_ticket_serializes.py:GroupAssignTicketSerializer"
+          },
+          {
+            "fact": "A seat reservation can't be removed once any passenger has been assigned to it \u2014 staff must unassign passengers first.",
+            "evidence": "ticket_management/views/assigned_ticket_views.py:BookingTicketsAPIViewSet.destroy"
+          },
+          {
+            "fact": "Staff can trigger a manual \"recreate segments\" action on a booking's linked PNR to re-sync its flight segments if they look stale or incomplete.",
+            "evidence": "booking/views/booking_itinerary_views.py:BookingFlightItineraryPnrRecreateSegmentsAPIView.post"
+          },
+          {
+            "fact": "A scheduled background process finds bookings whose linked PNR has flight segments that never made it onto the booking, and re-syncs them automatically.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.get_resyncable_pnrs/resync_booking_itineraries"
+          },
+          {
+            "fact": "Removing a PNR from a booking is blocked entirely if any billing has already been generated from its flight segments.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.delete_booking_itinerary_pnr"
+          },
+          {
+            "fact": "Staff can download a passenger manifest for a specific ticket reservation, or for a date/airport range, listing every assigned traveler and their passport/contact details.",
+            "evidence": "ticket_management/views/assigned_ticket_views.py:DownloadAssignedPassengersAPIView, DownloadAssignedPassengersByDateAPIView"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A reservation can't be for more seats than the PNR still has available, nor more than the number of passengers on the booking who still need transport.",
+            "evidence": "ticket_management/serializers/booking_ticket_serializers.py:BookingTicketCreateSerializer.validate_number_of_tickets"
+          },
+          {
+            "fact": "Only one seat reservation is allowed per booking-and-PNR combination \u2014 a second attempt is rejected.",
+            "evidence": "ticket_management/services/booking_ticket_services.py:BookingTicketService.create"
+          },
+          {
+            "fact": "Reducing an already-made reservation's seat count can't drop it below the number of passengers already assigned to it, nor exceed the booking's total passenger count.",
+            "evidence": "ticket_management/services/booking_ticket_services.py:BookingTicketService.update"
+          },
+          {
+            "fact": "Only one passenger can be assigned per seat reservation slot \u2014 the same passenger can't be assigned twice to the same reservation, and the same seat slot can't hold two passengers.",
+            "evidence": "ticket_management/serializers/assigned_ticket_serializes.py:AssignTicketCreateSerializer"
+          },
+          {
+            "fact": "Passengers marked as free-travel on tour and non-tour bookings don't count against the reservation's assigned-seat total; on yacht bookings every assigned passenger always counts.",
+            "evidence": "ticket_management/services/assigned_ticket_services.py:AssignedTicketService.create"
+          },
+          {
+            "fact": "One-click group assignment only works when the reservation's seat count, the number of passengers needing transport, and the booking's total passenger count are all exactly equal \u2014 any mismatch, or an already-fully-assigned reservation, blocks the action.",
+            "evidence": "ticket_management/serializers/assigned_ticket_serializes.py:GroupAssignTicketSerializer.validate"
+          },
+          {
+            "fact": "When a booking's flight segments are re-synced from its PNR, existing segments are matched to the PNR's current segments by flight order; any segment no longer present is removed, but if it already had billing attached, that billing is carried over to another segment instead of being lost, and removal is skipped if there's nowhere to move the billing.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.sync_booking_flight_itineraries"
+          },
+          {
+            "fact": "Removing a PNR from a booking is refused outright if any billing line exists on its flight segments \u2014 issued or not \u2014 and refused with a more specific message if that billing has already been issued.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.delete_booking_itinerary_pnr/validate_segments_financial_lines_before_deletion"
+          },
+          {
+            "fact": "Removing a PNR from a booking also removes any traveling passenger who only existed because of that PNR, and adjusts the booking's passenger count accordingly for bookings made without a tour package.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.delete_booking_itinerary_pnr"
+          },
+          {
+            "fact": "If a booking's flight cost changes after a re-sync, the booking's totals and balance due are recalculated automatically, and both an increase and a decrease trigger a notification to the accounting system.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.update_booking_calculations_for_flight_financial"
+          },
+          {
+            "fact": "A booking's return date can be set automatically from its flight data, but only for bookings made without a tour package, and only if it hasn't already been manually set.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.update_booking_return_date_from_flights"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Reserving or group-assigning seats on a booking that isn't in Booked status is rejected: \"Can't assign tickets on cancelled, transferred and pending booking!\"",
+            "evidence": "ticket_management/serializers/booking_ticket_serializers.py:BookingTicketCreateSerializer.validate_booking"
+          },
+          {
+            "fact": "Reserving seats on an inactive PNR is rejected: \"This ticket is not active.\"",
+            "evidence": "ticket_management/serializers/booking_ticket_serializers.py:BookingTicketCreateSerializer.validate_ticket"
+          },
+          {
+            "fact": "Reserving more seats than the PNR has left is rejected: \"There are not enough tickets on this ticket to allocate to this booking.\"",
+            "evidence": "ticket_management/serializers/booking_ticket_serializers.py:BookingTicketCreateSerializer.validate_ticket"
+          },
+          {
+            "fact": "Requesting more seats than passengers who still need transport is rejected: \"You can't assign more tickets than total transport required for passengers\"",
+            "evidence": "ticket_management/serializers/booking_ticket_serializers.py:BookingTicketCreateSerializer.validate_number_of_tickets"
+          },
+          {
+            "fact": "A duplicate seat reservation for the same booking and PNR is rejected: \"Same booking ticket exists.\"",
+            "evidence": "ticket_management/services/booking_ticket_services.py:BookingTicketService.create"
+          },
+          {
+            "fact": "Trying to remove a reservation that already has assigned passengers is rejected: \"This booking ticket is already used.\"",
+            "evidence": "ticket_management/views/assigned_ticket_views.py:BookingTicketsAPIViewSet.destroy"
+          },
+          {
+            "fact": "Assigning a seat to a passenger not on that booking is rejected: \"This passenger is not from this booking.\"",
+            "evidence": "ticket_management/serializers/assigned_ticket_serializes.py:AssignTicketCreateSerializer.validate_passenger"
+          },
+          {
+            "fact": "Assigning a passenger twice to the same reservation is rejected: \"You have already assigned the same ticket to this booking passenger.\"",
+            "evidence": "ticket_management/serializers/assigned_ticket_serializes.py:AssignTicketCreateSerializer.validate_booking_ticket"
+          },
+          {
+            "fact": "Group-assigning when the counts don't line up exactly is rejected: \"Passenger count does not match. Group assign is not possible.\"; attempting it when already fully assigned is rejected: \"Ticket assignment for all passenger completed!\"",
+            "evidence": "ticket_management/serializers/assigned_ticket_serializes.py:GroupAssignTicketSerializer.validate"
+          },
+          {
+            "fact": "Recreating a PNR's flight segments on a booking where that PNR isn't actually linked is rejected: \"PNR is not linked to this booking.\"",
+            "evidence": "booking/views/booking_itinerary_views.py:BookingFlightItineraryPnrRecreateSegmentsAPIView.post"
+          },
+          {
+            "fact": "Removing a PNR from a booking is rejected outright if any billing line is attached to its flight segments (\"Cannot delete PNR as there are financial lines linked to the itinerary segments.\"), and specifically if that billing was already issued (\"The corresponding PNR billing line is already issued and cannot be deleted.\").",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.delete_booking_itinerary_pnr/validate_segments_financial_lines_before_deletion"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Reserving seats from a PNR, assigning/reassigning/unassigning passengers, group-assigning, and downloading passenger manifests all only require the staff member to be logged in \u2014 no dedicated permission beyond that.",
+            "evidence": "ticket_management/views/assigned_ticket_views.py"
+          },
+          {
+            "fact": "Recreating a booking's flight segments and viewing/removing a booking's linked PNR require being logged in and holding the relevant permission.",
+            "evidence": "booking/views/booking_itinerary_views.py:BookingFlightItineraryPnrRecreateSegmentsAPIView, BookingFlightItineraryPnrRemoveAPIView"
+          },
+          {
+            "fact": "The scheduled bulk re-sync of booking flight segments is a system/service action, not something a staff member triggers directly through the normal login.",
+            "evidence": "booking/views/booking_itinerary_views.py:BookingFlightItineraryResyncSchedulerAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "Reserved Seats / Assigned Seats \u2014 how many seats a booking has reserved from a PNR, and how many of those have actually been given to a named passenger so far.",
+            "evidence": "ticket_management/models/assign_ticket_model.py:BookingTicket"
+          },
+          {
+            "fact": "Seat Assignment \u2014 the link between one reserved seat and the specific traveling passenger it belongs to.",
+            "evidence": "ticket_management/models/assign_ticket_model.py:AssignedTicket"
+          },
+          {
+            "fact": "Booking's Flight Segment \u2014 a copy of a PNR's flight-leg details (times, airports, carrier) kept on the booking itself, so viewing or printing a booking's itinerary doesn't depend on the master PNR staying unchanged.",
+            "evidence": "booking/models/booking_flight_itinerary_model.py"
+          },
+          {
+            "fact": "Show in Itinerary \u2014 lets staff hide a flight segment from the customer-facing itinerary/printout without deleting it from the booking.",
+            "evidence": "booking/models/booking_flight_itinerary_model.py"
+          },
+          {
+            "fact": "Manually Added \u2014 marks a flight segment or ticket line that a staff member entered directly on the booking, rather than one that came from syncing a PNR.",
+            "evidence": "booking/models/booking_flight_itinerary_model.py; booking/models/booking_pnr_ticket_model.py"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "To get a passenger flying: staff first reserve however many seats they need from an active PNR against the confirmed booking (blocked if the booking isn't Booked, the PNR is inactive, or there aren't enough seats/passengers to justify it) \u2014 this also fills in the booking's own flight-segment display right away.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.link_pnr_booking_passengers"
+          },
+          {
+            "fact": "Staff then assign each traveling passenger to one of the reserved seats one at a time, or \u2014 if the numbers line up exactly \u2014 assign everyone in a single group action instead.",
+            "evidence": "ticket_management/serializers/assigned_ticket_serializes.py:AssignTicketCreateSerializer, GroupAssignTicketSerializer"
+          },
+          {
+            "fact": "If a passenger's seat needs to change, staff reassign it directly; to free up a seat entirely, staff unassign the passenger first, since a reservation with any assigned passenger can't be deleted.",
+            "evidence": "ticket_management/services/assigned_ticket_services.py:AssignedTicketService.update/delete_assign_ticket; ticket_management/views/assigned_ticket_views.py:BookingTicketsAPIViewSet.destroy"
+          },
+          {
+            "fact": "If the master PNR's flight details change later, staff can trigger a manual re-sync (\"recreate segments\") on the booking to bring its flight display back in line, or wait for the scheduled background process to catch bookings that were missed.",
+            "evidence": "booking/views/booking_itinerary_views.py:BookingFlightItineraryPnrRecreateSegmentsAPIView; booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.resync_booking_itineraries"
+          },
+          {
+            "fact": "To remove a flight from a booking entirely, staff remove the linked PNR \u2014 but this is refused if any billing has already been created from those flight segments, so staff need to resolve the billing first.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.delete_booking_itinerary_pnr"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "A change in a booking's flight cost after re-syncing automatically updates the booking's total and balance due, and notifies the accounting system of the increase or decrease.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.update_booking_calculations_for_flight_financial"
+          },
+          {
+            "fact": "A flight-cost change can also adjust the travel agent's commission on the booking.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.update_booking_calculations_for_flight_financial"
+          },
+          {
+            "fact": "Removing a PNR from a booking removes any traveling passenger that only existed for that PNR, and unlinks any other traveler still referencing it.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.delete_booking_itinerary_pnr"
+          },
+          {
+            "fact": "Removing a PNR's flight segments also updates any bundled itinerary package those segments belonged to.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.delete_booking_itinerary_pnr"
+          },
+          {
+            "fact": "For bookings made without a tour package, a booking's return date can be automatically filled in from its flight data.",
+            "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.update_booking_return_date_from_flights"
+          }
+        ]
       }
     },
     {

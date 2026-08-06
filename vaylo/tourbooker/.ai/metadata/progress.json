@@ -2,9 +2,9 @@
   "mode": "create",
   "run_started_at": "2026-07-29",
   "run_anchor_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
-  "current_feature": "flights-tickets",
+  "current_feature": "tour-types",
   "current_step": "analyze",
   "scope_this_run": [],
-  "notes": "Resumed full backlog: passengers documented (1 of 26 remaining). Next: flights-tickets.",
-  "run_processed_count": 6
+  "notes": "Resumed full backlog. passengers + flights-tickets (split into overview/pnr-tickets/booking-assignment) documented (3 of 26 remaining). Next: tour-types.",
+  "run_processed_count": 8
 }
