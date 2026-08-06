@@ -27,3 +27,5 @@ Format: **Term** — definition in one or two sentences, primary-reader language
 **Account Invoice** — The formal billing document grouping a booking's billing lines, progressing through Draft, Issued, and Void/Credited states.
 
 **Transaction** — A single recorded payment or refund, linked to a booking, invoice, gift card, or account.
+
+**Co-Passenger** — A personal, reusable "known traveler" contact saved under one customer's account, automatically created from past booking companions; distinct from the master Passenger client record.

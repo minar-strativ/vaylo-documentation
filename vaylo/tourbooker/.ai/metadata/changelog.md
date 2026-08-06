@@ -12,3 +12,4 @@ Append-only. One line per event:
 2026-07-30 | booking | created | 3 of 5 scoped features | 20675c05c
 2026-07-30 | billing | created | 4 of 5 scoped features | 20675c05c
 2026-07-30 | payments | created | 5 of 5 scoped features — pilot run complete | 20675c05c
+2026-08-06 | passengers | created | resuming full backlog, 1 of 26 remaining features | 20675c05c

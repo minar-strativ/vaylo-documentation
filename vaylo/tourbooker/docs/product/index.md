@@ -1,13 +1,13 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 features discovered total; 5 documented so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 features discovered total; 6 documented so far.
 
 ## Bookings & Catalog
 
 - [Tours](tours.md) — The catalog listing customers browse and book: dates, capacity, pricing, drafts, and multi-brand visibility.
 - [Hotels & Accommodation](hotels.md) — Room-type inventory tours draw from when selling accommodation, plus simple lodging references.
 - [Bookings](booking.md) — Core booking record: reserve tours/hotels/yachts for passengers, payment/cancellation handling, waitlisting.
-- Passengers — Passenger and co-passenger records, bulk passenger import. *(pending)*
+- [Passengers](passengers.md) — Passenger and co-passenger records, bulk passenger import.
 - Flights & Ticketing (PNR) — Flight itineraries, PNR/ticket management, ticket assignment, and error-PNR handling. *(pending)*
 - Tour Types — Reusable tour templates (type, images, vehicles, pickup locations) that tours are built from. *(pending)*
 - Custom Tour Offers — Bespoke tour offers with Wetu itinerary import, supplements and pickup locations. *(pending)*

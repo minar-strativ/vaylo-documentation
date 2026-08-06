@@ -1,16 +1,10 @@
 {
-  "mode": "idle",
+  "mode": "create",
   "run_started_at": "2026-07-29",
   "run_anchor_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
-  "current_feature": null,
-  "current_step": null,
-  "scope_this_run": [
-    "tours",
-    "hotels",
-    "booking",
-    "billing",
-    "payments"
-  ],
-  "notes": "Pilot run scope complete: tours, hotels, booking, billing, payments all documented (5/5 scoped). 26 features remain pending overall \u2014 run /doc-create to continue into the full backlog (no scope restriction needed for the next run).",
-  "run_processed_count": 5
+  "current_feature": "flights-tickets",
+  "current_step": "analyze",
+  "scope_this_run": [],
+  "notes": "Resumed full backlog: passengers documented (1 of 26 remaining). Next: flights-tickets.",
+  "run_processed_count": 6
 }

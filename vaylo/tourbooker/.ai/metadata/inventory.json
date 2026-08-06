@@ -198,21 +198,374 @@
       "depends_on": [],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/passengers.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "what_it_does": [
+          "passenger/models/passenger_model.py",
+          "passenger/services/passenger_service.py:PassengerService.create_passengers"
+        ],
+        "who_uses_it": [
+          "passenger/views/passenger_views.py",
+          "passenger/views/passenger_import_views.py"
+        ],
+        "how_it_works": [
+          "passenger/views/passenger_views.py:PassengerListCreateAPIView.post",
+          "passenger/services/passenger_import_service.py:PassengerImportFileService.create_bulk_passengers_from_excel",
+          "passenger/services/passenger_template_service.py:PassengerTemplateService.generate_excel_file",
+          "passenger/services/passenger_service.py:PassengerService.update_status",
+          "booking/services/co_passenger_service.py:CoPassengerService.get_or_create_co_passenger"
+        ],
+        "rules_and_edge_cases": [
+          "passenger/models/passenger_model.py:Passenger.Meta",
+          "passenger/serializers/passenger_import_serializer.py:PassengerImportFileSerializer",
+          "passenger/services/passenger_data_transformer_service.py:PassengerDataTransformerService._parse_gender",
+          "passenger/services/passenger_import_validator_service.py:PassengerImportValidatorService"
+        ],
+        "limitations": [
+          "passenger/urls.py",
+          "passenger/services/passenger_data_transformer_service.py:PassengerDataTransformerService._get_organizations"
+        ],
+        "related_features": [
+          "booking/models/booking_passenger_model.py",
+          "booking/services/co_passenger_service.py"
+        ],
+        "faq": [
+          "passenger/services/passenger_service.py:PassengerService.check_passenger_email_exists",
+          "passenger/services/passenger_service.py:PassengerService.sync_linked_user_status"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "Staff create a passenger record via a form; if the email is already used by another passenger, creation is blocked with an error before anything is saved.",
+            "evidence": "passenger/views/passenger_views.py:PassengerListCreateAPIView.post"
+          },
+          {
+            "fact": "Staff can list/search passengers with filters, paginated.",
+            "evidence": "passenger/views/passenger_views.py:PassengerListCreateAPIView.get"
+          },
+          {
+            "fact": "Staff edit an existing passenger's full record; email uniqueness is re-checked (excluding the passenger being edited).",
+            "evidence": "passenger/views/passenger_views.py:PassengerRetrieveUpdateAPIView.put"
+          },
+          {
+            "fact": "There is no hard delete for a passenger record; passengers are deactivated instead via a status toggle.",
+            "evidence": "passenger/urls.py"
+          },
+          {
+            "fact": "Deactivating/reactivating a passenger is blocked if the acting user is trying to change their own linked passenger record.",
+            "evidence": "passenger/services/passenger_service.py:PassengerService.update_status"
+          },
+          {
+            "fact": "Deactivating or reactivating a passenger also flips the linked login account's active status to match, if that passenger has portal access.",
+            "evidence": "passenger/services/passenger_service.py:PassengerService.sync_linked_user_status"
+          },
+          {
+            "fact": "If a passenger is matched by email during a booking flow and found inactive, they are automatically reactivated (and their linked login re-activated too).",
+            "evidence": "passenger/services/passenger_service.py:PassengerService.reactivate_if_inactive"
+          },
+          {
+            "fact": "Staff can export the full passenger/client list to an Excel spreadsheet, respecting the same filters as the list view.",
+            "evidence": "passenger/views/passenger_views.py:PassengerExcelDownloadAPIView.get"
+          },
+          {
+            "fact": "Staff can download a blank Excel import template pre-filled with column headers, a translation row, and one example row, plus an instructions sheet.",
+            "evidence": "passenger/views/passenger_template_view.py:PassengerTemplateDownloadAPIView.get"
+          },
+          {
+            "fact": "Staff can bulk-upload a filled-in Excel file to create many passengers at once in a single request.",
+            "evidence": "passenger/views/passenger_import_views.py:PassengerImportExcelAPIView.post"
+          },
+          {
+            "fact": "Bulk import validates the file itself first (type and size) before opening it.",
+            "evidence": "passenger/serializers/passenger_import_serializer.py:PassengerImportFileSerializer.validate_file"
+          },
+          {
+            "fact": "Bulk import checks that the two mandatory columns exist in the sheet before processing any rows.",
+            "evidence": "passenger/services/passenger_import_service.py:PassengerImportFileService._validate_dataframe_columns"
+          },
+          {
+            "fact": "Bulk import processes each data row independently: a problem in one row does not stop the rest of the file from importing.",
+            "evidence": "passenger/services/passenger_import_service.py:PassengerImportFileService.create_bulk_passengers_from_excel"
+          },
+          {
+            "fact": "A row whose email already belongs to an existing passenger is skipped (not treated as an error).",
+            "evidence": "passenger/services/passenger_import_service.py:PassengerImportFileService.create_bulk_passengers_from_excel"
+          },
+          {
+            "fact": "Every bulk import upload is recorded as an import-file entry, tracking whether at least one passenger was successfully created from it.",
+            "evidence": "passenger/models/passenger_import_model.py:PassengerImportFile"
+          },
+          {
+            "fact": "When a booking includes travelers other than the lead passenger, each of those travelers is automatically saved as a reusable 'co-passenger' contact under the lead passenger's account.",
+            "evidence": "booking/services/co_passenger_service.py:CoPassengerService.get_or_create_co_passenger"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A passenger's email must be unique system-wide when set; multiple passengers may have no email at all.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.Meta (unique_passenger_email constraint)"
+          },
+          {
+            "fact": "Duplicate email at direct create/edit returns the message 'Client email already exists! Please try a new one.'",
+            "evidence": "passenger/services/passenger_service.py:PassengerService.check_passenger_email_exists"
+          },
+          {
+            "fact": "Bulk import requires only First Name and Last Name; all ~29 other columns are optional.",
+            "evidence": "passenger/services/passenger_column_mapper_service.py:PassengerColumnMapperService.get_required_columns"
+          },
+          {
+            "fact": "Bulk import files must be .xlsx format and no larger than 10 MB.",
+            "evidence": "passenger/serializers/passenger_import_serializer.py:PassengerImportFileSerializer.MAX_FILE_SIZE / ALLOWED_EXTENSIONS"
+          },
+          {
+            "fact": "In the import template, Excel row 1 is the English header, row 2 is a Swedish translation row that must be kept, and actual data starts at row 3.",
+            "evidence": "passenger/services/passenger_import_service.py:PassengerImportFileService._extract_rows_from_dataframe"
+          },
+          {
+            "fact": "Salutation is one of Mr, Mrs, or Ms.",
+            "evidence": "passenger/constants.py:NAME_TITLE_CHOICE"
+          },
+          {
+            "fact": "Gender is one of Male or Female.",
+            "evidence": "passenger/constants.py:GENDER_CHOICE"
+          },
+          {
+            "fact": "During import, an unrecognized salutation or gender value is left blank rather than rejecting the row.",
+            "evidence": "passenger/services/passenger_data_transformer_service.py:PassengerDataTransformerService._parse_gender / _parse_name_title"
+          },
+          {
+            "fact": "Import dates should be in YYYY-MM-DD format; a few common alternate formats (DD-MM-YYYY, MM/DD/YYYY, DD/MM/YYYY) are also accepted; anything else that was actually filled in is rejected as invalid.",
+            "evidence": "passenger/services/passenger_data_transformer_service.py:PassengerDataTransformerService._parse_date"
+          },
+          {
+            "fact": "Organizations and tags referenced during import must already exist in the system; unrecognized ones are silently skipped rather than created or flagged.",
+            "evidence": "passenger/services/passenger_data_transformer_service.py:PassengerDataTransformerService._get_organizations / _get_tags"
+          },
+          {
+            "fact": "Passengers created through bulk import are always categorized as passenger type 'Standard'.",
+            "evidence": "passenger/dtos/import_dtos.py:PassengerImportRow.to_passenger_dict"
+          },
+          {
+            "fact": "A staff member cannot deactivate or reactivate their own linked passenger record.",
+            "evidence": "passenger/services/passenger_service.py:PassengerService.update_status"
+          },
+          {
+            "fact": "The combined address field is built from two underlying address lines joined by a comma, and editing it splits the value back into those two lines.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.address"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Uploading no file returns 'No file provided.'",
+            "evidence": "passenger/serializers/passenger_import_serializer.py:PassengerImportFileSerializer.validate_file"
+          },
+          {
+            "fact": "Uploading a non-.xlsx file returns 'Invalid file type. Allowed: .xlsx'",
+            "evidence": "passenger/serializers/passenger_import_serializer.py:PassengerImportFileSerializer.validate_file"
+          },
+          {
+            "fact": "Uploading a file over 10 MB returns 'File too large. Maximum size: 10.0 MB'",
+            "evidence": "passenger/serializers/passenger_import_serializer.py:PassengerImportFileSerializer.validate_file"
+          },
+          {
+            "fact": "A sheet missing First Name or Last Name columns entirely returns 'Missing required columns: ...'",
+            "evidence": "passenger/services/passenger_import_service.py:PassengerImportFileService._validate_dataframe_columns"
+          },
+          {
+            "fact": "A blank First Name on a row returns row error 'first_name is required'; same pattern for Last Name.",
+            "evidence": "passenger/services/passenger_import_validator_service.py:PassengerImportValidatorService._validate_required_fields"
+          },
+          {
+            "fact": "An invalid email format on a row returns 'Invalid email format: {value}'",
+            "evidence": "passenger/services/passenger_import_validator_service.py:PassengerImportValidatorService._validate_email_format"
+          },
+          {
+            "fact": "An email already used by an existing passenger returns 'Email already exists: {value}' and the row is skipped rather than failed.",
+            "evidence": "passenger/services/passenger_import_validator_service.py:PassengerImportValidatorService._validate_email_uniqueness"
+          },
+          {
+            "fact": "An unparseable Date of Birth or Passport Expiry Date (when a value was actually entered) returns 'Invalid date_of_birth format: {value}' or 'Invalid passport_expiry_date format: {value}'.",
+            "evidence": "passenger/services/passenger_import_validator_service.py:PassengerImportValidatorService._validate_date_fields"
+          },
+          {
+            "fact": "Leaving email blank is always valid, both when creating directly and when importing.",
+            "evidence": "passenger/services/passenger_import_validator_service.py:PassengerImportValidatorService._validate_email_format"
+          },
+          {
+            "fact": "The status-update action requires an explicit active/inactive value; omitting it returns \"'is_active' field is required.\"",
+            "evidence": "passenger/serializers/passenger_serializer.py:PassengerUpdateStatusSerializer.validate"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Creating, viewing, editing, deactivating, and exporting passengers all require the user to be logged in and hold the corresponding passenger permission (add/change/view).",
+            "evidence": "passenger/views/passenger_views.py:PassengerListCreateAPIView, PassengerRetrieveUpdateAPIView, PassengerUpdateStatusAPIView, PassengerExcelDownloadAPIView"
+          },
+          {
+            "fact": "Downloading the import template and running a bulk import only require being logged in, not a specific passenger-management permission.",
+            "evidence": "passenger/views/passenger_import_views.py:PassengerImportExcelAPIView.permission_classes; passenger/views/passenger_template_view.py:PassengerTemplateDownloadAPIView.permission_classes"
+          },
+          {
+            "fact": "No staff member can change the active/inactive status of the passenger record linked to their own account.",
+            "evidence": "passenger/services/passenger_service.py:PassengerService.update_status"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "First Name / Last Name \u2014 the passenger's everyday given and family name, required.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.first_name/last_name"
+          },
+          {
+            "fact": "Email \u2014 the passenger's unique contact email; used to detect the same client across separate bookings and imports.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.email"
+          },
+          {
+            "fact": "Salutation \u2014 Mr, Mrs, or Ms.",
+            "evidence": "passenger/constants.py:NAME_TITLE_CHOICE"
+          },
+          {
+            "fact": "Address, Post Code, City \u2014 home/mailing address; Address is shown and edited as one combined field.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.address"
+          },
+          {
+            "fact": "Gender \u2014 Male or Female.",
+            "evidence": "passenger/constants.py:GENDER_CHOICE"
+          },
+          {
+            "fact": "Date of Birth \u2014 the passenger's birthdate.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.date_of_birth"
+          },
+          {
+            "fact": "National ID Number \u2014 the passenger's national identity/personnummer.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.personal_identity_number"
+          },
+          {
+            "fact": "Passport Number / Passport Expiry Date \u2014 the passenger's travel document identifiers and validity.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.passport_number/passport_expiry_date"
+          },
+          {
+            "fact": "Passport Name (Given Name / Surname) \u2014 the name exactly as printed on the passport, kept separate from the everyday First/Last Name.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.given_name/surname"
+          },
+          {
+            "fact": "Passport Birth City \u2014 city of birth as shown on the passport.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.passport_birth_city"
+          },
+          {
+            "fact": "Nationality \u2014 the passenger's nationality/citizenship.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.nationality"
+          },
+          {
+            "fact": "Telephone Number \u2014 the passenger's primary contact phone number.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.telephone_number"
+          },
+          {
+            "fact": "Allergy / Allergy Description \u2014 whether the passenger has a known allergy and a free-text description.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.allergy/allergy_description"
+          },
+          {
+            "fact": "Additional Information \u2014 free-text notes relevant to the passenger's travel (e.g. meal preference).",
+            "evidence": "passenger/models/passenger_model.py:Passenger.additional_info"
+          },
+          {
+            "fact": "Emergency Contact Name / Telephone / Email / Relation \u2014 next-of-kin contact details.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.emergency_contact_name/_telephone_number/_email/_relation"
+          },
+          {
+            "fact": "Preferred Language, Currency, Country of Residence \u2014 the passenger's communication and billing preferences.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.language/currency/country"
+          },
+          {
+            "fact": "Newsletter Subscription (and date) \u2014 whether the passenger has opted into marketing communication, and when.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.newsletter_subscription/newsletter_subscription_date"
+          },
+          {
+            "fact": "Organizations \u2014 companies or organizations this passenger is associated with (e.g. a corporate travel client).",
+            "evidence": "passenger/models/passenger_model.py:Passenger.organizations"
+          },
+          {
+            "fact": "Linked Account \u2014 the login account this passenger uses to access the customer portal, if any; deactivating one deactivates the other.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.user"
+          },
+          {
+            "fact": "Tags \u2014 free-form labels used to categorize passengers (e.g. 'VIP', 'Frequent').",
+            "evidence": "passenger/models/passenger_model.py:Passenger.tags"
+          },
+          {
+            "fact": "Active/Inactive Status (with changed-by and changed-at) \u2014 whether the passenger record is active; deactivating is the only form of 'deleting' a passenger, and every change is logged with who did it and when.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.is_active/status_changed_by/status_changed_timestamp"
+          },
+          {
+            "fact": "A Co-Passenger is a separate, lightweight 'known traveler' entry saved under a customer's own account, distinct from the master Passenger/client record \u2014 used to speed up adding the same travel companions to future bookings.",
+            "evidence": "booking/models/co_passenger_model.py:CoPassenger.primary_passenger"
+          },
+          {
+            "fact": "On a specific booking, each traveler is one Booking Passenger record, separate from the standalone Passenger/client record it may be linked to; it marks whether that person is the primary passenger, whether they are the paying booking client, and whether they are actually traveling.",
+            "evidence": "booking/models/booking_passenger_model.py:BookingPassenger.is_primary_passenger/is_booking_client/is_traveling"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "To add one passenger: staff open the new-passenger form, fill in at minimum First Name and Last Name; if the email they enter is already used, they see an error and must change it before the record saves.",
+            "evidence": "passenger/views/passenger_views.py:PassengerListCreateAPIView.post"
+          },
+          {
+            "fact": "To bulk-add passengers: staff first download the import template (an Excel file with an English header row, a Swedish translation row, and one filled-in example row, plus a separate instructions sheet explaining formats), delete the example row, fill in their real data starting at row 3, and keep the translation row untouched.",
+            "evidence": "passenger/services/passenger_template_service.py:PassengerTemplateService.create_data_sheet/create_readme_sheet"
+          },
+          {
+            "fact": "They upload the completed file; if it isn't a .xlsx or is over 10MB, or the required columns are missing entirely, the whole upload is rejected immediately with a specific message.",
+            "evidence": "passenger/serializers/passenger_import_serializer.py:PassengerImportFileSerializer.validate_file"
+          },
+          {
+            "fact": "Otherwise the file is processed row by row and the user is shown a summary: how many rows succeeded, how many were skipped (duplicate emails), how many failed with an error message for each failed row.",
+            "evidence": "passenger/dtos/import_dtos.py:PassengerImportSummary.add_result"
+          },
+          {
+            "fact": "To edit a passenger: staff open the passenger's detail record and update any field; changing the email re-runs the same duplicate check used at creation.",
+            "evidence": "passenger/views/passenger_views.py:PassengerRetrieveUpdateAPIView.put"
+          },
+          {
+            "fact": "To remove a passenger: staff toggle it to inactive rather than deleting it outright; they cannot do this to their own linked passenger record, and if that passenger has portal login access, the login is deactivated in the same action.",
+            "evidence": "passenger/services/passenger_service.py:PassengerService.update_status"
+          },
+          {
+            "fact": "To get a spreadsheet of all clients: staff use the export action, which produces a 20-column report covering identity, contact, passport, allergy, emergency-contact, and customer-ID details for the currently filtered list.",
+            "evidence": "passenger/services/passenger_service.py:PassengerService.get_passenger_report_data"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Adding travelers to a booking reuses an existing passenger record by matching email, and creates a new one only if there's no match \u2014 so the same client across multiple bookings stays as one passenger record.",
+            "evidence": "passenger/services/passenger_service.py:PassengerService.create_passengers"
+          },
+          {
+            "fact": "If a matched passenger was inactive, adding them to a new booking automatically reactivates them (and their login, if linked).",
+            "evidence": "passenger/services/passenger_service.py:PassengerService.reactivate_if_inactive"
+          },
+          {
+            "fact": "Booking travelers other than the lead passenger are automatically saved into the lead passenger's own reusable co-passenger contact list, so the same travel companions can be reused on future bookings.",
+            "evidence": "booking/services/co_passenger_service.py:CoPassengerService.get_or_create_co_passenger"
+          },
+          {
+            "fact": "Adding an organization tag or passenger tag that doesn't already exist under the passenger category creates that tag on the fly.",
+            "evidence": "passenger/services/passenger_service.py:PassengerService.get_or_create_tag_into_passenger"
+          },
+          {
+            "fact": "Booking travelers can be linked to a flight ticket/PNR record, tying passenger identity into ticketing.",
+            "evidence": "booking/models/booking_passenger_model.py:BookingPassenger.pnr_passenger"
+          },
+          {
+            "fact": "Booking travelers can be assigned to a specific tour vehicle seat and a room/room-type, tying passenger identity into tour logistics.",
+            "evidence": "booking/models/booking_passenger_model.py:BookingPassenger.tour_vehicle/tour_room_slot/booking_room_type"
+          }
+        ]
       }
     },
     {
