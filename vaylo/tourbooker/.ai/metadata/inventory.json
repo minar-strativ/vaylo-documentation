@@ -3717,21 +3717,294 @@
       "depends_on": [],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/tour-guides.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "what_it_does": [
+          "tour_guide/models/tour_guide_models.py"
+        ],
+        "how_it_works": [
+          "tour_guide/services/tour_guide_services.py:TourGuideService.create",
+          "tour_guide/services/time_slot_services.py:TimeSlotService.create",
+          "tour_guide/services/tour_guide_services.py:add_tour_to_tour_guide",
+          "tour_guide/services/guide_assignment_service.py:GuideAssignmentService.process_tour_assignments",
+          "tour_guide/services/download_passenger_service.py:DownloadPassengerService.generate_excel"
+        ],
+        "rules_and_edge_cases": [
+          "tour_guide/serializers/time_slot_serializers.py:TimeSlotSerializer.validate",
+          "tour_guide/services/tour_guide_services.py:add_tour_to_tour_guide",
+          "tour_guide/services/tour_guide_services.py:update_status"
+        ],
+        "limitations": [
+          "tour_guide/models/tour_guide_models.py:TourGuideType"
+        ],
+        "related_features": [
+          "tour_guide/services/tour_guide_services.py:add_tour_to_tour_guide"
+        ],
+        "faq": [
+          "tour_guide/services/tour_guide_services.py:add_tour_to_tour_guide",
+          "tour_guide/services/tour_guide_services.py:update_status"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "Staff set up guide types (categories like driver-guide or local guide) before guides can be categorized.",
+            "evidence": "tour_guide/views/tour_guide_views.py:TourGuideTypeViewSet"
+          },
+          {
+            "fact": "Staff create a tour guide with personal, contact, and document details; this automatically creates or links a login account and profile for that guide.",
+            "evidence": "tour_guide/services/tour_guide_services.py:TourGuideService.get_or_create_tour_guide_user/get_or_create_tour_guide_user_profile"
+          },
+          {
+            "fact": "A guide can sign in and view/edit their own profile, including uploading their contract, flight ticket, and photo.",
+            "evidence": "tour_guide/views/tour_guide_views.py:MyTourGuideProfileAPIView"
+          },
+          {
+            "fact": "Staff (or the guide) define time-slot windows stating when the guide is available to be assigned to tours.",
+            "evidence": "tour_guide/services/time_slot_services.py:TimeSlotService.create"
+          },
+          {
+            "fact": "When building a tour, staff look up which guides of a given type are available for the tour's exact dates.",
+            "evidence": "tour_guide/services/tour_guide_services.py:TourGuideService.get_available_tour_guides"
+          },
+          {
+            "fact": "Staff assign an available guide to a tour, optionally also linking them to one of the tour's vehicles.",
+            "evidence": "tour_guide/services/tour_guide_services.py:TourGuideService.add_tour_to_tour_guide"
+          },
+          {
+            "fact": "Staff can remove a guide from a tour, which frees up their availability again and detaches any vehicle link.",
+            "evidence": "tour_guide/services/tour_guide_services.py:TourGuideService.remove_tour_from_tour_guide"
+          },
+          {
+            "fact": "Staff can view a consolidated board of every tour's guide assignments grouped by guide type and vehicle, or drill into one guide's full assignment list.",
+            "evidence": "tour_guide/services/guide_assignment_service.py:GuideAssignmentService.process_tour_assignments/process_tour_detail_assignments"
+          },
+          {
+            "fact": "Staff download a passenger manifest for a tour or a specific vehicle on it, listing every traveling passenger's contact, passport, pickup, and allergy details for the assigned guide to use.",
+            "evidence": "tour_guide/services/download_passenger_service.py:DownloadPassengerService.generate_excel"
+          },
+          {
+            "fact": "Staff deactivate a guide when they're no longer available, which also deactivates their login unless they hold an admin role.",
+            "evidence": "tour_guide/services/tour_guide_services.py:TourGuideService.update_status"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A guide's availability window must be at least 5 days long, can't start in the past, and its start date can't come after its end date.",
+            "evidence": "tour_guide/serializers/time_slot_serializers.py:TimeSlotSerializer.validate"
+          },
+          {
+            "fact": "A guide's available time-slot windows can't overlap each other.",
+            "evidence": "tour_guide/services/time_slot_services.py:TimeSlotService.check_time_slot_does_not_overlap_for_tour_guide"
+          },
+          {
+            "fact": "A guide's availability window can't be shrunk to cut out a tour already assigned within it.",
+            "evidence": "tour_guide/services/time_slot_services.py:TimeSlotService.update"
+          },
+          {
+            "fact": "Each guide's email must be unique, and each guide-type label must be unique.",
+            "evidence": "tour_guide/models/tour_guide_models.py:TourGuide.email; TourGuideType.tour_guide_type"
+          },
+          {
+            "fact": "Only one guide of a given type can be assigned to a specific vehicle on a tour, and a guide can only be linked to one vehicle per tour.",
+            "evidence": "tour_guide/services/tour_guide_services.py:add_tour_to_tour_guide"
+          },
+          {
+            "fact": "A guide can only be assigned to a tour if they have an availability window that fully covers the tour's departure-to-return dates.",
+            "evidence": "tour_guide/services/time_slot_services.py:TimeSlotService.get_available_time_slots_for_tour"
+          },
+          {
+            "fact": "Guides can't be assigned to or removed from a tour once its return date has already passed.",
+            "evidence": "tour_guide/views/tour_guide_views.py:AddTourToTourGuideAPIView.post"
+          },
+          {
+            "fact": "A guide can't be deactivated while they're still assigned to any active tour.",
+            "evidence": "tour_guide/services/tour_guide_services.py:TourGuideService.update_status"
+          },
+          {
+            "fact": "An availability window can't be deactivated or removed while it has an active tour attached to it.",
+            "evidence": "tour_guide/views/guide_availability_views.py:TourGuideAvailabilityModifyAPIView.delete"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Setting an availability window's start date before today returns \"Start date can not be less than today.\"",
+            "evidence": "tour_guide/serializers/time_slot_serializers.py:TimeSlotSerializer.validate"
+          },
+          {
+            "fact": "Setting a start date after the end date returns \"Start date can not be greater than end date.\"",
+            "evidence": "tour_guide/serializers/time_slot_serializers.py:TimeSlotSerializer.validate"
+          },
+          {
+            "fact": "Setting a window shorter than 5 days returns \"The duration cannot be less than 5 days.\"",
+            "evidence": "tour_guide/serializers/time_slot_serializers.py:TimeSlotSerializer.validate"
+          },
+          {
+            "fact": "Creating an availability window that overlaps another one returns \"This timeslot overlap with another timeslot.\"",
+            "evidence": "tour_guide/services/time_slot_services.py:TimeSlotService.create"
+          },
+          {
+            "fact": "Shrinking a window to exclude an already-assigned tour returns \"This time range has active tour.\"",
+            "evidence": "tour_guide/services/time_slot_services.py:TimeSlotService.update"
+          },
+          {
+            "fact": "Trying to deactivate a window still assigned to a tour returns \"This time slot is assigned to tour\".",
+            "evidence": "tour_guide/views/tour_guide_views.py:TourGuideTimeSlotStatusUpdateAPIView.patch"
+          },
+          {
+            "fact": "Trying to remove a window still assigned to a tour returns a message naming which active tour(s) are blocking it.",
+            "evidence": "tour_guide/views/guide_availability_views.py:TourGuideAvailabilityModifyAPIView.delete"
+          },
+          {
+            "fact": "Trying to deactivate a guide still assigned to an active tour returns \"This tour guide has active tour.\"",
+            "evidence": "tour_guide/services/tour_guide_services.py:update_status"
+          },
+          {
+            "fact": "Trying to assign a guide with no availability covering the tour's dates returns \"Available time slot not found for this tour guide.\"",
+            "evidence": "tour_guide/services/tour_guide_services.py:add_tour_to_tour_guide"
+          },
+          {
+            "fact": "Picking a vehicle that isn't part of the tour being assigned returns a message naming the mismatch.",
+            "evidence": "tour_guide/services/tour_guide_services.py:add_tour_to_tour_guide"
+          },
+          {
+            "fact": "Assigning a second guide of the same type to a vehicle that already has one returns a message naming the conflict.",
+            "evidence": "tour_guide/services/tour_guide_services.py:add_tour_to_tour_guide"
+          },
+          {
+            "fact": "Assigning a guide who already has a different vehicle on the same tour returns a message naming the conflict.",
+            "evidence": "tour_guide/services/tour_guide_services.py:add_tour_to_tour_guide"
+          },
+          {
+            "fact": "Assigning or removing a guide on a tour whose return date has passed returns a message naming the tour and stating the return date has passed.",
+            "evidence": "tour_guide/views/tour_guide_views.py:AddTourToTourGuideAPIView.post"
+          },
+          {
+            "fact": "Downloading a passenger manifest for a tour with no traveling passengers returns \"No passengers found for this tour.\"",
+            "evidence": "tour_guide/services/download_passenger_service.py:DownloadPassengerService.generate_excel"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Creating, editing, and deactivating guides and guide types requires staff to be logged in and hold the corresponding permission.",
+            "evidence": "tour_guide/views/tour_guide_views.py:TourGuideListCreateAPIView/TourGuideStatusUpdateView"
+          },
+          {
+            "fact": "A guide can view and edit their own profile once logged in.",
+            "evidence": "tour_guide/views/tour_guide_views.py:MyTourGuideProfileAPIView"
+          },
+          {
+            "fact": "Viewing available guides, assigning a guide to a tour, and removing a guide from a tour only require being logged in, without a specific permission check.",
+            "evidence": "tour_guide/views/tour_guide_views.py:AvailableTourGuideListAPIView/AddTourToTourGuideAPIView/RemoveTourGuideFromTourAPIView"
+          },
+          {
+            "fact": "Only the guide who owns a time-slot window can view, edit, or change the status of it themselves.",
+            "evidence": "tour_guide/views/tour_guide_views.py:TourGuideTimeSlotRetrieveUpdateAPIView"
+          },
+          {
+            "fact": "Viewing the consolidated guide-assignment board and managing availability windows requires staff to be logged in and hold the corresponding permission.",
+            "evidence": "tour_guide/views/guide_assignment_views.py:TourGuideAssignmentListAPIView; tour_guide/views/guide_availability_views.py"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "Guide Type \u2014 the category of guide (e.g. driver-guide, local guide), configured by staff and used both to find available guides and to enforce one-guide-per-type-per-vehicle.",
+            "evidence": "tour_guide/models/tour_guide_models.py:TourGuideType"
+          },
+          {
+            "fact": "Name, Position, Employee ID \u2014 the guide's identifying and role details.",
+            "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
+          },
+          {
+            "fact": "License / License Number \u2014 the guide's professional license type and number.",
+            "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
+          },
+          {
+            "fact": "Home Base \u2014 the guide's home station or location they're normally based out of.",
+            "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
+          },
+          {
+            "fact": "Contract File, Flight Ticket File, Profile Picture \u2014 documents and photo uploaded for the guide.",
+            "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
+          },
+          {
+            "fact": "Passport / Personal ID details, Allergy info, Emergency Contact \u2014 the guide's travel and safety details, mirrored into their linked profile.",
+            "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
+          },
+          {
+            "fact": "Feedback \u2014 free-text notes recording feedback about the guide's performance.",
+            "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
+          },
+          {
+            "fact": "Active/Inactive \u2014 whether the guide is currently employable and assignable; a guide can't be deactivated while still assigned to an active tour.",
+            "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
+          },
+          {
+            "fact": "Availability Window (Start Date, End Date) \u2014 the date range during which a guide has said they're available to be assigned to a tour.",
+            "evidence": "tour_guide/models/time_slot_model.py:TimeSlot"
+          },
+          {
+            "fact": "Available \u2014 whether an availability window is currently open for new assignment; it's automatically closed alongside deactivating the window itself.",
+            "evidence": "tour_guide/models/time_slot_model.py:TimeSlot"
+          },
+          {
+            "fact": "Assigned Tours (on a window) \u2014 which tour(s) have actually been booked into a given availability window.",
+            "evidence": "tour_guide/models/time_slot_model.py:TimeSlot"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "To onboard a guide: staff first make sure the relevant guide type exists, then create the guide's record with their personal and contact details; the guide immediately gets a login they can use to manage their own profile.",
+            "evidence": "tour_guide/services/tour_guide_services.py:TourGuideService.create"
+          },
+          {
+            "fact": "To set up availability: staff or the guide themselves add windows of dates the guide is free to be assigned, each at least 5 days long and never overlapping another window.",
+            "evidence": "tour_guide/services/time_slot_services.py:TimeSlotService.create"
+          },
+          {
+            "fact": "To staff a tour: staff search for guides of the needed type who are available for the tour's exact dates, then assign one \u2014 optionally also linking them to a specific vehicle on that tour.",
+            "evidence": "tour_guide/services/tour_guide_services.py:add_tour_to_tour_guide"
+          },
+          {
+            "fact": "To review coverage: staff open a board showing every tour's guide assignments by type and vehicle, or look at one guide's full workload across tours.",
+            "evidence": "tour_guide/services/guide_assignment_service.py:GuideAssignmentService.process_tour_assignments"
+          },
+          {
+            "fact": "To prepare a guide for departure: staff download a passenger manifest for the tour or a specific vehicle, listing every traveler's contact, passport, pickup, and allergy details.",
+            "evidence": "tour_guide/services/download_passenger_service.py:DownloadPassengerService.generate_excel"
+          },
+          {
+            "fact": "To retire a guide: staff deactivate them, which is blocked while they're still assigned to an active tour, and which also disables their login unless they hold an admin role.",
+            "evidence": "tour_guide/services/tour_guide_services.py:update_status"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Creating a guide creates or updates a linked login account and profile, giving the guide portal access without a separate account-creation step.",
+            "evidence": "tour_guide/services/tour_guide_services.py:get_or_create_tour_guide_user/get_or_create_tour_guide_user_profile"
+          },
+          {
+            "fact": "Assigning a guide to a tour updates the guide's own tour list, their availability window's assigned-tours list, and \u2014 if a vehicle was chosen \u2014 the tour's vehicle roster, all together in one action.",
+            "evidence": "tour_guide/services/tour_guide_services.py:add_tour_to_tour_guide"
+          },
+          {
+            "fact": "Removing a guide from a tour reverses all of those links at once.",
+            "evidence": "tour_guide/services/tour_guide_services.py:remove_tour_from_tour_guide"
+          },
+          {
+            "fact": "Deactivating an availability window automatically marks it as unavailable too.",
+            "evidence": "tour_guide/services/time_slot_services.py:TimeSlotService.update_status"
+          },
+          {
+            "fact": "The passenger manifest download draws on booking and ticketing data to assemble each traveler's full details for the guide.",
+            "evidence": "tour_guide/services/download_passenger_service.py"
+          }
+        ]
       }
     },
     {

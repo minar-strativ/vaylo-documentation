@@ -2,9 +2,9 @@
   "mode": "create",
   "run_started_at": "2026-07-29",
   "run_anchor_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
-  "current_feature": "tour-guides",
+  "current_feature": "transport",
   "current_step": "analyze",
   "scope_this_run": [],
-  "notes": "Continuing full backlog. products documented (9 of 26 remaining). Next: tour-guides.",
-  "run_processed_count": 14
+  "notes": "Session paused per user request after tour-guides. tour-guides documented (10 of 26 remaining). Next: transport.",
+  "run_processed_count": 15
 }
