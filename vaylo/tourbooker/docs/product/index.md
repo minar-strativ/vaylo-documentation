@@ -1,6 +1,6 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (36 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs); 15 documented so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (36 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs); 16 documented so far.
 
 ## Bookings & Catalog
 
@@ -19,7 +19,7 @@ Generated and maintained by Canopy. One page per business capability — see eac
 - [Supplements & Add-ons](supplements.md) — Optional add-on products/supplements with groups, categories and local pricing.
 - [Products](products.md) — Generic sellable products with categories, images, files and notes.
 - [Tour Guides](tour-guides.md) — Tour guides, guide types and their time-slot availability.
-- Vehicles, Carriers & Stations — Transport logistics: vehicles and types, home bases, carriers and pickup/drop stations. *(pending)*
+- [Vehicles, Carriers & Stations](transport.md) — Transport logistics: vehicles and types, home bases, carriers and pickup/drop stations.
 - Booking Widget — Embeddable booking widget search parameters and configuration. *(pending)*
 
 ## Pricing & Payments
@@ -52,4 +52,4 @@ Generated and maintained by Canopy. One page per business capability — see eac
 
 ## Not yet documented
 
-The 26 features marked *(pending)* above are still queued — run `/doc-create` to continue documenting them, in the same dependency order recorded in `.ai/metadata/inventory.json`.
+The 19 features marked *(pending)* above are still queued — run `/doc-create` to continue documenting them, in the same dependency order recorded in `.ai/metadata/inventory.json`.

@@ -4021,21 +4021,205 @@
         "locations"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/transport.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "vehicle/models.py",
+          "carrier/models.py",
+          "station/models.py"
+        ],
+        "How it works": [
+          "vehicle/models.py:Vehicle",
+          "vehicle/services.py:update_status",
+          "carrier/services.py:sync_data",
+          "carrier/views/carrier_views.py:CarrierRetrieveUpdateAPIView",
+          "station/services/station_service.py:create",
+          "station/services/station_service.py:update",
+          "station/services/station_service.py:update_status"
+        ],
+        "Rules & Edge Cases": [
+          "vehicle/models.py:Vehicle.external_id",
+          "carrier/models.py:Carrier",
+          "carrier/services.py:sync_data",
+          "vehicle/services.py:update_status",
+          "station/services/station_service.py:get_duplicate_station",
+          "station/services/station_service.py:update",
+          "station/services/station_service.py:update_status",
+          "vehicle/views/views.py:VehicleAPIViewSet",
+          "station/views/views.py:StationAPIViewSet"
+        ],
+        "Related Features": [
+          "tour/models/tour_vehicle.py:TourVehicle"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "Staff create/edit vehicle types, home bases, and vehicles for use on tours.",
+            "evidence": "vehicle/views/views.py:VehicleAPIViewSet"
+          },
+          {
+            "fact": "A vehicle assigned to an active, not-yet-departed tour cannot be deactivated.",
+            "evidence": "vehicle/services.py:check_this_vehicle_has_active_tour_vehicle"
+          },
+          {
+            "fact": "Staff create/edit stations and view station types for use as ticket departure/destination points.",
+            "evidence": "station/views/views.py:StationAPIViewSet"
+          },
+          {
+            "fact": "A station can only be edited if both its current type and the new type are \"Other\"; otherwise the change is rejected.",
+            "evidence": "station/services/station_service.py:update"
+          },
+          {
+            "fact": "A station cannot be deactivated unless its type is \"Other\", and not at all if it's currently used as a ticket's departure or destination station.",
+            "evidence": "station/services/station_service.py:update_status"
+          },
+          {
+            "fact": "Creating or editing a station is rejected if another station with the same name and type already exists.",
+            "evidence": "station/services/station_service.py:get_duplicate_station"
+          },
+          {
+            "fact": "Carriers arrive automatically from a central sync feed matched by a unique signature key; an existing carrier is updated, a new one is created.",
+            "evidence": "carrier/services.py:sync_data"
+          },
+          {
+            "fact": "Staff can view carriers and edit a carrier's name directly; IATA/ICAO codes and active status stay under sync control.",
+            "evidence": "carrier/serializers.py:CarrierSerializer"
+          },
+          {
+            "fact": "Stations and station types can be synced in bulk from a central source, matched by a central record id.",
+            "evidence": "station/services/station_service.py:sync_data"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A vehicle's IATA-style external reference id, if set, must be unique across all vehicles.",
+            "evidence": "vehicle/models.py:Vehicle.external_id"
+          },
+          {
+            "fact": "A carrier's IATA code is at most 2 characters and unique; its ICAO code, if set, is at most 4 characters and unique.",
+            "evidence": "carrier/models.py:Carrier"
+          },
+          {
+            "fact": "A carrier's signature key is unique and is what the sync feed uses to recognize the same carrier on repeat syncs.",
+            "evidence": "carrier/services.py:sync_data"
+          },
+          {
+            "fact": "On carrier sync, only the IATA code, ICAO code, and active status are updated on an existing match \u2014 the carrier's name is never overwritten by sync.",
+            "evidence": "carrier/services.py:sync_data"
+          },
+          {
+            "fact": "\"Other\" is the station type reserved for stations staff create themselves, as opposed to system-managed stations synced from a central source.",
+            "evidence": "station/constants.py:StationTypeConstant"
+          },
+          {
+            "fact": "New stations created by staff are always assigned the \"Other\" type automatically.",
+            "evidence": "station/services/station_service.py:create"
+          },
+          {
+            "fact": "Two stations are considered duplicates when they share both the same name and the same station type.",
+            "evidence": "station/services/station_service.py:get_duplicate_station"
+          },
+          {
+            "fact": "Vehicles, vehicle types, home bases, stations, and station types are never deleted through these screens, only deactivated.",
+            "evidence": "vehicle/views/views.py:VehicleAPIViewSet,station/views/views.py:StationAPIViewSet"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "A vehicle type's name must be unique.",
+            "evidence": "vehicle/models.py:VehicleType"
+          },
+          {
+            "fact": "A station type's name must be unique.",
+            "evidence": "station/models.py:StationType"
+          },
+          {
+            "fact": "Deactivating a vehicle that's assigned to an active, not-departed tour is rejected with a message that the vehicle has an active tour assignment.",
+            "evidence": "vehicle/services.py:update_status"
+          },
+          {
+            "fact": "Editing a station whose current or new type isn't \"Other\" is rejected, telling staff to contact the BookingSystem admin instead.",
+            "evidence": "station/services/station_service.py:update"
+          },
+          {
+            "fact": "Deactivating a station that isn't type \"Other\", or one currently set as a ticket's departure or destination station, is rejected.",
+            "evidence": "station/services/station_service.py:update_status"
+          },
+          {
+            "fact": "Creating or editing a station that would duplicate an existing station's name and type is rejected with \"Same station exists.\"",
+            "evidence": "station/services/station_service.py:get_duplicate_station"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Staff need the standard add/change/view model permissions to manage vehicles, vehicle types, home bases, stations, and station types; unauthenticated access is rejected.",
+            "evidence": "vehicle/views/views.py:VehicleAPIViewSet,station/views/views.py:StationAPIViewSet"
+          },
+          {
+            "fact": "Central sync of carriers, stations, and station types is performed by an automated system integration authenticated with an API key, not by a staff user.",
+            "evidence": "carrier/views/admin_views.py:AdminCarrierSyncAPIView"
+          },
+          {
+            "fact": "Staff can view carriers and update a carrier's name, gated by standard model permissions.",
+            "evidence": "carrier/views/carrier_views.py:CarrierRetrieveUpdateAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "Vehicle Home Base is the depot/location a vehicle operates out of: a name, city, country, address, and optional map coordinates.",
+            "evidence": "vehicle/models.py:VehicleHomeBase"
+          },
+          {
+            "fact": "A vehicle's capacity is its total seat count, used to work out how many seats remain free once passengers are assigned.",
+            "evidence": "vehicle/services.py:get_available_seats_by_vehicle"
+          },
+          {
+            "fact": "A vehicle's external id is an optional reference code linking it to a record in another system.",
+            "evidence": "vehicle/models.py:Vehicle.external_id"
+          },
+          {
+            "fact": "A carrier's signature key is a one-time-generated key identifying the carrier for automated syncing, not a user-facing field.",
+            "evidence": "carrier/models.py:Carrier.signature_key"
+          },
+          {
+            "fact": "A station's code is its short reference code (e.g. an airport code); its central id links it to the corresponding record in the central sync source.",
+            "evidence": "station/models.py:Station"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "Staff set up vehicle types and home bases first, then create vehicles referencing them, so vehicles are ready to assign to tours and tour types.",
+            "evidence": "vehicle/models.py:Vehicle"
+          },
+          {
+            "fact": "Staff create custom (\"Other\"-type) stations for local pickup/drop points that aren't part of the synced airport list, then use them the same way as any other station.",
+            "evidence": "station/services/station_service.py:create"
+          },
+          {
+            "fact": "Carriers mostly appear automatically as flights get synced; staff occasionally correct a carrier's display name without touching the codes that came from the sync.",
+            "evidence": "carrier/views/carrier_views.py:CarrierRetrieveUpdateAPIView"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Vehicles are assigned to tours and tour types, which track their own seat capacity and passenger counts separately from the vehicle's own capacity.",
+            "evidence": "tour/models/tour_vehicle.py:TourVehicle"
+          },
+          {
+            "fact": "Stations are used as the departure and destination points on flight tickets.",
+            "evidence": "station/services/station_service.py:update_status"
+          },
+          {
+            "fact": "Carriers are referenced on flight PNRs/tickets to identify which airline a segment is with.",
+            "evidence": "carrier/models.py:Carrier.display_name"
+          }
+        ]
       }
     },
     {
