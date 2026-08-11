@@ -2,9 +2,9 @@
   "mode": "create",
   "run_started_at": "2026-07-29",
   "run_anchor_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
-  "current_feature": "vat",
+  "current_feature": "accounting",
   "current_step": "analyze",
   "scope_this_run": [],
-  "notes": "rewards marked needs_review, no doc (model-only, unreleased) (16 of 26 remaining). Next pending feature in plan order: vat.",
-  "run_processed_count": 21
+  "notes": "vat documented (17 of 26 remaining). Next pending feature in plan order: accounting.",
+  "run_processed_count": 22
 }

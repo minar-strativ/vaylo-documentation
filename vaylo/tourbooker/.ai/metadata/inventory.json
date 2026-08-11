@@ -4220,21 +4220,114 @@
       "depends_on": [],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/vat.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "vat_class/services.py:VATClassService.create",
+          "vat_class/services.py:VATClassTypeService,VatAccountService,CostAccountService"
+        ],
+        "How it works": [
+          "vat_class/services.py:VATClassService.create",
+          "vat_class/views.py:VATClassUpdateStatusView.patch"
+        ],
+        "Rules & Edge Cases": [
+          "vat_class/services.py:VATClassService._validate_vat_class_types",
+          "vat_class/services.py:VATClassService.update",
+          "vat_class/services.py:VATClassService.update_status",
+          "vat_class/models.py:VATClass.percentage",
+          "vat_class/models.py:VATClass.name"
+        ],
+        "Related Features": [
+          "supplement/models/supplement.py",
+          "billing/services/billing_discount_service.py"
+        ],
+        "FAQ": [
+          "vat_class/services.py:VATClassService.update_status",
+          "vat_class/services.py:VATClassService._validate_vat_class_types",
+          "vat_class/models.py:VATClass.will_show_in_invoice",
+          "vat_class/services.py:VATClassService.update"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "Staff create VAT classes \u2014 a name, a tax percentage, whether it should appear on invoices, and which VAT type(s) it belongs to \u2014 for use when pricing tours, supplements, and other sellable items.",
+            "evidence": "vat_class/services.py:VATClassService.create"
+          },
+          {
+            "fact": "Staff separately maintain VAT types (broad tax categories a VAT class can belong to) and a set of VAT accounts and cost accounts, which connect VAT classes to the tenant's accounting setup.",
+            "evidence": "vat_class/services.py:VATClassTypeService,VatAccountService,CostAccountService"
+          },
+          {
+            "fact": "Staff can turn a VAT class, VAT account, or cost account on or off, and browse VAT classes filtered by VAT type.",
+            "evidence": "vat_class/views.py:VATClassUpdateStatusView.patch,VatAccountUpdateStatusView.patch,CostAccountUpdateStatusView.patch,vat_class/filters.py:VATClassFilter"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A VAT type can only have one VAT class at any given tax percentage \u2014 creating or editing a class into a percentage that's already used by another class of the same type is rejected.",
+            "evidence": "vat_class/services.py:VATClassService._validate_vat_class_types"
+          },
+          {
+            "fact": "The built-in \"No VAT\" class's name and tax percentage can never be changed, and its active/inactive status can never be changed either \u2014 it's a fixed, permanent option.",
+            "evidence": "vat_class/services.py:VATClassService.update,VATClassService.update_status"
+          },
+          {
+            "fact": "A VAT class currently selected on any active tour or active supplement cannot have its status changed \u2014 it must first be removed from every active tour and supplement before it can be deactivated (or reactivated).",
+            "evidence": "vat_class/services.py:VATClassService.update_status,check_if_vat_class_is_selected_in_any_active_supplement,check_if_vat_class_is_selected_in_any_active_tour"
+          },
+          {
+            "fact": "A VAT class's tax percentage must be between 0 and 100.",
+            "evidence": "vat_class/models.py:VATClass.percentage"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Every VAT class name must be unique across the tenant.",
+            "evidence": "vat_class/models.py:VATClass.name"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Creating, editing, listing, and changing the status of VAT classes, VAT types, VAT accounts, and cost accounts all require an authenticated staff user with the standard staff model permissions \u2014 there is no customer-facing access to any of this.",
+            "evidence": "vat_class/views.py:VATClassListCreateAPIView,VATClassTypeListAPIView,VatAccountCreateView,CostAccountCreateView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A VAT class's tax percentage is the rate charged on whatever it's attached to (a tour, a supplement, and so on).",
+            "evidence": "vat_class/models.py:VATClass.percentage"
+          },
+          {
+            "fact": "\"Will show in invoice\" controls whether this VAT class's tax line is visible on the customer-facing invoice, separate from whether the tax itself is applied.",
+            "evidence": "vat_class/models.py:VATClass.will_show_in_invoice"
+          },
+          {
+            "fact": "A VAT type is a broader tax category (for example, standard vs. reduced rate) that groups related VAT classes together, and is what the one-class-per-percentage rule is scoped to.",
+            "evidence": "vat_class/models.py:VATClassType"
+          },
+          {
+            "fact": "VAT accounts and cost accounts are named references into the tenant's accounting setup, linked to a VAT class so its tax gets recorded to the right place in the books.",
+            "evidence": "vat_class/models.py:VatAccount,CostAccount,VATClass.vat_code"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "Staff set up the tenant's tax categories once (VAT types, VAT classes with their percentages, and the accounting accounts they post to), then simply pick the right VAT class when pricing a tour or supplement elsewhere \u2014 customers never interact with VAT classes directly.",
+            "evidence": "vat_class/services.py:VATClassService.create,vat_class/models.py:VATClass"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "The VAT class picked on a tour or supplement determines the tax rate billing calculates and shows for that item; this feature only defines the rates and accounting targets, not how they're applied to a specific sale.",
+            "evidence": "supplement/models/supplement.py,billing/services/billing_discount_service.py"
+          }
+        ]
       }
     },
     {

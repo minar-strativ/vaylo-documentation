@@ -30,3 +30,4 @@ Append-only. One line per event:
 2026-08-11 | coupons | created | 14 of 26 remaining features | 20675c05c
 2026-08-11 | gift-cards | created | 15 of 26 remaining features | 20675c05c
 2026-08-11 | rewards | needs_review | model-only scaffolding (no services/views/urls, nothing references it) — no doc written, flagged as likely unreleased per denylist; 16 of 26 remaining features | 20675c05c
+2026-08-11 | vat | created | 17 of 26 remaining features | 20675c05c
