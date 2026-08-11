@@ -5092,21 +5092,104 @@
       ],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/surveys.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "survey/services/netigate.py:NetigateSurveyService.sync_surveys",
+          "survey/services/survey_sendout_service.py:SurveySendoutService.sync_all_upcoming_tours,process_sendout",
+          "survey/services/survey_mail_service.py:SurveyMailService.send_pending_survey_emails"
+        ],
+        "How it works": [
+          "survey/services/survey_passenger_data_service.py:SurveyPassengerDataService.get_passenger_survey_data,format_passenger_data",
+          "survey/services/survey_sendout_service.py:SurveySendoutService.process_sendout",
+          "survey/services/survey_mail_service.py:SurveyMailService.send_pending_survey_emails,send_survey_email"
+        ],
+        "Rules & Edge Cases": [
+          "survey/views.py:SurveySendoutFullProcessAPIView.post,SendPendingSurveyEmailsAPIView.post",
+          "survey/services/survey_passenger_data_service.py:SurveyPassengerDataService.get_passenger_survey_data",
+          "survey/services/survey_mail_service.py:SurveyMailService.send_pending_survey_emails"
+        ],
+        "Related Features": [
+          "survey/services/survey_mail_service.py:SurveyMailService.send_survey_email"
+        ],
+        "FAQ": [
+          "survey/services/survey_sendout_service.py:SurveySendoutService.sync_all_upcoming_tours",
+          "survey/services/survey_passenger_data_service.py:SurveyPassengerDataService.get_passenger_survey_data",
+          "survey/services/survey_mail_service.py:SurveyMailService.send_pending_survey_emails",
+          "survey/views.py:SurveySendoutFullProcessAPIView.post"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
+        "workflows": [
+          {
+            "fact": "Surveys are created and managed in an external survey platform (Netigate) and synced into the tenant so staff can attach one to a tour.",
+            "evidence": "survey/services/netigate.py:NetigateSurveyService.sync_surveys,upsert_survey"
+          },
+          {
+            "fact": "The day before a tour with an attached survey returns, the platform automatically collects every traveling passenger on that tour's bookings who has an email address, and sends their details to the survey platform to create a personalized \"sendout\" \u2014 a batch of individually addressed survey links.",
+            "evidence": "survey/services/survey_sendout_service.py:SurveySendoutService.sync_all_upcoming_tours,process_sendout,survey/services/survey_passenger_data_service.py:SurveyPassengerDataService.get_passenger_survey_data"
+          },
+          {
+            "fact": "Passenger details sent to the survey platform include their name, gender, date of birth, phone number, and tour context (departure date/location, destination, tour guide, and skipper), so the survey provider can personalize or segment responses.",
+            "evidence": "survey/services/survey_passenger_data_service.py:SurveyPassengerDataService.format_passenger_data"
+          },
+          {
+            "fact": "Once a sendout is created, each respondent's personal survey link is recorded, and a scheduled job emails that link to every respondent 24 hours after the sendout was scheduled.",
+            "evidence": "survey/services/survey_mail_service.py:SurveyMailService.send_pending_survey_emails,send_survey_email"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "Survey sendouts and their follow-up emails only run at all if the tenant's Netigate survey subscription add-on is active; otherwise both scheduled jobs report the subscription is inactive and do nothing.",
+            "evidence": "survey/views.py:SurveySendoutFullProcessAPIView.post,SendPendingSurveyEmailsAPIView.post"
+          },
+          {
+            "fact": "Only passengers actually traveling on a booking, with a real email address, are included in a tour's survey sendout.",
+            "evidence": "survey/services/survey_passenger_data_service.py:SurveyPassengerDataService.get_passenger_survey_data"
+          },
+          {
+            "fact": "Each respondent only ever gets one survey email per sendout, even if they appear more than once in the respondent list.",
+            "evidence": "survey/services/survey_mail_service.py:SurveyMailService.send_pending_survey_emails"
+          }
+        ],
         "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "permissions": [
+          {
+            "fact": "Viewing the synced list of surveys requires an authenticated staff user with standard model permissions; triggering a sync from the survey platform requires only an authenticated staff user.",
+            "evidence": "survey/views.py:GetAllSurveysAPIView,SyncSurveyDataAPIView"
+          },
+          {
+            "fact": "Running a tour's survey sendout and sending its pending follow-up emails both run as the system itself via a machine API key on a schedule, not as a staff action.",
+            "evidence": "survey/views.py:SurveySendoutFullProcessAPIView,SendPendingSurveyEmailsAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A survey dispatch's status is Pending (sendout created, follow-up email not yet sent), Sent (the follow-up email has gone out), or Failed.",
+            "evidence": "survey/models.py:SurveyDispatchStatus"
+          },
+          {
+            "fact": "\"Activated\" on a survey reflects whether it's turned on in the survey platform itself \u2014 kept in sync whenever surveys are synced.",
+            "evidence": "survey/services/netigate.py:NetigateSurveyService.upsert_survey"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A passenger travels on a tour that has a survey attached; the day before the tour returns, they're added to that tour's survey sendout, and a day later they receive an email with their own personal link to fill it out.",
+            "evidence": "survey/services/survey_sendout_service.py:SurveySendoutService.sync_all_upcoming_tours,survey/services/survey_mail_service.py:SurveyMailService.send_pending_survey_emails"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "The follow-up survey email is sent through the platform's own email notification system, using a dedicated feedback-email template.",
+            "evidence": "survey/services/survey_mail_service.py:SurveyMailService.send_survey_email"
+          }
+        ]
       }
     },
     {

@@ -37,3 +37,4 @@ Append-only. One line per event:
 2026-08-11 | suppliers | split | analysis revealed >7 workflows across two distinct areas (~4,100 lines); split into parent overview + suppliers/invoicing-and-costs | 20675c05c
 2026-08-11 | suppliers/invoicing-and-costs | created | 20 of 26 remaining features | 20675c05c
 2026-08-11 | notifications | created | 21 of 26 remaining features | 20675c05c
+2026-08-11 | surveys | created | 22 of 26 remaining features | 20675c05c
