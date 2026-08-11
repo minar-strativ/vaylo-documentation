@@ -5569,21 +5569,90 @@
       "depends_on": [],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/subscription.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "subscription/models.py:SubscriptionPlan",
+          "subscription/middlewares/subscription_plan_middleware.py:SubscriptionPlanMiddleware",
+          "subscription/permissions.py:HasFeatureAccess",
+          "subscription/services.py:SubscriptionPlanService.get_subscription_plan_with_reservation_service"
+        ],
+        "How it works": [
+          "subscription/middlewares/subscription_plan_middleware.py:SubscriptionPlanMiddleware",
+          "subscription/permissions.py:HasFeatureAccess.has_permission"
+        ],
+        "Rules & Edge Cases": [
+          "subscription/permissions.py:HasFeatureAccess.has_permission",
+          "subscription/services.py:SubscriptionPlanService.remove_subscriptions"
+        ],
+        "Related Features": [
+          "subscription/permissions.py:HasFeatureAccess"
+        ],
+        "FAQ": [
+          "subscription/views.py:SubscriptionPlansAPIView,AdminSubscriptionPlansUpdateAPIView",
+          "subscription/permissions.py:HasFeatureAccess.has_permission",
+          "subscription/services.py:SubscriptionPlanService.remove_subscriptions"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
+        "workflows": [
+          {
+            "fact": "Each tenant has one active subscription plan, which is a list of specific add-on features and third-party integrations switched on or off \u2014 everything from the dynamic-pricing engine to survey integration to translation providers.",
+            "evidence": "subscription/models.py:SubscriptionPlan"
+          },
+          {
+            "fact": "On every request, the platform attaches the tenant's currently active plan to the request, and views can declare which specific feature(s) they require; a request is blocked if the tenant's plan doesn't include the required feature(s).",
+            "evidence": "subscription/middlewares/subscription_plan_middleware.py:SubscriptionPlanMiddleware,subscription/permissions.py:HasFeatureAccess"
+          },
+          {
+            "fact": "Staff can view which features are enabled on their tenant's subscription plan from the admin, but the plan itself is created, synced, and updated centrally rather than self-service by tenant staff.",
+            "evidence": "subscription/views.py:SubscriptionPlansAPIView,AdminSubscriptionPlanSyncAPIView,AdminSubscriptionPlansUpdateAPIView"
+          },
+          {
+            "fact": "Some plan features are tied to an external reservation-service provider (like a specific flight or hotel booking system) and carry their own connection configuration; other features are simply on/off with no further setup.",
+            "evidence": "subscription/services.py:SubscriptionPlanService.get_subscription_plan_with_reservation_service,get_reservation_service_provider_configuration"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A view can require either all of a set of features to be enabled, or just at least one of them, depending on how it's configured.",
+            "evidence": "subscription/permissions.py:HasFeatureAccess.has_permission"
+          },
+          {
+            "fact": "If a tenant's connected reservation-service provider becomes inactive, any subscription features tied to that provider are automatically turned off.",
+            "evidence": "subscription/services.py:SubscriptionPlanService.remove_subscriptions"
+          }
+        ],
         "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "permissions": [
+          {
+            "fact": "Viewing the tenant's own active subscription plan requires an authenticated staff user; syncing the list of available plans and updating a plan's enabled features are both machine-to-machine actions authenticated by an API key, not something tenant staff do themselves.",
+            "evidence": "subscription/views.py:SubscriptionPlansAPIView,AdminSubscriptionPlanSyncAPIView,AdminSubscriptionPlansUpdateAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A subscription plan's status is Active, Inactive, Expired, or Canceled \u2014 separate from any individual feature being on or off within it.",
+            "evidence": "subscription/constants.py:SubscriptionPlanStatus"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A tenant subscribes to (or has enabled for them) a specific add-on, like dynamic pricing or survey integration; every request their staff or customers make is then checked against that plan, so the feature simply becomes available \u2014 or stays hidden \u2014 without any code change per tenant.",
+            "evidence": "subscription/middlewares/subscription_plan_middleware.py:SubscriptionPlanMiddleware,subscription/permissions.py:HasFeatureAccess"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Every other feature in the platform that's gated behind a paid add-on (dynamic pricing, surveys, loyalty rewards, and similar) checks its access through this feature's plan and permission mechanism.",
+            "evidence": "subscription/permissions.py:HasFeatureAccess"
+          }
+        ]
       }
     },
     {
