@@ -1,6 +1,6 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (40 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs, Accounting Integration into a parent + 2 child docs, and Suppliers into a parent + 1 child doc); 26 documented, 1 flagged needs-review (Rewards & Loyalty — unreleased) so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (40 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs, Accounting Integration into a parent + 2 child docs, and Suppliers into a parent + 1 child doc); 27 documented, 1 flagged needs-review (Rewards & Loyalty — unreleased) so far.
 
 ## Bookings & Catalog
 
@@ -20,7 +20,7 @@ Generated and maintained by Canopy. One page per business capability — see eac
 - [Products](products.md) — Generic sellable products with categories, images, files and notes.
 - [Tour Guides](tour-guides.md) — Tour guides, guide types and their time-slot availability.
 - [Vehicles, Carriers & Stations](transport.md) — Transport logistics: vehicles and types, home bases, carriers and pickup/drop stations.
-- Booking Widget — Embeddable booking widget search parameters and configuration. *(pending)*
+- [Booking Widget](widget.md) — Embeddable widget configuration: defaults, theme, redirects, and its search-filter catalog.
 
 ## Pricing & Payments
 

@@ -5207,20 +5207,102 @@
         "multi-language"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/widget.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "core/models/configuration.py:WidgetConfiguration",
+          "widget/models/widget_search_param.py:WidgetSearchParameter",
+          "core/views/views.py:PublicWidgetConfigurationAPIView"
+        ],
+        "How it works": [
+          "core/models/configuration.py:WidgetConfiguration",
+          "core/serializers/configuration_serializer.py",
+          "core/views/views.py:PublicWidgetConfigurationAPIView"
+        ],
+        "Rules & Edge Cases": [
+          "widget/services/widget_search_param_service.py:WidgetSearchParameterService.update_active_status,update_display_order",
+          "widget/services/widget_multilanguage_service.py:WidgetSearchParameterMultiLanguageService.update",
+          "core/serializers/configuration_serializer.py"
+        ],
+        "Related Features": [
+          "core/models/configuration.py:WidgetConfiguration.booking_redirect_url,booking_success_redirect_url"
+        ],
+        "FAQ": [
+          "core/serializers/configuration_serializer.py",
+          "widget/services/widget_search_param_service.py:WidgetSearchParameterService.update_active_status",
+          "core/views/views.py:PublicWidgetConfigurationAPIView",
+          "core/models/configuration.py:WidgetConfiguration.theme"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
+        "workflows": [
+          {
+            "fact": "Staff configure the tenant's embeddable public booking widget: its default language and currency, how many tours show per page, whether it shows all tours by default, where a customer lands after searching or completing a booking, its visual theme, and whether room prices show separately from the tour price.",
+            "evidence": "core/models/configuration.py:WidgetConfiguration"
+          },
+          {
+            "fact": "Staff maintain a shared catalog of possible search filters (like destination or dates) with a display name, order, and translations, then choose which of those filters this tenant's widget actually shows and in what order.",
+            "evidence": "widget/models/widget_search_param.py:WidgetSearchParameter,core/models/configuration.py:WidgetConfiguration.search_params"
+          },
+          {
+            "fact": "The embedded widget itself fetches this configuration (theme, search filters in the tenant's chosen order and language, redirect URLs, defaults) publicly, with no login, so it can render itself correctly wherever it's embedded.",
+            "evidence": "core/views/views.py:PublicWidgetConfigurationAPIView"
+          },
+          {
+            "fact": "Turning a search filter off automatically pushes it to the end of the display order, so re-activating it later doesn't jump it back to where it used to be.",
+            "evidence": "widget/services/widget_search_param_service.py:WidgetSearchParameterService.update_active_status"
+          },
+          {
+            "fact": "Staff can reorder the active search filters by supplying the desired slug order; any filter left out of that list is pushed to the end.",
+            "evidence": "widget/services/widget_search_param_service.py:WidgetSearchParameterService.update_display_order"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "If a tenant hasn't chosen specific search filters for its widget, every active filter in the shared catalog is shown instead, in their default order.",
+            "evidence": "core/serializers/configuration_serializer.py"
+          },
+          {
+            "fact": "Deactivating a search filter always resets its display order to the very end of the list, so it doesn't retain its old position if turned back on.",
+            "evidence": "widget/services/widget_search_param_service.py:WidgetSearchParameterService.update_active_status"
+          },
+          {
+            "fact": "A search filter's translated name can be edited per language, but which language a translation belongs to can never be changed after it's created.",
+            "evidence": "widget/services/widget_multilanguage_service.py:WidgetSearchParameterMultiLanguageService.update"
+          }
+        ],
         "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
+        "permissions": [
+          {
+            "fact": "Viewing and changing the widget's configuration and its search-filter catalog (including activating/deactivating and reordering filters) all require an authenticated staff user with standard staff model permissions.",
+            "evidence": "core/views/views.py:WidgetConfigurationAPIView,widget/views/widget_search_param_views.py:WidgetSearchParameterListAPIView,WidgetSearchParameterUpdateStatusAPIView"
+          },
+          {
+            "fact": "The widget's own configuration lookup is public and requires no login, since the widget itself (embedded on external pages) needs to fetch it to render.",
+            "evidence": "core/views/views.py:PublicWidgetConfigurationAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "\"Display order\" controls the left-to-right (or top-to-bottom) order search filters appear in on the widget; a deactivated filter is always sent to the very end of that order.",
+            "evidence": "widget/models/widget_search_param.py:WidgetSearchParameter.display_order"
+          },
+          {
+            "fact": "The widget's \"theme\" is a set of visual styling values (colors, etc.) the tenant can customize so the embedded widget matches their own site's look.",
+            "evidence": "core/models/configuration.py:WidgetConfiguration.theme"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A visitor lands on the tenant's own website where the booking widget is embedded; the widget fetches the tenant's configuration (theme, available search filters, defaults) to render itself, then redirects the visitor to the configured search or booking-success page once they search or complete a booking.",
+            "evidence": "core/views/views.py:PublicWidgetConfigurationAPIView,core/models/configuration.py:WidgetConfiguration.search_redirect_url,booking_redirect_url,booking_success_redirect_url"
+          }
+        ],
         "side_effects": []
       }
     },

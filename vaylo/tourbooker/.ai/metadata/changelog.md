@@ -38,3 +38,4 @@ Append-only. One line per event:
 2026-08-11 | suppliers/invoicing-and-costs | created | 20 of 26 remaining features | 20675c05c
 2026-08-11 | notifications | created | 21 of 26 remaining features | 20675c05c
 2026-08-11 | surveys | created | 22 of 26 remaining features | 20675c05c
+2026-08-11 | widget | created | 23 of 26 remaining features | 20675c05c
