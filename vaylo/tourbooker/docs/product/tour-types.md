@@ -22,7 +22,7 @@ A tour type defines what a family of tours has in common: the standard price and
 
 ## How it works
 
-**Creating a tour type.** Staff enter the core commercial details — name, description, price, transfer price, duration, capacity, currency, territory, and fee configuration — along with optional pickup locations, vehicle assignments, and images, all in one submission. The system fills in a couple of things automatically: a default pickup location is added if none was specified, plus a "request pickup" option if the tenant allows customers to request pickup, and a translation entry in the tenant's default language is created immediately from the name/description/tour information just entered, ready for staff to translate into other languages from there.
+**Creating a tour type.** Staff enter the core commercial details — name, description, price, transfer price, duration, capacity, currency, territory, and fee configuration — along with optional pickup locations, vehicle assignments, and images, all in one submission. The system fills in a couple of things automatically: a default pickup location is added if none was specified, plus a "request pickup" option if the tenant allows customers to request pickup, and a translation entry in the tenant's default language is created immediately from the name/description/tour information just entered, ready for staff to translate into other languages from there. Staff can also pick which custom-field collection the booking form and the passenger form should use for tours built from this type — if either is left unset, the tenant's default collection for that form takes over automatically (see [Dynamic Forms & Custom Fields](dynamic-forms.md)).
 
 **Managing images.** Once a tour type exists, staff upload images to it one at a time. The first image uploaded automatically becomes the cover/main image; staff can change which image is the cover at any time, and if the current cover image is deleted, another remaining image is automatically promoted to take its place.
 
@@ -56,6 +56,7 @@ A tour type defines what a family of tours has in common: the standard price and
 
 - [Tours](tours.md) — individual bookable tour departures are built from a tour type template.
 - [Hotels & Accommodation](hotels.md) — accommodation options can be linked to a tour type.
+- [Dynamic Forms & Custom Fields](dynamic-forms.md) — the source of the custom-field collections a tour type can choose for its booking and passenger forms.
 
 ## FAQ
 
@@ -76,3 +77,6 @@ A: It automatically becomes the cover/main image — no separate step needed.
 
 **Q: Can I assign an inactive vehicle or supplement to a tour type?**
 A: No — vehicles, supplements, and accommodations linked to a tour type must all be active.
+
+**Q: What custom fields does a tour built from this type get?**
+A: Whichever booking-form and passenger-form collections the tour type is set to use; if either is left unset, the tenant's default collection for that form is used instead.

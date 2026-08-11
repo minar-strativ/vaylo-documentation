@@ -1425,7 +1425,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/tour-types.md",
-      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
       "evidence": {
         "what_it_does": [
           "tour_type/models/tour_type_model.py"
@@ -1434,7 +1434,8 @@
           "tour_type/services/tour_type_services.py:TourTypeService.create/update",
           "tour_type/services/tour_type_image_service.py:create_tour_type_image/delete_tour_type_image/update_main_image_status",
           "tour_type/services/tour_type_multi_language_service.py:create_or_update_tour_type_multilanguage_with_default_language",
-          "tour_type/services/tour_type_vehicle_services.py:create_or_update_tour_type_vehicle"
+          "tour_type/services/tour_type_vehicle_services.py:create_or_update_tour_type_vehicle",
+          "tour_type/services/tour_type_services.py:TourTypeService.apply_default_collections"
         ],
         "rules_and_edge_cases": [
           "tour_type/services/tour_type_services.py:prepare_data",
@@ -1445,7 +1446,8 @@
           "tour_type/services/tour_type_services.py:update_status"
         ],
         "related_features": [
-          "tour_type/services/tour_type_services.py:check_if_tour_type_is_used_in_any_active_tour"
+          "tour_type/services/tour_type_services.py:check_if_tour_type_is_used_in_any_active_tour",
+          "dynamic_form/services/custom_field_collection_service.py:CollectionService.get_default_collection"
         ],
         "faq": [
           "tour_type/services/tour_type_services.py:TourTypeService.create",
@@ -1503,6 +1505,10 @@
           {
             "fact": "A separate central-administration process (not a regular staff login) can also manage tour types system-wide, for platform-level configuration.",
             "evidence": "tour_type/views/admin_tour_type_view.py:AdminTourTypeAPIViewSet"
+          },
+          {
+            "fact": "Staff can choose which custom-field collection a tour type's booking form and passenger form should use; if left unset when the tour type is created, the tenant's default collection for that form takes over automatically.",
+            "evidence": "tour_type/services/tour_type_services.py:TourTypeService.apply_default_collections,tour_type/serializers/tour_type_serializer.py:TourTypeSerializer.booking_custom_fields_collection"
           }
         ],
         "rules": [

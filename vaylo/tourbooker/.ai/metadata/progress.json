@@ -2,8 +2,7 @@
   "mode": "maintain",
   "run_anchor_commit": "f47cf806f",
   "affected": [
-    "tours",
-    "tour-types"
+    "tours"
   ],
   "new_features": [],
   "current_feature": "tours",
