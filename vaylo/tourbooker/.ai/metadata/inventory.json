@@ -228,7 +228,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/passengers.md",
-      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
       "evidence": {
         "what_it_does": [
           "passenger/models/passenger_model.py",
@@ -243,7 +243,8 @@
           "passenger/services/passenger_import_service.py:PassengerImportFileService.create_bulk_passengers_from_excel",
           "passenger/services/passenger_template_service.py:PassengerTemplateService.generate_excel_file",
           "passenger/services/passenger_service.py:PassengerService.update_status",
-          "booking/services/co_passenger_service.py:CoPassengerService.get_or_create_co_passenger"
+          "booking/services/co_passenger_service.py:CoPassengerService.get_or_create_co_passenger",
+          "passenger/serializers/passenger_serializer.py:PassengerDetailSerializer.get_custom_fields"
         ],
         "rules_and_edge_cases": [
           "passenger/models/passenger_model.py:Passenger.Meta",
@@ -257,7 +258,8 @@
         ],
         "related_features": [
           "booking/models/booking_passenger_model.py",
-          "booking/services/co_passenger_service.py"
+          "booking/services/co_passenger_service.py",
+          "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService.get_responses_for_object"
         ],
         "faq": [
           "passenger/services/passenger_service.py:PassengerService.check_passenger_email_exists",
@@ -535,6 +537,10 @@
           {
             "fact": "On a specific booking, each traveler is one Booking Passenger record, separate from the standalone Passenger/client record it may be linked to; it marks whether that person is the primary passenger, whether they are the paying booking client, and whether they are actually traveling.",
             "evidence": "booking/models/booking_passenger_model.py:BookingPassenger.is_primary_passenger/is_booking_client/is_traveling"
+          },
+          {
+            "fact": "A passenger's detail view exposes their submitted custom field responses to staff, sourced from the Dynamic Forms feature.",
+            "evidence": "passenger/serializers/passenger_serializer.py:PassengerDetailSerializer.get_custom_fields"
           }
         ],
         "journeys": [

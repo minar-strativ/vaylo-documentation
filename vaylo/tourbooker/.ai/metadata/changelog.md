@@ -51,3 +51,4 @@ Append-only. One line per event:
 2026-08-11 | maintain run started | impact analysis via diff-since.sh, 20 features flagged changed after production fast-forward pull (20675c05c..f47cf806f) | f47cf806f
 2026-08-11 | dynamic-forms | updated | major rewrite — Collections/Groups now fully wired (tour/tour-type default collections, cloning, cross-tour sync), booking-level fields, CustomFieldResponse snapshots + automation (task/email/save-to-profile) | f47cf806f
 2026-08-11 | booking | updated | added payment-deadline scheduling (first/second/residue), dynamic-payment same-day merging, immediate-deadline collapse; cross-linked dynamic-forms and notifications | f47cf806f
+2026-08-11 | passengers | updated | passenger detail view now surfaces the passenger's own custom field responses to staff | f47cf806f

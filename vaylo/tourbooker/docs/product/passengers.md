@@ -38,6 +38,8 @@ Once past those checks, each row is processed on its own — a problem with one 
 
 **Exporting the client list.** Staff can export the currently filtered passenger list to a spreadsheet with a fixed set of columns covering identity, contact, passport, allergy, and emergency-contact details.
 
+**Custom field answers.** When staff open a passenger's own record, they can also see that passenger's submitted custom field answers — for example, any "save to profile" fields carried over from a booking (see [Dynamic Forms & Custom Fields](dynamic-forms.md)).
+
 **Co-passengers.** When a booking includes travelers besides the lead passenger, each of those travelers is automatically saved to the lead passenger's own list of known travel companions. This is separate from the main Passenger client record — it's a personal, reusable contact book tied to one customer's account, meant to speed up adding the same companions to future bookings rather than serving as the master client record.
 
 ## Rules & Edge Cases
@@ -66,6 +68,7 @@ Once past those checks, each row is processed on its own — a problem with one 
 
 - [Bookings](booking.md) — a booking's travelers are matched or created here by email; the lead traveler's companions are saved back as co-passengers.
 - [Tours](tours.md) — passengers on a tour are drawn from and linked back to their passenger records.
+- [Dynamic Forms & Custom Fields](dynamic-forms.md) — the source of a passenger's own submitted custom field answers, shown on their record.
 
 ## FAQ
 
