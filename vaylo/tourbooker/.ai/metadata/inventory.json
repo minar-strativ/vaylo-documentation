@@ -5485,20 +5485,77 @@
       "depends_on": [],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/organizations.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "organization/models/organization_model.py:Organization",
+          "passenger/models/passenger_model.py:Passenger.organizations",
+          "booking/models/booking.py:Booking.organization",
+          "organization/views/organization_views.py:OrganizationPassengersListAPIView"
+        ],
+        "How it works": [
+          "organization/constants.py:ORGANIZATION_CHOICES",
+          "organization/views/organization_views.py:OrganizationUpdateStatusAPIView"
+        ],
+        "Rules & Edge Cases": [
+          "organization/views/organization_views.py:OrganizationUpdateStatusAPIView",
+          "organization/services/organization_services.py:OrganizationService.check_if_organization_is_selected_in_any_active_booking"
+        ],
+        "FAQ": [
+          "organization/views/organization_views.py:OrganizationUpdateStatusAPIView",
+          "organization/constants.py:ORGANIZATION_CHOICES",
+          "passenger/models/passenger_model.py:Passenger.organizations"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
+        "workflows": [
+          {
+            "fact": "Staff create an organization record \u2014 a company, agent, or individual entity \u2014 with contact details, address, VAT/organization number, and its own default currency and language.",
+            "evidence": "organization/models/organization_model.py:Organization,organization/constants.py:ORGANIZATION_CHOICES"
+          },
+          {
+            "fact": "A passenger can be linked to one or more organizations, and a booking can be tagged as belonging to a specific organization, so staff can see which passengers and bookings are associated with a given company or agent.",
+            "evidence": "passenger/models/passenger_model.py:Passenger.organizations,booking/models/booking.py:Booking.organization"
+          },
+          {
+            "fact": "Staff can view the list of passengers linked to a given organization.",
+            "evidence": "organization/views/organization_views.py:OrganizationPassengersListAPIView"
+          },
+          {
+            "fact": "Staff can turn an organization on or off, as long as it isn't currently attached to any active booking.",
+            "evidence": "organization/views/organization_views.py:OrganizationUpdateStatusAPIView,organization/services/organization_services.py:OrganizationService.check_if_organization_is_selected_in_any_active_booking"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "An organization's active/inactive status can't be changed while it's still attached to any active booking.",
+            "evidence": "organization/views/organization_views.py:OrganizationUpdateStatusAPIView"
+          }
+        ],
         "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
+        "permissions": [
+          {
+            "fact": "Creating, editing, listing, and changing the status of organizations, and viewing an organization's linked passengers, all require an authenticated staff user with standard staff model permissions.",
+            "evidence": "organization/views/organization_views.py:OrganizationListCreateAPIView,OrganizationRetrieveUpdateAPIView,OrganizationUpdateStatusAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "An organization's type is Individual, Company, Agent, or Agent Direct \u2014 distinguishing ordinary customers from corporate accounts and travel agents.",
+            "evidence": "organization/constants.py:ORGANIZATION_CHOICES"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "Staff set up an organization for a corporate customer or travel agent once, link the relevant passengers to it, and then tag bookings made on its behalf with that organization \u2014 giving a consolidated view of everyone and everything associated with it.",
+            "evidence": "organization/views/organization_views.py:OrganizationPassengersListAPIView,booking/models/booking.py:Booking.organization"
+          }
+        ],
         "side_effects": []
       }
     },
