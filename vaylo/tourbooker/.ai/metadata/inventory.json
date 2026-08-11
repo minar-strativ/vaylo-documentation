@@ -5667,20 +5667,77 @@
       ],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/reporting.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "report/services/sales_report_service.py:SalesReportService.generate_sales_report_data_for_rows",
+          "report/services/revenue_report_service.py:RevenueReportService.get_revenue_report_data_rows",
+          "report/services/invoice_list_report_service.py:InvoiceListReportService.build_rows",
+          "report/services/report_services.py:ReportService.get_sales_report_by_departure_date,get_sales_report_by_booking_date,get_payment_deadline_report",
+          "report/services/payment_deadline_scheduler_service.py:PaymentDeadlineSchedulerService.send_payment_deadline_report_scheduled_email",
+          "report/services/revenue_report_service.py:RevenueReportService.send_revenue_report_scheduled_email",
+          "report/services/dashboard_report_service.py:DashboardReportService.get_summary"
+        ],
+        "How it works": [
+          "report/services/dashboard_report_service.py:DashboardReportService.get_summary",
+          "report/services/report_services.py:ReportService.get_sales_report_by_departure_date,get_sales_report_by_booking_date",
+          "report/services/payment_deadline_scheduler_service.py:PaymentDeadlineSchedulerService.send_payment_deadline_report_scheduled_email"
+        ],
+        "Limitations": [
+          "report/models.py:EscalationEvent"
+        ],
+        "FAQ": [
+          "report/services/payment_deadline_scheduler_service.py:PaymentDeadlineSchedulerService.send_payment_deadline_report_scheduled_email",
+          "report/services/dashboard_report_service.py:DashboardReportService.get_summary"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
+        "workflows": [
+          {
+            "fact": "Staff generate operational reports over a date range \u2014 sales, transactions, payment deadlines, revenue, and invoices \u2014 choosing which columns to include, and download them as an Excel file.",
+            "evidence": "report/services/sales_report_service.py:SalesReportService.generate_sales_report_data_for_rows,report/services/revenue_report_service.py:RevenueReportService.get_revenue_report_data_rows,report/services/invoice_list_report_service.py:InvoiceListReportService.build_rows"
+          },
+          {
+            "fact": "Staff can generate a sales or transaction report filtered by either a booking's departure date or the date it was booked, whichever is more useful for the question they're answering.",
+            "evidence": "report/services/report_services.py:ReportService.get_sales_report_by_departure_date,get_sales_report_by_booking_date"
+          },
+          {
+            "fact": "A payment-deadline report lists bookings due for their first, second, or residual payment within a date range, and can be scheduled to email itself out automatically instead of being pulled on demand.",
+            "evidence": "report/services/report_services.py:ReportService.get_payment_deadline_report,report/services/payment_deadline_scheduler_service.py:PaymentDeadlineSchedulerService.send_payment_deadline_report_scheduled_email"
+          },
+          {
+            "fact": "A revenue report can likewise be scheduled to email itself out for a given date range instead of being pulled on demand.",
+            "evidence": "report/services/revenue_report_service.py:RevenueReportService.send_revenue_report_scheduled_email"
+          },
+          {
+            "fact": "Staff can pull a report of bookings still owing a remaining balance for a given year, and a separate report of upcoming tours' advance payments due before departure.",
+            "evidence": "report/services/report_services.py:ReportService.get_remaining_booking_payment_report,get_advance_paid_bookings"
+          },
+          {
+            "fact": "The staff dashboard shows an at-a-glance operational summary: the last 30 days of transactions and their total, this month's booking and transaction summaries, and today's bookings.",
+            "evidence": "report/services/dashboard_report_service.py:DashboardReportService.get_summary"
+          }
+        ],
         "rules": [],
         "validations": [],
-        "permissions": [],
+        "permissions": [
+          {
+            "fact": "Pulling any report from the admin requires an authenticated staff user; the scheduled email versions of the payment-deadline and revenue reports run as the system itself via a machine API key, not as a staff action.",
+            "evidence": "report/views/sales_report_views.py:BookingsSalesReportByDepartureDateAPIView,report/views/payment_deadline_report_scheduler_view.py:PaymentDeadlineReportSchedulerAPIView,report/views/revenue_report_views.py:RevenueReportSchedulerAPIView"
+          }
+        ],
         "field_meanings": [],
-        "journeys": [],
+        "journeys": [
+          {
+            "fact": "Staff open the dashboard for a quick pulse on the business, then drill into a specific report \u2014 sales, payment deadlines, revenue, or invoices \u2014 filtered and column-customized to answer a specific question, and export it if they need to share or archive it.",
+            "evidence": "report/services/dashboard_report_service.py:DashboardReportService.get_summary"
+          }
+        ],
         "side_effects": []
       }
     },

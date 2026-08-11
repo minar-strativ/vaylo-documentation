@@ -44,3 +44,4 @@ Append-only. One line per event:
 2026-08-11 | user-access/impersonation-and-privacy | created | 25 of 26 remaining features | 20675c05c
 2026-08-11 | organizations | created | 26 of 26 remaining features | 20675c05c
 2026-08-11 | subscription | created | 27th feature documented this backlog run | 20675c05c
+2026-08-11 | reporting | created | reports live; escalation-event data model noted as unwired scaffolding, no separate doc | 20675c05c
