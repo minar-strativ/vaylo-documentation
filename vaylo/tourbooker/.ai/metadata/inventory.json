@@ -3493,21 +3493,176 @@
       ],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/res-pay.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "res_pay/views/res_pay_view.py:ResPayPaymentListCreateAPIView.post",
+          "res_pay/services/res_pay_service.py:ResPayService.generate_payment_link"
+        ],
+        "How it works": [
+          "res_pay/views/res_pay_view.py:ResPayPaymentListCreateAPIView.post",
+          "res_pay/services/res_pay_service.py:ResPayService.create_scheduled_reminder",
+          "res_pay/serializers/res_pay_public_serializer.py:ResPayPublicSerializer.get_payment_methods",
+          "res_pay/views/klarna/klarna_payment_view.py:KlarnaPaymentSuccessAPIView.post",
+          "res_pay/services/res_pay_email_service.py:ResPayEmailService.send_payment_confirmation_email",
+          "res_pay/views/res_pay_view.py:ResPayReminderAPIView.post",
+          "res_pay/services/res_pay_service.py:ResPayService.update_status",
+          "res_pay/services/res_pay_service.py:ResPayService.update_accounted_status",
+          "res_pay/services/res_pay_service.py:ResPayService.update_payment_link_expiry_status",
+          "res_pay/services/res_pay_service.py:ResPayService.internal_link_expiry_reminder",
+          "res_pay/views/res_pay_view.py:ResPayPaymentExcelDownloadAPIView.get",
+          "res_pay/services/res_pay_service.py:ResPayService.get_transaction_summary"
+        ],
+        "Rules & Edge Cases": [
+          "res_pay/services/res_pay_service.py:ResPayService.generate_payment_link",
+          "res_pay/services/res_pay_service.py:ResPayService.update_status",
+          "res_pay/services/res_pay_service.py:ResPayService.update_accounted_status",
+          "res_pay/services/res_pay_email_service.py:ResPayEmailService.send_payment_reminder",
+          "res_pay/serializers/res_pay_serializer.py:ResPaySerializer.get_payment_status",
+          "res_pay/models/res_pay.py:ResPayPayment.payment_unique_code",
+          "res_pay/models/configuration.py:ResPayConfiguration",
+          "res_pay/views/res_pay_public_view.py:ResPayPublicPaymentInfoAPIView"
+        ],
+        "Related Features": [
+          "payment/services/transaction_service.py:TransactionService.get_res_pay_transaction"
+        ],
+        "FAQ": [
+          "res_pay/views/res_pay_public_view.py:ResPayPublicPaymentInfoAPIView",
+          "res_pay/services/res_pay_service.py:ResPayService.update_payment_link_expiry_status",
+          "res_pay/services/res_pay_service.py:ResPayService.update_status",
+          "res_pay/services/res_pay_service.py:ResPayService.update_accounted_status",
+          "res_pay/serializers/res_pay_public_serializer.py:ResPayPublicSerializer.get_payment_methods",
+          "payment/services/transaction_service.py:TransactionService.get_res_pay_transaction"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "Staff create a standalone payment request (not tied to a booking): an amount, currency, due date, and the customer's email, choosing whether to notify the customer by email, SMS, or both.",
+            "evidence": "res_pay/views/res_pay_view.py:ResPayPaymentListCreateAPIView.post"
+          },
+          {
+            "fact": "Creating the request generates a unique payment code and a payment link, and \u2014 if requested \u2014 immediately sends the customer an email containing that link; a reminder is also scheduled ahead of the due date.",
+            "evidence": "res_pay/views/res_pay_view.py:ResPayPaymentListCreateAPIView.post,res_pay/services/res_pay_service.py:ResPayService.create_scheduled_reminder"
+          },
+          {
+            "fact": "The customer opens the payment link's public page, which shows the company's name and logo, the amount and due date, and the payment methods available to pay with (manual, refund, and invoice payment are never offered here).",
+            "evidence": "res_pay/serializers/res_pay_public_serializer.py:ResPayPublicSerializer.get_payment_methods"
+          },
+          {
+            "fact": "The customer completes payment through one of the offered payment providers (Klarna, Trustly, or Altapay); once the provider confirms the payment, the request's status becomes Paid and an internal confirmation email is sent to whoever created the request.",
+            "evidence": "res_pay/views/klarna/klarna_payment_view.py:KlarnaPaymentSuccessAPIView.post,res_pay/services/res_pay_email_service.py:ResPayEmailService.send_payment_confirmation_email"
+          },
+          {
+            "fact": "Staff can manually resend a reminder to the customer at any time before the request is paid.",
+            "evidence": "res_pay/views/res_pay_view.py:ResPayReminderAPIView.post"
+          },
+          {
+            "fact": "Staff can cancel a request that has not yet been paid or expired.",
+            "evidence": "res_pay/services/res_pay_service.py:ResPayService.update_status"
+          },
+          {
+            "fact": "Once a request is paid, staff can mark it as accounted (recorded in accounting) and see who marked it and when; a request cannot be marked accounted while still pending, expired, failed, or canceled.",
+            "evidence": "res_pay/services/res_pay_service.py:ResPayService.update_accounted_status"
+          },
+          {
+            "fact": "A scheduled job automatically marks any pending request whose due date has passed as Expired.",
+            "evidence": "res_pay/services/res_pay_service.py:ResPayService.update_payment_link_expiry_status"
+          },
+          {
+            "fact": "A day before a pending request's due date, a scheduled job emails the staff member who created it, listing every customer whose payment link is about to expire.",
+            "evidence": "res_pay/services/res_pay_service.py:ResPayService.internal_link_expiry_reminder,res_pay/services/res_pay_email_service.py:ResPayEmailService.send_internal_link_expiry_reminder"
+          },
+          {
+            "fact": "Staff can export all payment requests to an Excel report, and view a dashboard summary comparing this month's paid and outstanding totals to last month's.",
+            "evidence": "res_pay/views/res_pay_view.py:ResPayPaymentExcelDownloadAPIView.get,res_pay/services/res_pay_service.py:ResPayService.get_transaction_summary"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A payment request can only be created if the tenant has an active Resemolnet payment provider connection configured; otherwise creation is rejected.",
+            "evidence": "res_pay/services/res_pay_service.py:ResPayService.generate_payment_link"
+          },
+          {
+            "fact": "A request already Paid or Expired cannot be canceled.",
+            "evidence": "res_pay/services/res_pay_service.py:ResPayService.update_status"
+          },
+          {
+            "fact": "Only a Paid request can be marked accounted; Pending, Expired, Failed, or Canceled requests are rejected.",
+            "evidence": "res_pay/services/res_pay_service.py:ResPayService.update_accounted_status"
+          },
+          {
+            "fact": "A reminder cannot be sent for a request that has already been paid.",
+            "evidence": "res_pay/services/res_pay_email_service.py:ResPayEmailService.send_payment_reminder"
+          },
+          {
+            "fact": "A request's public payment page and payment link stop working once the request is no longer active, has passed its due date, or has already been paid \u2014 the customer sees a not-found/expired message instead.",
+            "evidence": "res_pay/services/res_pay_service.py:ResPayService.get_validated_payment,res_pay/views/res_pay_public_view.py:ResPayPublicPaymentInfoAPIView.post"
+          },
+          {
+            "fact": "Whether payment requests automatically email or SMS customers, whether internal staff get expiry/paid-reminder notifications, and how long a link stays valid before expiring (and how long before that an internal expiry warning goes out) are all set per tenant in the feature's configuration.",
+            "evidence": "res_pay/models/configuration.py:ResPayConfiguration"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "The public payment page and the customer-facing payment status both treat a request as Expired the moment its due date passes, even before the scheduled cleanup job has run, so a customer can never pay a link past its due date.",
+            "evidence": "res_pay/serializers/res_pay_serializer.py:ResPaySerializer.get_payment_status,res_pay/serializers/res_pay_public_serializer.py:ResPayPublicDataSerializer.get_payment_status"
+          },
+          {
+            "fact": "Payment codes are always unique, so a payment link can never be shared by more than one request.",
+            "evidence": "res_pay/models/res_pay.py:ResPayPayment.payment_unique_code"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Any authenticated staff member can create and list payment requests; canceling, marking accounted, and retrieving a single request's detail additionally require the standard staff model permissions.",
+            "evidence": "res_pay/views/res_pay_view.py:ResPayPaymentListCreateAPIView,ResPayCancelAPIView,ResPayAccountedAPIView,ResPayPaymentRetrieveAPIView"
+          },
+          {
+            "fact": "The public payment page and the customer's checkout endpoints (Klarna, Trustly, Altapay) need no staff login at all \u2014 they identify the request purely by its unique payment code, so anyone with the link's code can view and pay it.",
+            "evidence": "res_pay/views/res_pay_public_view.py:ResPayPublicPaymentInfoAPIView,res_pay/views/klarna/klarna_payment_view.py:KlarnaPaymentRequestAPIView"
+          },
+          {
+            "fact": "The scheduled expiry and internal-reminder jobs run as the system itself via a machine API key, not as a staff user.",
+            "evidence": "res_pay/views/res_pay_view.py:UpdateResPayLinkExpirationAPIView,ResPayInternalExpiryEmailRemainder"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A payment request's status is Pending (link sent, awaiting payment), Paid (successfully paid), Expired (due date passed without payment), Failed (a payment attempt did not go through), or Canceled (a staff member canceled it).",
+            "evidence": "res_pay/constants.py:PaymentStatus"
+          },
+          {
+            "fact": "\"Accounted\" marks that a paid request has been recorded for accounting purposes, separate from its payment status, with who accounted it and when.",
+            "evidence": "res_pay/models/res_pay.py:ResPayPayment.is_accounted"
+          },
+          {
+            "fact": "\"Sent by\" records whether the payment link was delivered to the customer by email, SMS, or both.",
+            "evidence": "res_pay/models/res_pay.py:ResPayPayment.link_sent_by"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A staff member creates a payment request for a customer (e.g. for a charge outside a normal booking flow), the customer receives the link by email and/or SMS, opens it, picks a payment method, and pays; the staff member is notified by email once it's paid, and can later mark it as accounted.",
+            "evidence": "res_pay/views/res_pay_view.py:ResPayPaymentListCreateAPIView.post,res_pay/services/res_pay_email_service.py:ResPayEmailService.send_payment_confirmation_email"
+          },
+          {
+            "fact": "If a customer hasn't paid yet, they may get an automatic or staff-sent reminder before the link expires; if the due date passes unpaid, the link stops working and the staff member who created it is warned in advance.",
+            "evidence": "res_pay/services/res_pay_email_service.py:ResPayEmailService.send_payment_reminder,ResPayEmailService.send_internal_link_expiry_reminder"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "A completed ResPay payment creates a Transaction record, the same record type the Payments feature uses for booking payments, linking this payment request to that shared transaction history.",
+            "evidence": "payment/services/transaction_service.py:TransactionService.get_res_pay_transaction"
+          }
+        ]
       }
     },
     {
