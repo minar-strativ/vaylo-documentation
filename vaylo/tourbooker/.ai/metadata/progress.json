@@ -2,9 +2,9 @@
   "mode": "create",
   "run_started_at": "2026-07-29",
   "run_anchor_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
-  "current_feature": "notes-todos",
+  "current_feature": "reservation-service",
   "current_step": "analyze",
   "scope_this_run": [],
-  "notes": "reporting documented. 2 features left in the original 26-feature backlog: notes-todos, reservation-service.",
-  "run_processed_count": 33
+  "notes": "notes-todos documented. 1 feature left in the original 26-feature backlog: reservation-service.",
+  "run_processed_count": 34
 }

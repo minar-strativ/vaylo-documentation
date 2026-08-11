@@ -1,6 +1,6 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (42 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs, Accounting Integration into a parent + 2 child docs, and Suppliers and User & Access Management each into a parent + 1 child doc); 33 documented, 1 flagged needs-review (Rewards & Loyalty — unreleased) so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (42 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs, Accounting Integration into a parent + 2 child docs, and Suppliers and User & Access Management each into a parent + 1 child doc); 34 documented, 1 flagged needs-review (Rewards & Loyalty — unreleased) so far.
 
 ## Bookings & Catalog
 
@@ -43,7 +43,7 @@ Generated and maintained by Canopy. One page per business capability — see eac
 - [Notifications (Email)](notifications.md) — Templated/translated email events, provider connection, scheduling and delivery logs.
 - [Surveys](surveys.md) — Post-tour feedback surveys, synced from Netigate and auto-dispatched after a tour returns.
 - [Dynamic Forms & Custom Fields](dynamic-forms.md) — Per-tour custom booking/passenger form fields, seeded with standard fields and validated on submission.
-- Notes, Todos & Travel Information — Internal notes, to-do items and traveller-facing travel information content. *(pending)*
+- [Notes, Todos & Travel Information](notes-todos.md) — Staff notes/tasks with reminders, and multilingual traveler-facing content.
 
 ## Platform & Access
 

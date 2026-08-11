@@ -5755,21 +5755,121 @@
         "multi-language"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/notes-todos.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "note/services/note_services.py:NoteService.prepare_data",
+          "todo/services/todo_services.py:TodoService.create,send_todo_email,complete_task",
+          "travel_information/services/travel_information_service.py:TravelInformationService.get_travel_information_for_booking"
+        ],
+        "How it works": [
+          "note/services/note_services.py:NoteService.prepare_data",
+          "todo/services/todo_services.py:TodoService.create,create_or_update_reminder,complete_task",
+          "travel_information/services/travel_information_service.py:TravelInformationService.get_travel_information_for_booking,_raise_if_linked_to_active_records"
+        ],
+        "Rules & Edge Cases": [
+          "todo/services/todo_services.py:TodoService.create",
+          "note/services/note_services.py:NoteService.prepare_data",
+          "travel_information/services/travel_information_service.py:TravelInformationService._raise_if_linked_to_active_records",
+          "todo/services/todo_services.py:TodoService.complete_task"
+        ],
+        "Related Features": [
+          "todo/services/todo_services.py:TodoService.send_todo_email,create_or_update_reminder"
+        ],
+        "FAQ": [
+          "note/services/note_services.py:NoteService.prepare_data",
+          "todo/services/todo_services.py:TodoService.complete_task,create",
+          "travel_information/services/travel_information_service.py:TravelInformationService._raise_if_linked_to_active_records",
+          "travel_information/views/passenger_portal_travel_information_views.py:PassengerPortalBookingTravelInformationAPIView"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
+        "workflows": [
+          {
+            "fact": "Staff attach notes to a booking or tour, typed by category, marked internal (staff-only) or external, and optionally assigned to a staff member or a specific passenger on the booking.",
+            "evidence": "note/services/note_services.py:NoteService.prepare_data,note/models/note.py:Note"
+          },
+          {
+            "fact": "Staff create todo tasks tied to a booking or a tour, with a title, description, due date/time, and an assigned staff member; the assignee is emailed when a task is created or reassigned.",
+            "evidence": "todo/services/todo_services.py:TodoService.create,send_todo_email"
+          },
+          {
+            "fact": "A tour-level task can be created once and automatically fanned out as a matching copy on every currently booked or transferred booking under that tour, with one parent task representing the whole group.",
+            "evidence": "todo/services/todo_services.py:TodoService.create,get_task_group"
+          },
+          {
+            "fact": "Completing a fanned-out task can either close just that one copy, or cascade to close the entire group (the tour-level parent and every booking copy) at once.",
+            "evidence": "todo/services/todo_services.py:TodoService.complete_task"
+          },
+          {
+            "fact": "A task's assignee gets one or more reminder emails ahead of its due date/time, timed according to the tenant's configured reminder lead times; reminders are cancelled once the task is completed.",
+            "evidence": "todo/services/todo_services.py:TodoService.create_or_update_reminder,complete_task"
+          },
+          {
+            "fact": "Staff maintain traveler-facing travel information content (in multiple languages) that can be general (shown to everyone), or attached to a specific tour, tour type, location, or booking.",
+            "evidence": "travel_information/models/travel_information_model.py:TravelInformation,travel_information/services/travel_information_service.py:TravelInformationService.get_general_travel_information_list"
+          },
+          {
+            "fact": "A passenger viewing their booking in the passenger portal sees a combined set of travel information assembled from every applicable source for that specific booking \u2014 general content, the tour's own details, its location, its tour type, and anything linked directly to the booking \u2014 in their preferred language.",
+            "evidence": "travel_information/services/travel_information_service.py:TravelInformationService.get_travel_information_for_booking,travel_information/views/passenger_portal_travel_information_views.py:PassengerPortalBookingTravelInformationAPIView"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A todo's due date and time can never be set in the past.",
+            "evidence": "todo/services/todo_services.py:TodoService.create"
+          },
+          {
+            "fact": "A piece of travel information can't be deactivated while it's still linked to any active tour, tour type, custom tour offer, location, itinerary template, or active booking \u2014 it has to be unlinked from all of those first.",
+            "evidence": "travel_information/services/travel_information_service.py:TravelInformationService._raise_if_linked_to_active_records"
+          },
+          {
+            "fact": "An internal note is assigned to a staff member; an external note is assigned to a specific passenger on the booking instead \u2014 never both at once.",
+            "evidence": "note/services/note_services.py:NoteService.prepare_data"
+          }
+        ],
         "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "permissions": [
+          {
+            "fact": "Creating, viewing, updating, and changing the status of notes and todos all require an authenticated staff user with standard staff model permissions.",
+            "evidence": "note/views/note_views.py:NoteAPIView,NoteRetrieveUpdateAPIView,todo/views/todo_views.py:TodoAPIView,TodoRetrieveUpdateAPIView"
+          },
+          {
+            "fact": "A passenger can view their own booking's travel information through the passenger portal without any elevated permission beyond being logged in as (or authorized to view) that booking.",
+            "evidence": "travel_information/views/passenger_portal_travel_information_views.py:PassengerPortalBookingTravelInformationAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A note's type distinguishes what kind of note it is (for example, a general remark vs. a specific category), separate from whether it's internal or external.",
+            "evidence": "note/models/note_type.py:NoteType"
+          },
+          {
+            "fact": "A todo's \"pending copy count\" tells staff how many bookings under a tour-level task's fan-out group still have that task open, so they know at a glance whether it needs following up.",
+            "evidence": "todo/services/todo_services.py:TodoService.get_booking_task_count,annotate_booking_task_count"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "Staff leave a note on a booking for a colleague or flag something for a specific passenger, create a follow-up task with a due date, and get reminded automatically if it's not done in time; if the task applies to a whole tour, one task covers every booking on it and can be closed out for all of them together.",
+            "evidence": "todo/services/todo_services.py:TodoService.create,complete_task,create_or_update_reminder"
+          },
+          {
+            "fact": "A passenger opens their booking in the passenger portal and sees all the practical information relevant to their specific trip \u2014 general advice, details about their tour, its location, and its type, plus anything added just for their booking \u2014 in their own language.",
+            "evidence": "travel_information/views/passenger_portal_travel_information_views.py:PassengerPortalBookingTravelInformationAPIView"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "A todo's reminder emails and a note's passenger assignment both rely on the platform's own email notification system.",
+            "evidence": "todo/services/todo_services.py:TodoService.send_todo_email,create_or_update_reminder"
+          }
+        ]
       }
     },
     {
