@@ -40,3 +40,5 @@ Append-only. One line per event:
 2026-08-11 | surveys | created | 22 of 26 remaining features | 20675c05c
 2026-08-11 | widget | created | 23 of 26 remaining features | 20675c05c
 2026-08-11 | dynamic-forms | created | 24 of 26 remaining features | 20675c05c
+2026-08-11 | user-access | split | analysis revealed >7 workflows across two distinct areas (~2,900 lines); split into parent overview + user-access/impersonation-and-privacy | 20675c05c
+2026-08-11 | user-access/impersonation-and-privacy | created | 25 of 26 remaining features | 20675c05c

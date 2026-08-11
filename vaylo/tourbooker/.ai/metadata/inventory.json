@@ -5436,15 +5436,37 @@
         "activity-log"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/user-access.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "user/services/user_service.py:UserService._set_superuser_data,_set_admin_user_data,_set_passenger_user_data,_set_tour_guide_user_data"
+        ],
+        "How it works": [
+          "user/services/user_service.py:UserService._create_user,send_forget_password_email,update_status",
+          "auth_group/services.py:AuthGroupService.update"
+        ],
+        "Rules & Edge Cases": [
+          "user/services/user_service.py:UserService._create_user,update_status",
+          "auth_group/services.py:AuthGroupService.update"
+        ],
+        "FAQ": [
+          "user/services/user_service.py:UserService._set_passenger_user_data",
+          "auth_group/services.py:AuthGroupService.update",
+          "user/services/user_service.py:UserService.update_status"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
+        "workflows": [
+          {
+            "fact": "The platform has four kinds of accounts \u2014 super admin, staff/admin, tour guide, and passenger \u2014 each defined by which role (group) they belong to, which in turn determines which admin permissions or which portal (admin site vs. passenger site) they can access.",
+            "evidence": "user/services/user_service.py:UserService._set_superuser_data,_set_admin_user_data,_set_passenger_user_data,_set_tour_guide_user_data"
+          }
+        ],
         "rules": [],
         "validations": [],
         "permissions": [],
@@ -5919,6 +5941,123 @@
           {
             "fact": "A supplier invoice sent to accounting posts through the same connected accounting provider used elsewhere in the platform.",
             "evidence": "supplier/services/supplier_accounting_service.py:SupplierAccountingService.send_supplier_invoice_to_accounting_service"
+          }
+        ]
+      }
+    },
+    {
+      "id": "user-access/impersonation-and-privacy",
+      "name": "Passenger Impersonation & GDPR Anonymisation",
+      "summary": "Staff read-only impersonation of a passenger with full audit logging, and permanent GDPR data anonymisation.",
+      "files": [
+        "user/services/impersonate_passenger.py",
+        "user/services/anonymise_user_data_service.py",
+        "user/views/token_views.py",
+        "user/views/anonymise_user_data_views.py",
+        "user/models.py"
+      ],
+      "depends_on": [
+        "user-access"
+      ],
+      "shared_modules": [
+        "activity-log"
+      ],
+      "existing_docs": [],
+      "status": "completed",
+      "skip_reason": null,
+      "doc": "docs/product/user-access-impersonation-and-privacy.md",
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "user/services/impersonate_passenger.py:ImpersonationPassengerService.create_impersonation_token,authorize_request",
+          "user/services/anonymise_user_data_service.py:AnonymiseUserDataService.anonymise_user_data"
+        ],
+        "How it works": [
+          "user/services/impersonate_passenger.py:ImpersonationPassengerService.create_impersonation_token,authorize_request,end_impersonation_token,close_previous_sessions",
+          "user/services/anonymise_user_data_service.py:AnonymiseUserDataService.anonymise_user_data,send_admin_email_with_anonymised_user_data"
+        ],
+        "Rules & Edge Cases": [
+          "user/services/impersonate_passenger.py:ImpersonationPassengerService.authorize_request",
+          "user/services/anonymise_user_data_service.py:AnonymiseUserDataService._validate_user_for_anonymisation,_get_all_transactions_for_passenger"
+        ],
+        "Related Features": [
+          "user/services/anonymise_user_data_service.py:AnonymiseUserDataService.anonymise_booking_passenger_data,_get_all_invoices_for_passenger"
+        ],
+        "FAQ": [
+          "user/services/impersonate_passenger.py:ImpersonationPassengerService.authorize_request,close_previous_sessions",
+          "user/services/anonymise_user_data_service.py:AnonymiseUserDataService._validate_user_for_anonymisation"
+        ]
+      },
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "A staff member can start an impersonation session to see the passenger portal exactly as a specific passenger sees it, using a temporary time-limited token \u2014 useful for support and troubleshooting without needing the passenger's own credentials.",
+            "evidence": "user/services/impersonate_passenger.py:ImpersonationPassengerService.create_impersonation_token"
+          },
+          {
+            "fact": "While impersonating, every request the staff member makes is checked against that session and logged with the HTTP method, IP address, and path accessed, giving a full audit trail of what was viewed or done under impersonation.",
+            "evidence": "user/services/impersonate_passenger.py:ImpersonationPassengerService.authorize_request,ImpersonationAuditLogService.create_log"
+          },
+          {
+            "fact": "An impersonation session can be ended explicitly, and starting any new impersonation automatically closes out every other currently open impersonation session platform-wide.",
+            "evidence": "user/services/impersonate_passenger.py:ImpersonationPassengerService.end_impersonation_token,close_previous_sessions"
+          },
+          {
+            "fact": "Staff can permanently anonymise a passenger's personal data (for a GDPR data-erasure request), which scrubs their identifying details everywhere they appear \u2014 their own account, passenger profile, any booking they were a passenger on, any co-passenger record, and their payment/invoice history \u2014 while keeping a private record of what was anonymised.",
+            "evidence": "user/services/anonymise_user_data_service.py:AnonymiseUserDataService.anonymise_user_data"
+          },
+          {
+            "fact": "Anonymising a user automatically emails a designated admin recipient a notice of the action, including who performed it and when.",
+            "evidence": "user/services/anonymise_user_data_service.py:AnonymiseUserDataService.send_admin_email_with_anonymised_user_data"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "While impersonating, a staff member can only perform read (safe) actions \u2014 any attempt to create, change, or delete something is blocked, with a small, explicit set of exceptions (like ending the session or downloading an invoice/receipt).",
+            "evidence": "user/services/impersonate_passenger.py:ImpersonationPassengerService.authorize_request,_is_whitelisted_write"
+          },
+          {
+            "fact": "An impersonation token only works for the specific passenger account it was issued for, and only while that session is still marked valid \u2014 an expired or already-ended session, or a token used by the wrong account, is rejected.",
+            "evidence": "user/services/impersonate_passenger.py:ImpersonationPassengerService.authorize_request,_decode_token"
+          },
+          {
+            "fact": "A user who has already been anonymised, is a superuser, or currently has an active, not-yet-departed booking as a passenger cannot be anonymised.",
+            "evidence": "user/services/anonymise_user_data_service.py:AnonymiseUserDataService._validate_user_for_anonymisation"
+          },
+          {
+            "fact": "Anonymising a user replaces their name and email everywhere their personal data appears, but keeps the underlying booking, transaction, and invoice records themselves \u2014 only the personally identifying details are scrubbed, not the business records.",
+            "evidence": "user/services/anonymise_user_data_service.py:AnonymiseUserDataService._get_all_transactions_for_passenger,_get_all_invoices_for_passenger"
+          }
+        ],
+        "validations": [],
+        "permissions": [
+          {
+            "fact": "Only an authenticated user can start or end an impersonation session; anonymising a user's data requires a superuser account specifically.",
+            "evidence": "user/views/token_views.py:ImpersonationTokenCreateView,user/views/anonymise_user_data_views.py:UserAnonymiseDataAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "An impersonation session's status is Valid (currently usable) or Invalid (ended, superseded by a newer session, or otherwise closed).",
+            "evidence": "user/constants.py:TokenStatusChoices"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "Support staff open an impersonation session to see a passenger's own view and confirm what they're experiencing, browsing read-only with every action logged, then end the session when done.",
+            "evidence": "user/services/impersonate_passenger.py:ImpersonationPassengerService.create_impersonation_token,end_impersonation_token"
+          },
+          {
+            "fact": "When a passenger asks to have their data erased, staff trigger anonymisation once all of their bookings have departed or been cancelled; their personal details disappear from every record that mentioned them, while an internal log and an admin notification preserve what happened for compliance purposes.",
+            "evidence": "user/services/anonymise_user_data_service.py:AnonymiseUserDataService.anonymise_user_data,send_admin_email_with_anonymised_user_data"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Anonymising a user touches records owned by several other features at once: their passenger profile, any booking they were the primary or a co-passenger on, their payment transactions, and their invoices.",
+            "evidence": "user/services/anonymise_user_data_service.py:AnonymiseUserDataService.anonymise_booking_passenger_data,anonymise_co_passenger_data,_get_all_transactions_for_passenger,_get_all_invoices_for_passenger"
           }
         ]
       }

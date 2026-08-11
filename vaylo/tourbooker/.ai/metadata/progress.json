@@ -2,9 +2,9 @@
   "mode": "create",
   "run_started_at": "2026-07-29",
   "run_anchor_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
-  "current_feature": "user-access",
+  "current_feature": "organizations",
   "current_step": "analyze",
   "scope_this_run": [],
-  "notes": "dynamic-forms documented (24 of 26 remaining). Next pending feature in plan order: user-access.",
-  "run_processed_count": 29
+  "notes": "user-access split into parent + impersonation-and-privacy, both documented (25 of 26 remaining). Next pending feature in plan order: organizations.",
+  "run_processed_count": 30
 }

@@ -1,6 +1,6 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (40 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs, Accounting Integration into a parent + 2 child docs, and Suppliers into a parent + 1 child doc); 28 documented, 1 flagged needs-review (Rewards & Loyalty — unreleased) so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (42 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs, Accounting Integration into a parent + 2 child docs, and Suppliers and User & Access Management each into a parent + 1 child doc); 30 documented, 1 flagged needs-review (Rewards & Loyalty — unreleased) so far.
 
 ## Bookings & Catalog
 
@@ -47,7 +47,8 @@ Generated and maintained by Canopy. One page per business capability — see eac
 
 ## Platform & Access
 
-- User & Access Management — Users and profiles, roles/permissions, passenger impersonation with audit, and GDPR data anonymisation. *(pending)*
+- [User & Access Management](user-access.md) — Accounts, roles/permissions across staff, tour guide and passenger users.
+  - [Passenger Impersonation & GDPR Anonymisation](user-access-impersonation-and-privacy.md) — Read-only staff impersonation with audit logging, and permanent GDPR data anonymisation.
 - Organizations — Organization records grouping users/customers. *(pending)*
 - Subscription Plans — Tenant-facing subscription plans that gate platform capabilities. *(pending)*
 - Reporting & Escalation — Operational reports and escalation events. *(pending)*
