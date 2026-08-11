@@ -34,3 +34,5 @@ Append-only. One line per event:
 2026-08-11 | accounting | split | analysis revealed >7 workflows across two distinct areas (~5,900 lines, two external providers); split into parent overview + accounting/provider-setup + accounting/vouchers-and-logs | 20675c05c
 2026-08-11 | accounting/provider-setup | created | 18 of 26 remaining features | 20675c05c
 2026-08-11 | accounting/vouchers-and-logs | created | 19 of 26 remaining features | 20675c05c
+2026-08-11 | suppliers | split | analysis revealed >7 workflows across two distinct areas (~4,100 lines); split into parent overview + suppliers/invoicing-and-costs | 20675c05c
+2026-08-11 | suppliers/invoicing-and-costs | created | 20 of 26 remaining features | 20675c05c

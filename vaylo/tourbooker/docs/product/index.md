@@ -1,6 +1,6 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (38 docs, since Flights & Ticketing, Yacht Booking, and Accounting Integration each split into a parent + 2 child docs); 22 documented, 1 flagged needs-review (Rewards & Loyalty — unreleased) so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (40 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs, Accounting Integration into a parent + 2 child docs, and Suppliers into a parent + 1 child doc); 24 documented, 1 flagged needs-review (Rewards & Loyalty — unreleased) so far.
 
 ## Bookings & Catalog
 
@@ -35,7 +35,8 @@ Generated and maintained by Canopy. One page per business capability — see eac
 - [Accounting Integration](accounting.md) — Connecting an external accounting provider and auto-posting business events to it.
   - [Accounting Provider Setup & Reference Data](accounting-provider-setup.md) — Connecting a provider and syncing/mapping its projects, cost centers, tax codes and accounts.
   - [Accounting Vouchers & Logs](accounting-vouchers-and-logs.md) — Automatic voucher posting on business events, logging, and manual/batch resend.
-- Suppliers — Suppliers, supplier types, supplier invoices and their financial/VAT accounts. *(pending)*
+- [Suppliers](suppliers.md) — The vendor directory: contact, financial and accounting defaults per supplier.
+  - [Supplier Invoices & Cost Registration](suppliers-invoicing-and-costs.md) — Recording supplier invoices and reconciling them against booking costs.
 
 ## Communication & Content
 

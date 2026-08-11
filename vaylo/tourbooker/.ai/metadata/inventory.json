@@ -4389,15 +4389,32 @@
         "vat"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/suppliers.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "supplier/services/supplier_services.py:SupplierService",
+          "supplier/views/supplier_views.py:CompanySupplierListAPIView"
+        ],
+        "Related Features": [
+          "supplier/models/supplier_model.py:Supplier.default_cost_account,default_vat_account"
+        ],
+        "FAQ": [
+          "supplier/models/supplier_model.py:Supplier.supplier_type",
+          "supplier/views/supplier_views.py:CompanySupplierListAPIView"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
+        "workflows": [
+          {
+            "fact": "Staff maintain a directory of suppliers (transport, flight, accommodation, and other vendors) with contact, financial, and accounting defaults, grouped by supplier type; a supplier's own system can also be given a company-level API token to fetch its own invoices and register the costs it's billed for.",
+            "evidence": "supplier/services/supplier_services.py:SupplierService,supplier/views/supplier_views.py:CompanySupplierListAPIView"
+          }
+        ],
         "rules": [],
         "validations": [],
         "permissions": [],
@@ -5415,6 +5432,130 @@
           {
             "fact": "A successful or failed accounting post is reflected back onto the related booking or payment transaction as an accounting-sent status, which other features can read.",
             "evidence": "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService._update_booking_service_status,update_service_status"
+          }
+        ]
+      }
+    },
+    {
+      "id": "suppliers/invoicing-and-costs",
+      "name": "Supplier Invoices & Cost Registration",
+      "summary": "Recording supplier invoices with cost/VAT account splits, registering actual supplier costs against bookings, and sending invoices to the connected accounting system.",
+      "files": [
+        "supplier/services/supplier_invoice_services.py",
+        "supplier/services/supplier_invoice_register_cost_service.py",
+        "supplier/services/supplier_financial_cost_service.py",
+        "supplier/services/supplier_accounting_service.py",
+        "supplier/services/supplier_invoice_cost_account_services.py",
+        "supplier/services/supplier_invoice_vat_account_services.py",
+        "supplier/models/supplier_invoice_model.py"
+      ],
+      "depends_on": [
+        "suppliers",
+        "vat",
+        "accounting"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "completed",
+      "skip_reason": null,
+      "doc": "docs/product/suppliers-invoicing-and-costs.md",
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "supplier/services/supplier_invoice_services.py:SupplierInvoiceService.create_supplier_invoice",
+          "supplier/services/supplier_invoice_register_cost_service.py:SupplierInvoiceRegisterCostService.process_supplier_financial_cost"
+        ],
+        "How it works": [
+          "supplier/services/supplier_invoice_services.py:SupplierInvoiceService.create_supplier_invoice,create_account_entries",
+          "supplier/services/supplier_invoice_register_cost_service.py:SupplierInvoiceRegisterCostService.process_supplier_financial_cost,_process_financial_lines",
+          "supplier/services/supplier_invoice_services.py:SupplierInvoiceService.get_invoice_financial_summary,get_status_summary",
+          "supplier/services/supplier_accounting_service.py:SupplierAccountingService.send_supplier_invoice_to_accounting_service"
+        ],
+        "Rules & Edge Cases": [
+          "supplier/services/supplier_invoice_services.py:SupplierInvoiceService.create_supplier_invoice",
+          "supplier/services/supplier_invoice_register_cost_service.py:SupplierInvoiceRegisterCostService._handle_financial_cost",
+          "supplier/services/supplier_invoice_services.py:SupplierInvoiceService.create_account_entries"
+        ],
+        "Related Features": [
+          "supplier/services/supplier_accounting_service.py:SupplierAccountingService.send_supplier_invoice_to_accounting_service"
+        ],
+        "FAQ": [
+          "supplier/services/supplier_invoice_register_cost_service.py:SupplierInvoiceRegisterCostService._handle_financial_cost",
+          "supplier/views/company_supplier_invoice_views.py:CompanySupplierInvoiceListCreateAPIView",
+          "supplier/models/supplier_invoice_model.py:SupplierInvoiceFinancialCost",
+          "supplier/services/supplier_accounting_service.py:SupplierAccountingService.send_supplier_invoice_to_accounting_service"
+        ]
+      },
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "Staff record a supplier invoice \u2014 the amount owed, its VAT, due date, and which cost/VAT accounts it should be split across \u2014 and can attach it to the specific bookings it covers.",
+            "evidence": "supplier/services/supplier_invoice_services.py:SupplierInvoiceService.create_supplier_invoice,create_company_supplier_invoice"
+          },
+          {
+            "fact": "For each booking a supplier is involved in, staff (or the supplier's own system, via a company API token) register what that supplier actually charged for it, against what the platform had estimated it would cost \u2014 split by currency and by whether it was a room, an extra, or a flight itinerary.",
+            "evidence": "supplier/services/supplier_invoice_register_cost_service.py:SupplierInvoiceRegisterCostService.process_supplier_financial_cost,supplier/services/supplier_financial_cost_service.py:SupplierFinancialTotalsService.get_financial_totals"
+          },
+          {
+            "fact": "Registering a supplier's actual cost against a booking marks the underlying cost line(s) on that booking as invoiced, so staff can see which costs still need a supplier invoice and which are already covered.",
+            "evidence": "supplier/services/supplier_invoice_register_cost_service.py:SupplierInvoiceRegisterCostService._process_financial_lines"
+          },
+          {
+            "fact": "Staff can see a financial summary for an invoice (total, VAT, how much of it has been allocated to cost/VAT accounts and to specific bookings, and how much remains), and a status summary across all invoices (pending, paid, overdue totals).",
+            "evidence": "supplier/services/supplier_invoice_services.py:SupplierInvoiceService.get_invoice_financial_summary,get_status_summary"
+          },
+          {
+            "fact": "If a supplier invoice is marked to be sent to the tenant's connected accounting system, the platform builds and sends it there automatically, and marks the invoice as sent once accepted.",
+            "evidence": "supplier/services/supplier_accounting_service.py:SupplierAccountingService.send_supplier_invoice_to_accounting_service"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A supplier invoice's due date defaults to its invoice date plus the supplier's own configured credit period, if no due date is given.",
+            "evidence": "supplier/services/supplier_invoice_services.py:SupplierInvoiceService.create_supplier_invoice"
+          },
+          {
+            "fact": "Registering the same supplier's cost against the same booking, currency, and invoice a second time adds to the previously registered amount rather than creating a separate record \u2014 unless that combination is explicitly not allowed to be updated, in which case it's rejected as a duplicate.",
+            "evidence": "supplier/services/supplier_invoice_register_cost_service.py:SupplierInvoiceRegisterCostService._handle_financial_cost"
+          },
+          {
+            "fact": "A supplier invoice's amount is automatically split into a cost-account entry and a VAT-account entry when it's created, so its totals always reconcile against those two accounts.",
+            "evidence": "supplier/services/supplier_invoice_services.py:SupplierInvoiceService.create_account_entries"
+          }
+        ],
+        "validations": [],
+        "permissions": [
+          {
+            "fact": "Creating, viewing, and updating supplier invoices and registering costs against them from the admin all require an authenticated staff user with the standard staff model permissions.",
+            "evidence": "supplier/views/supplier_invoice_views.py:SupplierInvoiceListCreateView,create_supplier_invoice_views.py:CreateSupplierInvoice"
+          },
+          {
+            "fact": "A supplier's own system can be issued a separate company-level access token to list its own invoices and register its own costs against bookings, without needing a staff login.",
+            "evidence": "supplier/views/company_supplier_invoice_views.py:CompanySupplierInvoiceListCreateAPIView,CompanySupplierInvoiceFinancialCostAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A supplier invoice's status is Pending, Paid, Unpaid, Canceled, or Sent To Accounting (once it's been posted to the tenant's connected accounting system).",
+            "evidence": "supplier/constants.py:SupplierInvoiceStatus"
+          },
+          {
+            "fact": "\"Estimate cost\" is what the platform expected a supplier to charge for a booking (from its own room/extra/flight pricing); \"invoice cost\" is what the supplier actually invoiced for it \u2014 the difference is what staff reconcile.",
+            "evidence": "supplier/models/supplier_invoice_model.py:SupplierInvoiceFinancialCost"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A booking uses a supplier for a room, an extra, or a flight; later, staff receive that supplier's invoice, record it with its cost/VAT split, and register how much of it applies to each affected booking \u2014 closing the loop between what was estimated and what was actually billed.",
+            "evidence": "supplier/services/supplier_invoice_register_cost_service.py:SupplierInvoiceRegisterCostService.process_supplier_financial_cost"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "A supplier invoice sent to accounting posts through the same connected accounting provider used elsewhere in the platform.",
+            "evidence": "supplier/services/supplier_accounting_service.py:SupplierAccountingService.send_supplier_invoice_to_accounting_service"
           }
         ]
       }
