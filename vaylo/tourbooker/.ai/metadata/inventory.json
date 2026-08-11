@@ -3207,21 +3207,150 @@
         "currency"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/pricing.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "price_manager/services/webhook_service.py:WebhookService.process_webhook",
+          "price_manager/services/pricing_log_service.py:PricingLogService._sync_project_tours"
+        ],
+        "How it works": [
+          "price_manager/services/webhook_service.py:WebhookService.process_webhook",
+          "price_manager/services/pricing_log_service.py:PricingLogService._sync_project_tours",
+          "price_manager/services/pricing_log_service.py:PricingLogService.ceil_to_multiple",
+          "price_manager/views/pricing_log_view.py:PendingPricingLogsAPIView",
+          "price_manager/views/pricing_log_view.py:ApplyPricingLogAPIView",
+          "price_manager/views/pricing_log_view.py:RejectPricingLogAPIView",
+          "price_manager/views/pricing_log_view.py:TourPricingLogAPIView",
+          "price_manager/views/pricing_log_view.py:AutoApplyPricingLogAPIView",
+          "tour/services/tour_service.py:TourService.update_tour_dynamic_price"
+        ],
+        "Rules & Edge Cases": [
+          "price_manager/services/pricing_log_service.py:PricingLogService.ceil_to_multiple",
+          "price_manager/services/pricing_log_service.py:PricingLogService.get_applicable_pricing_log_ids",
+          "price_manager/views/pricing_log_view.py:AutoApplyPricingLogAPIView.post",
+          "price_manager/views/pricing_log_view.py:ApplyPricingLogAPIView.post",
+          "price_manager/services/pricing_log_service.py:PricingLogService.apply_pricing_from_logs",
+          "tour/services/tour_service.py:TourService.update_tour_dynamic_price"
+        ],
+        "Related Features": [
+          "tour/services/tour_service.py:TourService.update_tour_dynamic_price"
+        ],
+        "FAQ": [
+          "price_manager/services/pricing_log_service.py:PricingLogService.ceil_to_multiple",
+          "price_manager/views/pricing_log_view.py:AutoApplyPricingLogAPIView.post",
+          "tour/services/tour_service.py:TourService.update_tour_dynamic_price",
+          "price_manager/views/pricing_log_view.py:ApplyPricingLogAPIView.post",
+          "price_manager/views/pricing_log_view.py:TourPricingLogAPIView"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "An external pricing engine (Beetroot) sends a webhook when a pricing project becomes active or when next week's price schedule is ready; the system records the event and, for those two event types, immediately asks the scheduler to fetch fresh price recommendations for that project's tours.",
+            "evidence": "price_manager/services/webhook_service.py:WebhookService.process_webhook"
+          },
+          {
+            "fact": "The scheduled sync fetches the pricing project's tour list and a price recommendation per tour from the external engine, then creates one pending pricing log per tour holding the suggested price.",
+            "evidence": "price_manager/services/pricing_log_service.py:PricingLogService._sync_project_tours"
+          },
+          {
+            "fact": "A suggested price is rounded up to the nearest 50 (currency units) before being stored as the tour's new standard price on the log.",
+            "evidence": "price_manager/services/pricing_log_service.py:PricingLogService.ceil_to_multiple"
+          },
+          {
+            "fact": "Staff can list pending pricing logs, then apply one or many to actually update the tour's price, or reject them instead; either action requires the log's price to actually differ from the tour's current price and the tour to not have already departed.",
+            "evidence": "price_manager/services/pricing_log_service.py:PricingLogService.get_applicable_pricing_log_ids"
+          },
+          {
+            "fact": "If the tenant has automatic price synchronization turned on, a scheduled job applies pending logs on their own without staff review, but only for logs created the same week as today's automatic run.",
+            "evidence": "price_manager/views/pricing_log_view.py:AutoApplyPricingLogAPIView.post"
+          },
+          {
+            "fact": "Applying a log updates the tour's standard price and recalculates the tour's dependent fees (booking fee, cancellation fee, second-payment amount, travel-insurance fee) to match the new price, subject to the tour's existing minimum/maximum price limits.",
+            "evidence": "tour/services/tour_service.py:TourService.update_tour_dynamic_price"
+          },
+          {
+            "fact": "Staff can add a note when applying or rejecting a log, and can view a tour's full pricing history (applied and rejected logs) separately from the pending queue.",
+            "evidence": "price_manager/views/pricing_log_view.py:TourPricingLogAPIView,PricingHistoryLogAPIView"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A suggested price is always rounded up to the nearest 50.",
+            "evidence": "price_manager/services/pricing_log_service.py:PricingLogService.ceil_to_multiple"
+          },
+          {
+            "fact": "A pricing log only counts as actionable (pending, applicable) if its new price differs from the tour's price at the time, the log's pricing project is currently active (today falls within the project's start/end date), and the tour has not departed.",
+            "evidence": "price_manager/services/pricing_log_service.py:PricingLogService.get_applicable_pricing_log_ids"
+          },
+          {
+            "fact": "Automatic (unattended) apply additionally requires the log to have been created in the same scheduling run as today's automatic sync \u2014 older pending logs are left for manual review.",
+            "evidence": "price_manager/services/pricing_log_service.py:PricingLogService.get_applicable_pricing_log_ids"
+          },
+          {
+            "fact": "Automatic apply only runs at all if the tenant's automatic price synchronization setting is switched on; otherwise staff must apply or reject every log by hand.",
+            "evidence": "price_manager/views/pricing_log_view.py:AutoApplyPricingLogAPIView.post"
+          },
+          {
+            "fact": "A tour's price change from this feature still has to respect the tour's own minimum/maximum standard price limits, same as a manual price edit.",
+            "evidence": "tour/services/tour_service.py:TourService.update_tour_dynamic_price"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Applying or rejecting logs when none are applicable returns a success response saying no applicable pricing logs were found, rather than an error.",
+            "evidence": "price_manager/views/pricing_log_view.py:ApplyPricingLogAPIView.post,RejectPricingLogAPIView.post"
+          },
+          {
+            "fact": "If some (but not all) selected logs fail to apply, staff still get the successfully applied ones plus a message stating how many applied vs. how many could not be, asking them to contact an administrator for the rest.",
+            "evidence": "price_manager/views/pricing_log_view.py:ApplyPricingLogAPIView.post"
+          },
+          {
+            "fact": "Only logs linked to a Tour can be applied through this workflow today; a log linked to any other record type is reported back as unsupported.",
+            "evidence": "price_manager/services/pricing_log_service.py:PricingLogService.apply_pricing_from_logs"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Viewing, applying, and rejecting pricing logs requires the standard staff model permissions for pricing logs plus the tenant having the dynamic-pricing add-on enabled on its subscription plan.",
+            "evidence": "price_manager/views/pricing_log_view.py:PricingLogAPIView,ApplyPricingLogAPIView,RejectPricingLogAPIView"
+          },
+          {
+            "fact": "The webhook that receives events from the external pricing engine, and the scheduled automatic-apply job, authenticate as the system itself (not as a staff user) \u2014 they are machine-to-machine endpoints, not something a staff member calls directly.",
+            "evidence": "price_manager/views/price_sync_view.py:PricingLogEventAPIView,price_manager/views/pricing_log_view.py:AutoApplyPricingLogAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A pricing log's status is Pending (awaiting a decision), Accepted (applied to the tour), Rejected (a staff member declined it), or Failed (the sync itself did not complete).",
+            "evidence": "price_manager/constaints.py:SyncStatus"
+          },
+          {
+            "fact": "A pricing project is the external engine's grouping of tours that share one pricing run, with its own active date range and tour list; a project only feeds price recommendations while it is active.",
+            "evidence": "price_manager/models/tour_price_log_model.py:PricingProject"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "Staff open the pending pricing queue, see each tour's current price next to the newly suggested one, and either apply the suggestion (optionally with a note) or reject it (optionally with a note) \u2014 nothing changes on the tour until one of those actions happens, unless automatic sync is on.",
+            "evidence": "price_manager/views/pricing_log_view.py:PendingPricingLogsAPIView,ApplyPricingLogAPIView,RejectPricingLogAPIView"
+          },
+          {
+            "fact": "Staff can look at a single tour's own pricing history to see every past applied or rejected suggestion for that tour, separate from the tenant-wide pending queue.",
+            "evidence": "price_manager/views/pricing_log_view.py:TourPricingLogAPIView"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Applying a pricing log changes the tour's price and its dependent fees, which is the same tour data the Tours feature validates and displays elsewhere.",
+            "evidence": "tour/services/tour_service.py:TourService.update_tour_dynamic_price"
+          }
+        ]
       }
     },
     {

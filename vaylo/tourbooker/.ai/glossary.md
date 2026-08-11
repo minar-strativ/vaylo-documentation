@@ -33,3 +33,7 @@ Format: **Term** — definition in one or two sentences, primary-reader language
 **PNR** — A flight-ticket booking record (from an airline/GDS reservation system, or entered manually), holding a fixed number of seats that can be reserved and assigned to passengers on one or more bookings.
 
 **Group PNR** — A PNR representing a block booking of shared seats, rather than individually named passenger tickets.
+
+**Pricing Run** — One batch of tours the external pricing engine is actively re-pricing together, with its own active date range. (not: pricing project)
+
+**Price Suggestion** — A new price the external pricing engine proposes for a tour, pending a staff decision to apply or reject it, or automatic application if enabled. (not: pricing log)

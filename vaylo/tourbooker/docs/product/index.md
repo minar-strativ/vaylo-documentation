@@ -1,6 +1,6 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (36 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs); 16 documented so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (36 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs); 17 documented so far.
 
 ## Bookings & Catalog
 
@@ -24,7 +24,7 @@ Generated and maintained by Canopy. One page per business capability — see eac
 
 ## Pricing & Payments
 
-- Pricing & Price Manager — Pricing projects, price calculation, pricing webhooks and logs across products. *(pending)*
+- [Pricing & Price Manager](pricing.md) — Receiving, reviewing, and applying dynamic price suggestions from an external pricing engine.
 - [Payments](payments.md) — Payment/refund transactions against bookings, invoices, and gift cards; manual payment recording.
 - ResPay Payments — ResPay payment provider integration and its configuration. *(pending)*
 - [Billing & Invoicing](billing.md) — Billing lines and account invoices generated from bookings, invoice issue/void/credit lifecycle.
