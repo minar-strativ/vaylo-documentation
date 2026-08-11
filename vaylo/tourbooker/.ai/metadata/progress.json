@@ -2,9 +2,9 @@
   "mode": "create",
   "run_started_at": "2026-07-29",
   "run_anchor_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
-  "current_feature": "coupons",
+  "current_feature": "gift-cards",
   "current_step": "analyze",
   "scope_this_run": [],
-  "notes": "res-pay documented (13 of 26 remaining). Next pending feature in plan order: coupons.",
-  "run_processed_count": 18
+  "notes": "coupons documented (14 of 26 remaining). Next pending feature in plan order: gift-cards.",
+  "run_processed_count": 19
 }

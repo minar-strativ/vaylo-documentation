@@ -3829,21 +3829,170 @@
         "currency"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/coupons.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "coupon/services/coupon_service.py:CouponService.create",
+          "coupon/services/coupon_local_price_service.py:CouponLocalPriceService.create_or_update",
+          "coupon/services/coupon_service.py:CouponService.update_booking_coupon_usage"
+        ],
+        "How it works": [
+          "coupon/services/coupon_service.py:CouponService.create",
+          "coupon/services/coupon_local_price_service.py:CouponLocalPriceService.create_or_update",
+          "coupon/views/coupon_views.py:ValidateTourCouponAPIView.post",
+          "coupon/services/coupon_service.py:CouponService.validate_coupon",
+          "coupon/services/coupon_service.py:CouponService.update_booking_coupon_usage",
+          "coupon/services/coupon_service.py:CouponService.update",
+          "coupon/views/coupon_bookings_views.py:CouponBookingListAPIView.get",
+          "coupon/views/coupon_views.py:CouponUpdateStatusView.patch"
+        ],
+        "Rules & Edge Cases": [
+          "coupon/services/coupon_service.py:CouponService.create",
+          "coupon/models.py:Coupon.coupon_type",
+          "coupon/models.py:Coupon.use_limit",
+          "coupon/services/coupon_service.py:CouponService.update_coupon_status_after_usage",
+          "coupon/services/coupon_service.py:CouponService.update_status",
+          "coupon/services/coupon_service.py:CouponService.get_coupon_discount",
+          "coupon/services/coupon_service.py:CouponService.is_valid",
+          "coupon/views/coupon_views.py:ValidateTourCouponAPIView.post"
+        ],
+        "Related Features": [
+          "booking/services/booking_service.py:BookingService.get_discount",
+          "booking/services/booking_cancel_service.py"
+        ],
+        "FAQ": [
+          "coupon/models.py:Coupon.coupon_type",
+          "coupon/services/coupon_service.py:CouponService.update_booking_coupon_usage",
+          "coupon/services/coupon_service.py:CouponService.update",
+          "coupon/models.py:Coupon.use_limit",
+          "coupon/services/coupon_service.py:CouponService.get_coupon_discount",
+          "coupon/views/coupon_views.py:ValidateTourCouponAPIView"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "Staff create a coupon with a unique code, a discount (either a percentage or a fixed amount), a validity date range, how many times it can be used in total, and whether it applies to all tours or only specific tours they pick.",
+            "evidence": "coupon/services/coupon_service.py:CouponService.create"
+          },
+          {
+            "fact": "A fixed-amount coupon's discount is automatically converted into every active currency the tenant supports, so the same coupon shows a locally appropriate discount no matter which currency a customer is browsing in.",
+            "evidence": "coupon/services/coupon_local_price_service.py:CouponLocalPriceService.create_or_update"
+          },
+          {
+            "fact": "Before checkout, a customer (or the booking preview) can check whether a coupon code is valid for a specific tour, and see the discount amount and type it would apply.",
+            "evidence": "coupon/views/coupon_views.py:ValidateTourCouponAPIView.post,coupon/services/coupon_service.py:CouponService.validate_coupon"
+          },
+          {
+            "fact": "When a booking is completed with a coupon code attached, the coupon's usage count goes up by one and the booking is recorded against that coupon; if the booking is later cancelled, the usage count goes back down and the record is removed.",
+            "evidence": "coupon/services/coupon_service.py:CouponService.update_booking_coupon_usage,booking/services/booking_cancel_service.py"
+          },
+          {
+            "fact": "A coupon automatically turns itself off once its usage count reaches its use limit, and turns back on if usage drops back below the limit (for example after a cancellation).",
+            "evidence": "coupon/services/coupon_service.py:CouponService.update_coupon_status_after_usage"
+          },
+          {
+            "fact": "Staff can view every booking that has used a specific coupon, filterable by booking reference, status, and date.",
+            "evidence": "coupon/views/coupon_bookings_views.py:CouponBookingListAPIView.get"
+          },
+          {
+            "fact": "Staff can turn a coupon on or off directly, and can list which tours a coupon is currently valid for.",
+            "evidence": "coupon/views/coupon_views.py:CouponUpdateStatusView.patch,TourCouponAPIView.get"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A coupon's discount can never be set to 0 \u2014 creating or updating one with a zero discount is rejected.",
+            "evidence": "coupon/services/coupon_service.py:CouponService.create"
+          },
+          {
+            "fact": "A coupon applies either to every tour (\"all tour\") or to a specific list of tours the staff member picks \u2014 not a mix decided per booking.",
+            "evidence": "coupon/models.py:Coupon.coupon_type,coupon/services/coupon_service.py:CouponService.validate_coupon"
+          },
+          {
+            "fact": "A coupon's valid-to date always covers the entire last day (through 23:59:59), so a coupon set to expire on a given date is still usable any time that day.",
+            "evidence": "coupon/services/coupon_service.py:CouponService.create"
+          },
+          {
+            "fact": "Once a coupon has been used at least once, its code, discount, and discount type can no longer be edited \u2014 only its validity dates, use limit, tours, description, and active status can still change.",
+            "evidence": "coupon/services/coupon_service.py:CouponService.update"
+          },
+          {
+            "fact": "A coupon's active status cannot be changed by hand once its use limit has been reached \u2014 the system reports that the limit has been exceeded.",
+            "evidence": "coupon/services/coupon_service.py:CouponService.update_status"
+          },
+          {
+            "fact": "A use limit of 0 means the coupon can be used an unlimited number of times and never auto-deactivates from usage.",
+            "evidence": "coupon/models.py:Coupon.use_limit,coupon/services/coupon_service.py:CouponService.update_coupon_status_after_usage"
+          },
+          {
+            "fact": "For a fixed-amount coupon, the discount applied on a booking never exceeds the booking's own cost \u2014 a coupon can bring a booking to zero but never below it.",
+            "evidence": "coupon/services/coupon_service.py:CouponService.get_coupon_discount"
+          },
+          {
+            "fact": "A coupon only validates successfully if it is currently active and today falls within its validity date range; an expired, not-yet-active, or inactive coupon is treated as invalid.",
+            "evidence": "coupon/services/coupon_service.py:CouponService.is_valid,validate_coupon"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Checking a coupon against a tour that doesn't exist or is inactive is rejected as an invalid tour, rather than as an invalid coupon.",
+            "evidence": "coupon/views/coupon_views.py:ValidateTourCouponAPIView.post"
+          },
+          {
+            "fact": "Applying an unknown coupon code to a booking, or one that is inactive or has exceeded its usage limit, is rejected outright rather than silently ignored.",
+            "evidence": "coupon/services/coupon_service.py:CouponService.update_booking_coupon_usage"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Creating, updating, listing, retrieving, activating/deactivating a coupon, and viewing which bookings used it all require standard staff model permissions.",
+            "evidence": "coupon/views/coupon_views.py:CouponListCreateAPIView,CouponRetrieveUpdateAPIView,CouponUpdateStatusView,coupon/views/coupon_bookings_views.py:CouponBookingListAPIView"
+          },
+          {
+            "fact": "Checking whether a coupon code is valid for a tour is a public action \u2014 no staff login is required, since customers use it while browsing a tour.",
+            "evidence": "coupon/views/coupon_views.py:ValidateTourCouponAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "\"Use limit\" is the total number of bookings a coupon can be used on across all customers combined, not a per-customer limit; 0 means unlimited.",
+            "evidence": "coupon/models.py:Coupon.use_limit"
+          },
+          {
+            "fact": "\"Used count\" tracks how many times a coupon has actually been applied to a completed booking so far.",
+            "evidence": "coupon/models.py:Coupon.used_count"
+          },
+          {
+            "fact": "Discount type is either \"Percentage\" (a percent off the booking cost) or \"Amount\" (a fixed sum off, converted per currency).",
+            "evidence": "coupon/constants.py:DiscountType"
+          },
+          {
+            "fact": "Coupon type is either \"All Tour\" (usable on any tour) or \"Specific Tour\" (only usable on the tours explicitly attached to the coupon).",
+            "evidence": "coupon/constants.py:CouponType"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A customer enters a coupon code while browsing or booking a tour; the system tells them immediately whether it's valid for that tour and what discount it gives, before they commit to the booking.",
+            "evidence": "coupon/views/coupon_views.py:ValidateTourCouponAPIView.post"
+          },
+          {
+            "fact": "Once the booking with that coupon is confirmed, the discount is applied and the coupon's usage count increases; if the customer later cancels the booking, the coupon's usage count is given back.",
+            "evidence": "coupon/services/coupon_service.py:CouponService.update_booking_coupon_usage"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Applying a coupon to a booking reduces the price the Bookings feature charges for that booking, and a cancellation there reverses the coupon's usage count here.",
+            "evidence": "booking/services/booking_service.py:BookingService.get_discount,booking/services/booking_cancel_service.py"
+          }
+        ]
       }
     },
     {
