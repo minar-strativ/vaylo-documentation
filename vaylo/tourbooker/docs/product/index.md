@@ -30,7 +30,7 @@ Generated and maintained by Canopy. One page per business capability — see eac
 - [Billing & Invoicing](billing.md) — Billing lines and account invoices generated from bookings, invoice issue/void/credit lifecycle.
 - [Coupons](coupons.md) — Discount codes with per-currency amounts, usage limits and per-booking usage tracking.
 - [Gift Cards](gift-cards.md) — Purchasable and staff-issued vouchers with greeting texts/images, spendable against bookings.
-- Rewards & Loyalty — Loyalty point accounts, reward tiers, and a point ledger. *(pending)*
+- Rewards & Loyalty — Loyalty point accounts, reward tiers, and a point ledger. *(needs review — data model only, no services/views/urls exist yet; likely unreleased, see `.ai/metadata/inventory.json`)*
 - VAT & Tax Classes — VAT classes, VAT/cost accounts and tax categorisation used in billing. *(pending)*
 - Accounting Integration — Integration with external accounting providers: projects, VAT codes, customers, cost centers, event sync. *(pending)*
 - Suppliers — Suppliers, supplier types, supplier invoices and their financial/VAT accounts. *(pending)*

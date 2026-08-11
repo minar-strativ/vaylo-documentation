@@ -4183,7 +4183,7 @@
       ],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "needs_review",
       "skip_reason": null,
       "doc": "docs/product/rewards.md",
       "documented_at_commit": null,
@@ -4191,11 +4191,21 @@
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
+        "workflows": [
+          {
+            "fact": "No workflow exists yet: reward/ contains only three models (RewardTier, RewardPointAccount, RewardPointLedgerEntry) with no services, views, or urls.py, and nothing outside the app references them.",
+            "evidence": "reward/models/reward_tier_model.py,reward/models/reward_point_account_model.py,reward/models/reward_point_ledger_entry_model.py"
+          }
+        ],
         "rules": [],
         "validations": [],
         "permissions": [],
-        "field_meanings": [],
+        "field_meanings": [
+          {
+            "fact": "The data model anticipates a tiered points program: a RewardTier defines an earn rate and point money-value; a RewardPointAccount ties one passenger to one tier; a RewardPointLedgerEntry records signed point credits/debits (earn, redeem, cancellation re-credit, manual credit/debit, backfill, share debit/credit, expiry) with tier/rate snapshots.",
+            "evidence": "reward/models/reward_tier_model.py:RewardTier,reward/models/reward_point_ledger_entry_model.py:RewardPointLedgerEntry,reward/constants.py:RewardLedgerEntryType"
+          }
+        ],
         "journeys": [],
         "side_effects": []
       }
