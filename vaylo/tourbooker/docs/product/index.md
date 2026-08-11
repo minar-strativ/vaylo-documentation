@@ -1,6 +1,6 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (42 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs, Accounting Integration into a parent + 2 child docs, and Suppliers and User & Access Management each into a parent + 1 child doc); 34 documented, 1 flagged needs-review (Rewards & Loyalty — unreleased) so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (43 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs, Accounting Integration into a parent + 2 child docs, and Suppliers and User & Access Management each into a parent + 1 child doc). 35 documented; 1 flagged needs-review (Rewards & Loyalty — unreleased, no doc). All other discovered features are now documented.
 
 ## Bookings & Catalog
 
@@ -52,8 +52,8 @@ Generated and maintained by Canopy. One page per business capability — see eac
 - [Organizations](organizations.md) — Grouping passengers and bookings under a company, agent, or other entity.
 - [Subscription Plans](subscription.md) — Per-tenant feature/add-on gating checked on every request.
 - [Reporting & Escalation](reporting.md) — Sales/revenue/payment/invoice reports, a dashboard summary, and scheduled emailed reports.
-- Reservation Service Integration — Integration with external reservation-service providers and their configuration. *(pending)*
+- [Reservation Service Integration](reservation-service.md) — Shared connection layer to external GDS/booking providers, used by pricing, ResPay, and flight ticketing.
 
-## Not yet documented
+## Needs review
 
-The 19 features marked *(pending)* above are still queued — run `/doc-create` to continue documenting them, in the same dependency order recorded in `.ai/metadata/inventory.json`.
+- **Rewards & Loyalty** — `reward/` is model-only scaffolding (no services, views, or urls, and nothing else in the codebase references it). No doc was written since there's no live workflow to document and it risks documenting an unreleased feature. Revisit once the feature is actually built out — see `.ai/metadata/inventory.json` for details.

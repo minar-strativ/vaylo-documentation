@@ -46,3 +46,5 @@ Append-only. One line per event:
 2026-08-11 | subscription | created | 27th feature documented this backlog run | 20675c05c
 2026-08-11 | reporting | created | reports live; escalation-event data model noted as unwired scaffolding, no separate doc | 20675c05c
 2026-08-11 | notes-todos | created | last-but-one feature in the 26-feature backlog | 20675c05c
+2026-08-11 | reservation-service | created | final pending feature in the full 31-feature inventory | 20675c05c
+2026-08-11 | create run completed | 35 features documented (43 docs, several split into parent+children); 1 flagged needs_review (rewards — unreleased, no doc); 0 skipped | 20675c05c

@@ -5882,21 +5882,98 @@
       "depends_on": [],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/reservation-service.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "reservation_service/models/reservation_service_model.py:ReservationService",
+          "reservation_service/models/reservation_service_provider_model.py:ReservationServiceProvider",
+          "reservation_service/services/reservation_service_provider_configuration_service.py:ReservationServiceProviderConfigurationService.update_or_create_configuration,get_subscribed_reservation_service_configuration",
+          "reservation_service/services/gds_flight_data_sync.py:GDSPnrService.retrieve_flight_pnr_from_gds",
+          "reservation_service/views/gds_flight_data_sync_apiview.py:GDSFlightDataSyncAPIView"
+        ],
+        "How it works": [
+          "reservation_service/services/reservation_service_provider_configuration_service.py:ReservationServiceProviderConfigurationService.update_or_create_configuration,prepare_reservation_service_provider_configuration_data",
+          "reservation_service/services/gds_flight_data_sync.py:GDSPnrService.retrieve_flight_pnr_from_gds,GDSFlightDataSyncService.sync_flight_envelope"
+        ],
+        "Rules & Edge Cases": [
+          "reservation_service/services/reservation_service_provider_configuration_service.py:ReservationServiceProviderConfigurationService.update_or_create_configuration,get_subscribed_reservation_service_configuration",
+          "reservation_service/services/gds_flight_data_sync.py:GDSFlightDataSyncService.sync_flight_envelope"
+        ],
+        "Related Features": [
+          "reservation_service/services/reservation_service_provider_configuration_service.py:ReservationServiceProviderConfigurationService.prepare_reservation_service_provider_configuration_data"
+        ],
+        "FAQ": [
+          "reservation_service/services/reservation_service_provider_configuration_service.py:ReservationServiceProviderConfigurationService.update_or_create_configuration,get_subscribed_reservation_service_configuration",
+          "reservation_service/services/gds_flight_data_sync.py:GDSFlightDataSyncService.sync_flight_envelope,GDSPnrService.retrieve_flight_pnr_from_gds"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
+        "workflows": [
+          {
+            "fact": "The platform recognizes a catalog of reservation service types (Flight, Hotel, Yacht, and similar) and the external providers that can supply each of them (for example Amadeus, Sabre, or Resemolnet), synced in from the central platform.",
+            "evidence": "reservation_service/models/reservation_service_model.py:ReservationService,reservation_service/models/reservation_service_provider_model.py:ReservationServiceProvider"
+          },
+          {
+            "fact": "Staff configure the connection details (credentials, connection URLs, and provider-specific settings) for each service-type-and-provider pair the tenant actually uses.",
+            "evidence": "reservation_service/services/reservation_service_provider_configuration_service.py:ReservationServiceProviderConfigurationService.update_or_create_configuration"
+          },
+          {
+            "fact": "Which of a tenant's configured connections are actually usable is filtered by their subscription plan \u2014 a connection only counts as active if the matching feature is enabled on the tenant's plan.",
+            "evidence": "reservation_service/services/reservation_service_provider_configuration_service.py:ReservationServiceProviderConfigurationService.get_subscribed_reservation_service_configuration"
+          },
+          {
+            "fact": "Staff can retrieve a flight PNR directly from its connected reservation system (GDS) on demand, and the retrieved flight, passenger, ticket, and itinerary details are synced into the platform's own ticket records.",
+            "evidence": "reservation_service/services/gds_flight_data_sync.py:GDSPnrService.retrieve_flight_pnr_from_gds,GDSFlightDataSyncService.sync_flight_data"
+          },
+          {
+            "fact": "An external reservation system can also push flight ticket data into the platform directly, along with any records it couldn't process, which are kept as error entries for staff to follow up on.",
+            "evidence": "reservation_service/views/gds_flight_data_sync_apiview.py:GDSFlightDataSyncAPIView,reservation_service/services/gds_flight_data_sync.py:GDSFlightDataSyncService.sync_flight_envelope"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A tenant can only have one configuration per combination of service type and provider \u2014 configuring the same pair again updates the existing connection rather than creating a duplicate.",
+            "evidence": "reservation_service/services/reservation_service_provider_configuration_service.py:ReservationServiceProviderConfigurationService.update_or_create_configuration"
+          },
+          {
+            "fact": "Removing tickets that couldn't be processed during an external sync never blocks the ones that did succeed \u2014 a failure on some records is tracked separately rather than rolling back the whole batch.",
+            "evidence": "reservation_service/services/gds_flight_data_sync.py:GDSFlightDataSyncService.sync_flight_envelope"
+          }
+        ],
         "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "permissions": [
+          {
+            "fact": "Staff viewing connection configurations, retrieving a single flight PNR, or checking a background sync job's status all require an authenticated staff user.",
+            "evidence": "reservation_service/views/reservation_service_provider_configuration_view.py:ReservationServiceProviderConfigurationListAPIView,reservation_service/views/gds_flight_data_sync_apiview.py:RetrieveSinglePNRAPIView"
+          },
+          {
+            "fact": "Syncing the catalog of reservation services/providers, and receiving pushed flight data from an external GDS, both run as the system itself via a machine API key, not as a staff action.",
+            "evidence": "reservation_service/views/reservation_service_provider_view.py:ReservationServiceProviderSyncAPIView,reservation_service/views/gds_flight_data_sync_apiview.py:GDSFlightDataSyncAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A \"reservation service\" is a category of bookable resource (Flight, Hotel, Yacht, and similar); a \"reservation service provider\" is a specific external system that can supply one or more of those categories.",
+            "evidence": "reservation_service/models/reservation_service_model.py:ReservationService,reservation_service/models/reservation_service_provider_model.py:ReservationServiceProvider"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "Staff open a flight ticket and pull its latest details straight from the connected airline reservation system instead of re-entering them by hand, and the platform's own record updates to match.",
+            "evidence": "reservation_service/services/gds_flight_data_sync.py:GDSPnrService.retrieve_flight_pnr_from_gds"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Other features that rely on an external system (dynamic pricing, ResPay payments, flight ticketing, yacht booking) look up their own connection details through this feature's provider configuration.",
+            "evidence": "reservation_service/services/reservation_service_provider_configuration_service.py:ReservationServiceProviderConfigurationService.prepare_reservation_service_provider_configuration_data"
+          }
+        ]
       }
     },
     {
