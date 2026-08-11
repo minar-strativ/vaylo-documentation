@@ -1,6 +1,6 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (40 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs, Accounting Integration into a parent + 2 child docs, and Suppliers into a parent + 1 child doc); 24 documented, 1 flagged needs-review (Rewards & Loyalty — unreleased) so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (40 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs, Accounting Integration into a parent + 2 child docs, and Suppliers into a parent + 1 child doc); 25 documented, 1 flagged needs-review (Rewards & Loyalty — unreleased) so far.
 
 ## Bookings & Catalog
 
@@ -40,7 +40,7 @@ Generated and maintained by Canopy. One page per business capability — see eac
 
 ## Communication & Content
 
-- Notifications (Email) — Email events, templates, scheduled mail, recipients and delivery logs. *(pending)*
+- [Notifications (Email)](notifications.md) — Templated/translated email events, provider connection, scheduling and delivery logs.
 - Surveys — Customer surveys with dispatch and dispatch-status tracking. *(pending)*
 - Dynamic Forms & Custom Fields — Configurable custom form fields, collections/groups and stored responses. *(pending)*
 - Notes, Todos & Travel Information — Internal notes, to-do items and traveller-facing travel information content. *(pending)*

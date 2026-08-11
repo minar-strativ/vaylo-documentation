@@ -4952,20 +4952,130 @@
         "multi-language"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/notifications.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "email_service/models/email_event_model.py:EmailEvent,EmailEventTemplate",
+          "email_service/services/email_event_multi_language_service.py:EmailEventMultiLanguageService._create_translation,_update_translation",
+          "email_service/services/email_sending/email_service.py:EmailService.send_email",
+          "email_service/services/schedule_email_service.py:ScheduleEmailService.send_schedule_email",
+          "email_service/services/email_log_service.py:EmailLogService.resend_email_from_log",
+          "email_service/services/chat_email_service.py:ChatEmailService.send_chat_email"
+        ],
+        "How it works": [
+          "email_service/services/email_event_multi_language_service.py:EmailEventMultiLanguageService.create_or_update",
+          "email_service/services/email_sending/email_service.py:EmailService.send_email,get_multi_language_data",
+          "email_service/services/schedule_email_service.py:ScheduleEmailService.update_or_create_schedule_email,update_schedule_email_payment_reminder_send_on_date,send_schedule_email"
+        ],
+        "Rules & Edge Cases": [
+          "email_service/services/email_sending/email_service.py:EmailService.send_email",
+          "email_service/services/email_event_multi_language_service.py:EmailEventMultiLanguageService.create_or_update,_update_translation",
+          "email_service/services/email_provider_configuration_service.py:EmailProviderConfigurationService.disable_email_provider_configurations_except_requested_one",
+          "email_service/services/schedule_email_service.py:ScheduleEmailService.send_schedule_email"
+        ],
+        "Related Features": [
+          "email_service/services/schedule_email_service.py:ScheduleEmailService.update_schedule_email_payment_reminder_send_on_date"
+        ],
+        "FAQ": [
+          "email_service/services/email_log_service.py:EmailLogService.resend_email_from_log",
+          "email_service/services/email_event_multi_language_service.py:EmailEventMultiLanguageService._update_translation",
+          "email_service/services/schedule_email_service.py:ScheduleEmailService.update_schedule_email_payment_reminder_send_on_date",
+          "email_service/services/email_provider_configuration_service.py:EmailProviderConfigurationService.disable_email_provider_configurations_except_requested_one"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
+        "workflows": [
+          {
+            "fact": "Staff define email events \u2014 a name, subject, and content template, with a set of allowed placeholders (dynamic values) that content can reference \u2014 and connect them to a specific template on the tenant's connected email provider.",
+            "evidence": "email_service/models/email_event_model.py:EmailEvent,EmailEventTemplate,email_service/services/email_event_multi_language_service.py:EmailEventMultiLanguageService.create_or_update"
+          },
+          {
+            "fact": "Staff can write a translated version of an event's subject/content per language; if they don't, the system automatically machine-translates the default-language content into every other active language, without ever overwriting a translation a staff member already wrote.",
+            "evidence": "email_service/services/email_event_multi_language_service.py:EmailEventMultiLanguageService._create_translation,_update_translation"
+          },
+          {
+            "fact": "Staff connect one active email provider (currently Sendgrid) with its sender name and credentials; the platform sends every notification through that connection.",
+            "evidence": "email_service/services/email_provider_configuration_service.py:EmailProviderConfigurationService.create,disable_email_provider_configurations_except_requested_one"
+          },
+          {
+            "fact": "Business events elsewhere in the platform (a booking confirmation, a payment reminder, a flight ticket update, and so on) trigger an email event immediately, filling in its dynamic values with real data and rendering it in the recipient's preferred language.",
+            "evidence": "email_service/services/email_sending/email_service.py:EmailService.send_email,get_multi_language_data,get_language_code"
+          },
+          {
+            "fact": "Some notifications are scheduled ahead of time instead of sent immediately \u2014 tied to a specific record (like a booking) with a send date \u2014 either on a fixed daily batch, or, for one-off dynamic dates, through an external scheduler that fires exactly on that date and time.",
+            "evidence": "email_service/services/schedule_email_service.py:ScheduleEmailService.update_or_create_schedule_email,send_schedule_email"
+          },
+          {
+            "fact": "A scheduled email tied to a booking can have its send date pushed automatically when the thing it's tied to changes \u2014 for example, a payment reminder moves if the payment deadline itself moves.",
+            "evidence": "email_service/services/schedule_email_service.py:ScheduleEmailService.update_schedule_email_payment_reminder_send_on_date"
+          },
+          {
+            "fact": "Every email attempt is logged with who it was sent to, what event triggered it, whether it succeeded, and the provider's response; staff can review these logs, export them, and resend any specific one.",
+            "evidence": "email_service/services/email_log_service.py:EmailLogService.build_email_log_data,resend_email_from_log"
+          },
+          {
+            "fact": "Outside the templated-event system, staff (or an integrated chat tool) can send an ad-hoc email \u2014 for example, a chat transcript or a custom tour offer \u2014 using the same provider connection and logging.",
+            "evidence": "email_service/services/chat_email_service.py:ChatEmailService.send_chat_email"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "An email only actually sends if its event is both active and marked available, has a configured provider template, and has a recipient address \u2014 otherwise the attempt is rejected and logged as failed with the specific reason.",
+            "evidence": "email_service/services/email_sending/email_service.py:EmailService.send_email"
+          },
+          {
+            "fact": "A translated version of an event's content can only use the same dynamic-value placeholders already defined for that event; referencing an undefined placeholder is rejected.",
+            "evidence": "email_service/services/email_event_multi_language_service.py:EmailEventMultiLanguageService.create_or_update"
+          },
+          {
+            "fact": "Auto-translation never overwrites a translation a staff member already filled in by hand \u2014 it only fills in fields that are still empty.",
+            "evidence": "email_service/services/email_event_multi_language_service.py:EmailEventMultiLanguageService._update_translation"
+          },
+          {
+            "fact": "Only one email provider connection can be active at a time; connecting a new one deactivates all others.",
+            "evidence": "email_service/services/email_provider_configuration_service.py:EmailProviderConfigurationService.disable_email_provider_configurations_except_requested_one"
+          },
+          {
+            "fact": "A scheduled email that has already been sent, or whose target record no longer applies (for example, a passenger-information update reminder for a booking that's since been cancelled), is skipped rather than sent.",
+            "evidence": "email_service/services/schedule_email_service.py:ScheduleEmailService.send_schedule_email"
+          }
+        ],
         "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
+        "permissions": [
+          {
+            "fact": "Managing email events, templates, recipients, translations, provider configuration, and viewing/resending logs from the admin all require an authenticated staff user, generally with standard staff model permissions.",
+            "evidence": "email_service/views/email_event_view.py:EmailEventAPIView,email_service/views/email_log_views.py:EmailLogAPIViewSet,ResendEmailFromLogAPIView"
+          },
+          {
+            "fact": "Sending an ad-hoc chat email and running the scheduled-email dispatch job both run as the system itself via a machine API key, not as a staff action.",
+            "evidence": "email_service/views/send_chat_email_view.py:SendChatEmailAPIView,email_service/views/schedule_email_view.py:SendScheduledEmailSchedulerAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "\"Is available\" on an event controls whether it can be used to send mail at all; \"is active\" (standard on every record) is the usual on/off toggle \u2014 both must be true for an email to actually go out.",
+            "evidence": "email_service/models/email_event_model.py:EmailEvent.is_available"
+          },
+          {
+            "fact": "A dynamic value is a named placeholder (like a booking reference or a due date) an event's content can reference; only placeholders registered for that specific event are allowed in its content or translations.",
+            "evidence": "email_service/models/email_event_dynamic_value.py:EmailEventDynamicValue"
+          },
+          {
+            "fact": "An event-wise recipient sets a default to/cc/bcc address for a specific event \u2014 independent of whoever the email is actually about \u2014 for example, routing an internal notification to a fixed staff mailbox.",
+            "evidence": "email_service/models/email_event_model.py:EventWiseRecipient"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A customer's booking milestone (confirmation, a payment reminder, a ticket update, and similar) automatically triggers the matching notification, rendered in their preferred language with their booking's real details, and sent through the tenant's connected provider \u2014 with a full log kept either way, so staff can find and resend anything that failed.",
+            "evidence": "email_service/services/email_sending/email_service.py:EmailService.send_email"
+          }
+        ],
         "side_effects": []
       }
     },
