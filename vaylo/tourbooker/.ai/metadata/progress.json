@@ -2,7 +2,6 @@
   "mode": "maintain",
   "run_anchor_commit": "f47cf806f",
   "affected": [
-    "booking",
     "passengers",
     "flights-tickets",
     "flights-tickets/pnr-tickets",
@@ -23,7 +22,7 @@
     "notes-todos"
   ],
   "new_features": [],
-  "current_feature": "booking",
+  "current_feature": "passengers",
   "current_step": "update",
   "notes": "Impact analysis via diff-since.sh against 20675c05c..f47cf806f (production fast-forward pull). new_paths judged as shared plumbing already owned by existing docs (typed errors, config serializer/service, excel generator, billing template) -- no new pending features."
 }

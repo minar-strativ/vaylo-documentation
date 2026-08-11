@@ -29,13 +29,14 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/booking.md",
-      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
       "evidence": {
         "what_it_does_and_how_it_works": [
           "booking/booking_validators/rules.py:BookingClientRequiredRule",
           "booking/services/booking_waitlist_service.py:update_waitlist_status",
           "booking/services/booking_cancel_service.py:cancel_booking",
-          "booking/services/booking_service.py:update_reservation_status"
+          "booking/services/booking_service.py:update_reservation_status",
+          "booking/services/payment_deadline_service.py:PaymentDeadlineService.get_booking_payment_deadline_dates,compute_payment_deadline_dates,_merge_same_day_slots"
         ],
         "who_uses_it": [
           "booking/views/booking_public_view.py:TourBookingCreatePublicAPIView",
@@ -49,10 +50,12 @@
           "booking/services/booking_service.py:check_is_valid_for_total_payment",
           "booking/services/booking_service.py:check_amount_is_valid_for_refund",
           "booking/models/booking.py:booking_fee_percent",
-          "booking/models/booking.py:is_dynamic_cancellation"
+          "booking/models/booking.py:is_dynamic_cancellation",
+          "booking/services/payment_deadline_service.py:PaymentDeadlineService.compute_payment_deadline_dates,_enforce_deadline_ordering,should_apply_immediate_payment_deadline"
         ],
         "related_features": [
-          "booking/services/booking_cancel_service.py:cancel_booking"
+          "booking/services/booking_cancel_service.py:cancel_booking",
+          "dynamic_form/services/custom_field_response_service.py"
         ]
       },
       "audited_at_commit": null,
@@ -86,6 +89,18 @@
           {
             "fact": "Once payment is received, a Pending booking automatically transitions to Booked.",
             "evidence": "booking/services/booking_service.py:update_reservation_status"
+          },
+          {
+            "fact": "A booking's payment can be split into up to three deadlines \u2014 first, second, and residue \u2014 each computed from the tenant's configured number of days after booking (first) or before departure (second, residue); any stage the booking doesn't actually use (for example, no second payment at all) is left out of the schedule.",
+            "evidence": "booking/services/payment_deadline_service.py:PaymentDeadlineService.get_booking_payment_deadline_dates,compute_payment_deadline_dates,resolve_payment_flags"
+          },
+          {
+            "fact": "If a tenant turns on dynamic payment deadlines, any two (or all three) of those deadlines that would otherwise land on the same day are merged into a single payment covering the combined amount, instead of showing as separate stages.",
+            "evidence": "booking/services/payment_deadline_service.py:PaymentDeadlineService._merge_same_day_slots,get_effective_payment_amounts"
+          },
+          {
+            "fact": "If a booking is made close enough to departure that its first payment window (or, with dynamic deadlines, its later stages) would otherwise already be overdue, the tenant can configure the platform to collapse the entire schedule into one immediate payment due the next day, rather than leaving a deadline in the past.",
+            "evidence": "booking/services/payment_deadline_service.py:PaymentDeadlineService.should_apply_immediate_payment_deadline,compute_payment_deadline_dates"
           }
         ],
         "rules": [
@@ -108,6 +123,18 @@
           {
             "fact": "A booking can be flagged for dynamic cancellation pricing instead of a flat cancellation fee \u2014 mirroring the same option on the Tours feature.",
             "evidence": "booking/models/booking.py:is_dynamic_cancellation"
+          },
+          {
+            "fact": "Every payment deadline is floored to at least one day after the booking was made, even if the configured day-offset would put it earlier.",
+            "evidence": "booking/services/payment_deadline_service.py:PaymentDeadlineService.compute_payment_deadline_dates"
+          },
+          {
+            "fact": "Payment deadlines are always kept in order \u2014 the second payment date can never fall before the first, and the residue date can never fall before the second.",
+            "evidence": "booking/services/payment_deadline_service.py:PaymentDeadlineService._enforce_deadline_ordering"
+          },
+          {
+            "fact": "If staff push a tour's own accounting project onto its bookings, only the bookings still pointing at a different project are updated \u2014 bookings already matching are left untouched.",
+            "evidence": "booking/services/booking_service.py:BookingService.sync_bookings_project_with_tour"
           }
         ],
         "validations": [

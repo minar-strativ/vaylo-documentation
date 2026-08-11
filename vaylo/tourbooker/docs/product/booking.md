@@ -30,6 +30,8 @@ A booking ties together a departure (tour, hotel room, or yacht), the passengers
 
 **Paying.** A payment is only accepted while there's still a balance due, for a positive amount that doesn't exceed that balance. Once a payment fully covers what's owed, a Pending booking automatically becomes Booked — no manual confirmation step needed. For a yacht booking, this also confirms the reservation with the external yacht provider the tour/booking uses.
 
+**Payment deadlines.** A booking's price can be split into up to three payment stages — first, second, and residue — each due a configured number of days after the booking was made (first) or before departure (second, residue); any stage the booking doesn't actually use is simply left out. If the tenant turns on dynamic payment deadlines, any stages that would land on the same day merge into one combined payment instead of showing separately, and if the booking is made too close to departure for the normal schedule to make sense, the whole thing can collapse into a single payment due the next day.
+
 **Cancelling.** Cancelling a booking is a single action that unwinds several things at once: it gives back the tour's booked capacity, releases any held hotel room-type inventory, frees the pickup-location seat and vehicle assignment, removes any assigned tickets, and — if the booking used a yacht from an external source — cancels that reservation there too. Whatever was paid, minus the cancellation fee, is automatically queued for refund. Both the customer and staff get notified by email.
 
 ## Rules & Edge Cases
@@ -41,6 +43,7 @@ A booking ties together a departure (tour, hotel room, or yacht), the passengers
 - A refund is rejected if the booking has no payment on record at all, the requested amount is more than what was actually paid, or the amount is zero or negative.
 - A booking can carry its own booking fee percentage, second/balance payment split, and cancellation fee — separate from (and able to override) the tour's defaults for that specific booking.
 - A booking can opt into dynamic cancellation pricing instead of a flat cancellation fee, the same option available on the tour itself.
+- Every payment deadline is floored to at least one day after the booking was made, and deadlines always stay in order — the second date can never fall before the first, and the residue date can never fall before the second.
 
 ## Limitations
 
@@ -54,6 +57,8 @@ A booking ties together a departure (tour, hotel room, or yacht), the passengers
 - [Hotels & Accommodation](hotels.md) — a booking reserves and releases room-type inventory here.
 - [Payments](payments.md) — booking payment/refund processing happens there; this feature only validates whether an amount is allowed.
 - [Billing & Invoicing](billing.md) — invoices are generated from booking financial lines.
+- [Dynamic Forms & Custom Fields](dynamic-forms.md) — a booking's and its passengers' custom-field answers are validated and stored through this feature.
+- [Notifications (Email)](notifications.md) — payment deadline reminder emails are scheduled to match a booking's payment deadlines and rescheduled automatically when they move.
 
 ## FAQ
 
@@ -71,3 +76,6 @@ A: Acceptance is rejected — the system re-checks real inventory availability a
 
 **Q: Does a Pending booking need to be manually confirmed once payment comes in?**
 A: No — once payment is received, a Pending booking is automatically moved to Booked.
+
+**Q: What happens if a booking is made too close to departure for its normal payment schedule?**
+A: If the tenant has this configured, the whole payment schedule collapses into a single payment due the next day, instead of leaving a deadline that's already in the past.
