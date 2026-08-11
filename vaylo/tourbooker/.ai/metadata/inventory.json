@@ -4008,21 +4008,167 @@
         "currency"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/gift-cards.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "gift_card/services/gift_card_service.py:GiftCardService.create",
+          "payment/handlers/gift_card_handler.py:GiftCardPaymentHandler.process_payment",
+          "gift_card/services/gift_card_service.py:GiftCardService.apply_gift_card_to_booking"
+        ],
+        "How it works": [
+          "gift_card/services/gift_card_service.py:GiftCardService.create",
+          "gift_card/services/gift_card_service.py:GiftCardService.prepare_public_create_defaults",
+          "payment/handlers/gift_card_handler.py:GiftCardPaymentHandler.process_payment",
+          "gift_card/services/gift_card_service.py:GiftCardService.apply_gift_card_to_booking",
+          "gift_card/services/gift_card_payment_service.py:GiftCardPaymentService.create_gift_card_payment",
+          "gift_card/services/gift_card_service.py:GiftCardService.update",
+          "gift_card/services/gift_card_service.py:GiftCardService.expire_overdue_gift_cards",
+          "gift_card/services/gift_card_service.py:GiftCardService.delete_expired_draft_gift_cards",
+          "gift_card/services/gift_card_service.py:GiftCardService.get_gift_card_amount_summary"
+        ],
+        "Rules & Edge Cases": [
+          "gift_card/services/gift_card_service.py:GiftCardService.is_validate_gift_card_for_booking",
+          "gift_card/services/gift_card_service.py:GiftCardService.apply_gift_card_to_booking",
+          "gift_card/serializers/gift_card_serializers.py:ApplyGiftCardSerializer.validate_payment_amount",
+          "gift_card/services/gift_card_service.py:GiftCardService.get_valid_gift_card",
+          "gift_card/services/gift_card_service.py:GiftCardService.update",
+          "gift_card/models/gift_card_models.py:GiftCard.is_internal_gift_card"
+        ],
+        "Related Features": [
+          "gift_card/services/gift_card_payment_service.py:GiftCardPaymentService.create_gift_card_payment"
+        ],
+        "FAQ": [
+          "gift_card/views/gift_card_views.py:GiftCardCreatePublicAPIView",
+          "gift_card/services/gift_card_service.py:GiftCardService.expire_overdue_gift_cards",
+          "gift_card/services/gift_card_service.py:GiftCardService.is_validate_gift_card_for_booking",
+          "gift_card/services/gift_card_service.py:GiftCardService.update",
+          "gift_card/models/gift_card_models.py:GiftCard.is_internal_gift_card"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
-        "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
-        "side_effects": []
+        "workflows": [
+          {
+            "fact": "A gift card can be created two ways: staff create an internal gift card directly from the admin (active immediately, no separate payment step), or a customer buys one through a public purchase flow that starts the card as Inactive and only activates it once payment succeeds.",
+            "evidence": "gift_card/services/gift_card_service.py:GiftCardService.create,payment/handlers/gift_card_handler.py:GiftCardPaymentHandler.process_payment"
+          },
+          {
+            "fact": "Creating a gift card records the recipient's name and email, the amount, an expiry date, an optional personal note, a greeting text, and an optional image; if requested, the card is emailed to the recipient as a PDF attachment right away.",
+            "evidence": "gift_card/services/gift_card_service.py:GiftCardService.create,generate_gift_card_pdf_attachment"
+          },
+          {
+            "fact": "A publicly purchased gift card's expiry date is always set automatically from the tenant's configured number of expiry days from the purchase date \u2014 the customer cannot choose it.",
+            "evidence": "gift_card/services/gift_card_service.py:GiftCardService.prepare_public_create_defaults"
+          },
+          {
+            "fact": "Once a purchased gift card's payment completes through the payment provider, the card automatically becomes Active and is marked paid, and the customer can then start spending it.",
+            "evidence": "payment/handlers/gift_card_handler.py:GiftCardPaymentHandler.process_payment"
+          },
+          {
+            "fact": "Staff maintain a reusable library of greeting texts (with translations) and a gallery of images that customers and staff pick from when creating a card, instead of writing free text or uploading a new image each time.",
+            "evidence": "gift_card/services/gift_card_greeting_text_service.py:GiftCardGreetingTextService,gift_card/services/gift_card_image_service.py:GiftCardImageService"
+          },
+          {
+            "fact": "A staff member or, through the passenger portal, the customer can apply a gift card to an existing booking's outstanding balance, spending part or all of the card's remaining amount against what's still due.",
+            "evidence": "gift_card/services/gift_card_service.py:GiftCardService.apply_gift_card_to_booking"
+          },
+          {
+            "fact": "Applying a gift card creates a payment record against the booking and, if that clears the full amount due, marks the booking as paid; it also records the gift card usage against that specific booking so there's a history of where each card's balance went.",
+            "evidence": "gift_card/services/gift_card_payment_service.py:GiftCardPaymentService.create_gift_card_payment,gift_card/services/gift_card_service.py:GiftCardService.apply_gift_card_to_booking"
+          },
+          {
+            "fact": "Staff can look up a gift card's remaining balance and whether it's currently valid by its code, either from the admin or from the customer-facing passenger portal.",
+            "evidence": "gift_card/views/gift_card_views.py:GiftCardRemainingAmountAPIView.get,GiftCardPassengerPortalRemainingAmountAPIView.get"
+          },
+          {
+            "fact": "Staff can view a summary of gift card sales and how much unspent value is still outstanding across a chosen date range.",
+            "evidence": "gift_card/services/gift_card_service.py:GiftCardService.get_gift_card_amount_summary"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A gift card can only be spent on bookings priced in SEK \u2014 it cannot be applied to a booking in any other currency.",
+            "evidence": "gift_card/services/gift_card_service.py:GiftCardService.is_validate_gift_card_for_booking"
+          },
+          {
+            "fact": "The amount applied from a gift card to a booking is capped at whichever is smallest: the amount requested, the card's remaining balance, or the booking's outstanding due amount \u2014 it can never exceed any of those.",
+            "evidence": "gift_card/services/gift_card_service.py:GiftCardService.apply_gift_card_to_booking"
+          },
+          {
+            "fact": "A gift card cannot be applied to a booking that has already been fully paid, and cannot be applied for zero or a negative amount.",
+            "evidence": "gift_card/serializers/gift_card_serializers.py:ApplyGiftCardSerializer.validate_payment_amount,gift_card/services/gift_card_service.py:GiftCardService.apply_gift_card_to_booking"
+          },
+          {
+            "fact": "A gift card only counts as valid to redeem if it is Active, still marked usable, and has not passed its expiry date; an inactive, wrong-status, or expired card is rejected with the specific reason why.",
+            "evidence": "gift_card/services/gift_card_service.py:GiftCardService.get_valid_gift_card"
+          },
+          {
+            "fact": "Once a gift card is no longer a Draft, most of its details (recipient, amount, code) can no longer be changed \u2014 only its expiry date, note, image, and greeting text remain editable.",
+            "evidence": "gift_card/services/gift_card_service.py:GiftCardService.update"
+          },
+          {
+            "fact": "A scheduled job automatically expires any gift card past its expiry date and deactivates it; a paid card that still had unspent balance when it expired is recorded for accounting so that unused value isn't lost from the books.",
+            "evidence": "gift_card/services/gift_card_service.py:GiftCardService.expire_overdue_gift_cards"
+          },
+          {
+            "fact": "A Draft gift card that sits unpurchased/unfinished past the tenant's configured number of days is automatically deleted, along with any image uploaded just for it.",
+            "evidence": "gift_card/services/gift_card_service.py:GiftCardService.delete_expired_draft_gift_cards"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Looking up a gift card's remaining amount or validity by a code that doesn't exist is rejected as not found, with the specific invalid reason (not active, wrong status, expired) surfaced when applying it to a booking.",
+            "evidence": "gift_card/services/gift_card_service.py:GiftCardService.get_valid_gift_card,gift_card/views/gift_card_views.py:GiftCardRemainingAmountAPIView.get"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Creating, updating, listing, viewing summaries, updating status, and downloading a gift card as PDF from the admin all require an authenticated staff user (several also require standard staff model permissions).",
+            "evidence": "gift_card/views/gift_card_views.py:GiftCardListCreateAPIView,GiftCardRetrieveUpdateAPIView,GiftCardStatusUpdateAPIView,GiftCardSummaryAPIView"
+          },
+          {
+            "fact": "Buying a gift card publicly needs no login; checking a card's remaining balance or applying it through the passenger portal is restricted to that customer's own impersonated session, not open to anyone.",
+            "evidence": "gift_card/views/gift_card_views.py:GiftCardCreatePublicAPIView,GiftCardPassengerPortalRemainingAmountAPIView,ApplyPassengerPortalGiftCardAPIView"
+          },
+          {
+            "fact": "The scheduled expiry and draft-cleanup jobs run as the system itself via a machine API key, not as a staff action.",
+            "evidence": "gift_card/views/gift_card_views.py:GiftCardSchedulerStatusUpdateAPIView,GiftCardSchedulerDeleteDraftAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A gift card's status is Draft (being set up, not yet purchased/finalized), Active (usable), Inactive (turned off), Expired (past its expiry date), or reflects how much of it has been used (Unused, Partially Used, Used).",
+            "evidence": "gift_card/constants.py:GiftCardStatus"
+          },
+          {
+            "fact": "\"Remaining amount\" is the card's total value minus what's already been spent \u2014 the balance still available to redeem.",
+            "evidence": "gift_card/models/gift_card_models.py:GiftCard.remaining_amount"
+          },
+          {
+            "fact": "\"Internal gift card\" marks a card staff issued directly (for example, as a goodwill gesture) rather than one a customer purchased; it skips the payment step and is active right away.",
+            "evidence": "gift_card/models/gift_card_models.py:GiftCard.is_internal_gift_card,gift_card/services/gift_card_service.py:GiftCardService.create"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A customer buys a gift card for someone through the public purchase flow, picking a greeting text, image, amount, and the recipient's details, then pays; once payment succeeds the card becomes active and (if chosen) the recipient gets it by email as a PDF.",
+            "evidence": "gift_card/views/gift_card_views.py:GiftCardCreatePublicAPIView.post,payment/handlers/gift_card_handler.py:GiftCardPaymentHandler.process_payment"
+          },
+          {
+            "fact": "A recipient later books a tour and enters their gift card code, or asks staff to apply it, to cover some or all of what they owe; the booking's remaining due amount drops by the amount used, and the card's own remaining balance drops to match.",
+            "evidence": "gift_card/views/gift_card_views.py:ApplyGiftCardAPIView.post,ApplyPassengerPortalGiftCardAPIView.post"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Applying a gift card to a booking creates the same kind of payment transaction record used for other booking payments, and can mark the booking as fully paid.",
+            "evidence": "gift_card/services/gift_card_payment_service.py:GiftCardPaymentService.create_gift_card_payment"
+          }
+        ]
       }
     },
     {

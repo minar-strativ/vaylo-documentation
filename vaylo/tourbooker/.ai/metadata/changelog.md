@@ -28,3 +28,4 @@ Append-only. One line per event:
 2026-08-11 | pricing | created | 12 of 26 remaining features | 20675c05c
 2026-08-11 | res-pay | created | 13 of 26 remaining features | 20675c05c
 2026-08-11 | coupons | created | 14 of 26 remaining features | 20675c05c
+2026-08-11 | gift-cards | created | 15 of 26 remaining features | 20675c05c
