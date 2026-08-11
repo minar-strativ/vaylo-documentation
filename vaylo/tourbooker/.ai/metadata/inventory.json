@@ -5318,20 +5318,108 @@
         "multi-language"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/dynamic-forms.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "dynamic_form/services.py:CustomFormFieldService.create_custom_form_field,create_static_fields_for_content_object",
+          "booking/serializers/booking_passenger_serializer.py:BookingPassengerSerializer.validate",
+          "booking/models/booking_passenger_model.py:BookingPassenger.custom_fields"
+        ],
+        "How it works": [
+          "dynamic_form/services.py:CustomFormFieldService.create_static_fields_for_content_object,create_custom_form_field,validate_custom_field_submission",
+          "dynamic_form/models/custom_field_models.py:CustomFormField.is_only_primary_passenger,portal"
+        ],
+        "Rules & Edge Cases": [
+          "dynamic_form/services.py:CustomFormFieldService.create_custom_form_field",
+          "dynamic_form/services.py:CustomFormFieldService.validate_custom_field_submission",
+          "dynamic_form/services.py:CustomFormFieldService.update_content_object_based_custom_form_fields"
+        ],
+        "Limitations": [
+          "dynamic_form/models/custom_field_models.py:Collection,Group",
+          "dynamic_form/models/custom_field_response_models.py:CustomFieldResponse"
+        ],
+        "Related Features": [
+          "booking/models/booking_passenger_model.py:BookingPassenger.custom_fields"
+        ],
+        "FAQ": [
+          "dynamic_form/services.py:CustomFormFieldService.create_static_fields_for_content_object",
+          "booking/serializers/booking_public_serializer.py",
+          "dynamic_form/constants.py:PortalTypes"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
-        "rules": [],
+        "workflows": [
+          {
+            "fact": "Staff add custom fields to a tour's booking/passenger form \u2014 choosing a field type (text, number, date, dropdown, checkbox, file, and others), label, whether it's required, and validation limits like min/max length or value.",
+            "evidence": "dynamic_form/services.py:CustomFormFieldService.create_custom_form_field"
+          },
+          {
+            "fact": "Creating a new tour automatically seeds it with the platform's standard passenger fields (name, email, address, and similar) as its starting set of fields, which staff can then add to.",
+            "evidence": "dynamic_form/services.py:CustomFormFieldService.create_static_fields_for_content_object,dynamic_form/dtos/booking_passenger_dtos.py:BookingPassengerStaticFieldDefinitions"
+          },
+          {
+            "fact": "Staff can bulk-update an existing set of a tour's custom fields (label, requirement, order, and other settings) in one request.",
+            "evidence": "dynamic_form/services.py:CustomFormFieldService.update_content_object_based_custom_form_fields"
+          },
+          {
+            "fact": "When a passenger is added to a booking (whether by staff, on the public site, or through the passenger portal), whatever values they submit for that tour's custom fields are checked against the tour's field definitions before the booking can be saved.",
+            "evidence": "booking/serializers/booking_passenger_serializer.py:BookingPassengerSerializer.validate,booking/serializers/booking_public_serializer.py"
+          },
+          {
+            "fact": "A passenger's submitted custom-field answers are stored directly on their own booking-passenger record.",
+            "evidence": "booking/models/booking_passenger_model.py:BookingPassenger.custom_fields"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "Two custom fields on the same tour can't share the same label.",
+            "evidence": "dynamic_form/services.py:CustomFormFieldService.create_custom_form_field"
+          },
+          {
+            "fact": "A required custom field must have a value submitted, and a field with a maximum length rejects any answer longer than that limit.",
+            "evidence": "dynamic_form/services.py:CustomFormFieldService.validate_custom_field_submission"
+          },
+          {
+            "fact": "Any submitted answer for a field that isn't actually defined on that tour is silently dropped rather than causing an error or being saved.",
+            "evidence": "dynamic_form/services.py:CustomFormFieldService.validate_custom_field_submission"
+          },
+          {
+            "fact": "A field's own internal name can't be changed once it's created \u2014 only its label, requirement, order, and other settings can be updated afterward.",
+            "evidence": "dynamic_form/services.py:CustomFormFieldService.update_content_object_based_custom_form_fields"
+          }
+        ],
         "validations": [],
-        "permissions": [],
-        "field_meanings": [],
-        "journeys": [],
+        "permissions": [
+          {
+            "fact": "Adding or reconfiguring a tour's custom fields from the admin requires an authenticated staff user with standard staff model permissions.",
+            "evidence": "dynamic_form/views.py:TourCustomFormFieldListCreateConfigUpdateAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A field's \"portal\" says where it's meant to be filled in \u2014 the public booking widget, the passenger portal, or the staff admin \u2014 so the same tour can offer different fields depending on where the booking is made.",
+            "evidence": "dynamic_form/constants.py:PortalTypes"
+          },
+          {
+            "fact": "\"Only for primary passenger\" restricts a field to the one passenger designated as the booking's main contact, rather than every passenger on the booking.",
+            "evidence": "dynamic_form/models/custom_field_models.py:CustomFormField.is_only_primary_passenger"
+          },
+          {
+            "fact": "A \"static\" field is one of the platform's own standard passenger fields (like name or email), seeded automatically on every tour, as opposed to a custom field staff added themselves.",
+            "evidence": "dynamic_form/models/custom_field_models.py:CustomFormField.is_static_field"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A customer books a tour and fills in whatever fields that tour's form asks for \u2014 the platform's standard passenger details plus any extra fields staff added \u2014 and the booking is rejected with a specific message if a required field is missing or an answer is too long.",
+            "evidence": "booking/serializers/booking_public_serializer.py"
+          }
+        ],
         "side_effects": []
       }
     },
