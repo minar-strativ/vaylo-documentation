@@ -25,7 +25,9 @@ Until a tour is ready to sell, staff can leave it as a **Draft** — invisible t
 
 ## How it works
 
-**Creating a tour.** Staff enter the tour's dates, capacity, and price. The price a customer pays can never be set below the tour's transport cost. Creating the tour also sets up its passenger-type options, applies the location's default pickup point (and a "pickup on request" option, if the tenant allows it), sets local currency prices, and sends an internal notification email that a new tour was added.
+**Creating a tour.** Staff enter the tour's dates, capacity, and price. The price a customer pays can never be set below the tour's transport cost. Creating the tour also sets up its passenger-type options, applies the location's default pickup point (and a "pickup on request" option, if the tenant allows it), sets local currency prices, sends an internal notification email that a new tour was added, and clones the booking-form and passenger-form custom fields from its tour type's (or the tenant's default) collections onto the tour itself (see [Dynamic Forms & Custom Fields](dynamic-forms.md)).
+
+**Keeping custom fields in sync.** If staff later change which collection a tour uses for its booking or passenger form, the tour's fields are re-synced to match — fields from a newly attached collection are added, fields from one that's no longer attached are removed, and fields added to the tour by hand are always left alone.
 
 **Repeating a tour.** Instead of building a new tour from scratch, staff can create it as a repeat of an existing one. The repeat copies the original's images and translations and, unless a different one is chosen, keeps the same default brand/office assignment.
 
@@ -59,8 +61,9 @@ Until a tour is ready to sell, staff can leave it as a **Draft** — invisible t
 
 - [Bookings](booking.md) — a tour's active/waitlist bookings block certain tour changes, and dynamic cancellation pricing is calculated there.
 - [Hotels & Accommodation](hotels.md) — room-type inventory reserved by a tour is released back here when the tour is deactivated.
-- Tour Types — a tour can be based on a reusable tour type, from which it inherits its default images. (not in this run's scope)
-- Pricing & Price Manager — the minimum/maximum price bounds enforced on a tour come from this feature's configuration. (not in this run's scope)
+- [Tour Types](tour-types.md) — a tour can be based on a reusable tour type, from which it inherits its default images and its default custom-field collections.
+- [Pricing & Price Manager](pricing.md) — the minimum/maximum price bounds enforced on a tour come from this feature's configuration.
+- [Dynamic Forms & Custom Fields](dynamic-forms.md) — the source of a tour's booking-form and passenger-form custom fields.
 
 ## FAQ
 
@@ -69,6 +72,9 @@ A: No — the sale price must always be greater than or equal to the transport c
 
 **Q: What's the difference between a Draft tour and an inactive tour?**
 A: They're linked but not identical. Draft is a separate "not ready yet" flag that always forces the tour inactive when turned on. A tour can also be made inactive directly (without being a Draft) — for example, after it fills up bookings and staff temporarily suspend it — but a Draft tour can never be active until it's taken out of Draft.
+
+**Q: Where do a tour's custom fields come from?**
+A: They're cloned from the booking-form and passenger-form collections its tour type (or the tenant's default) is set to use, at the moment the tour is created. Changing those collections later re-syncs the tour's fields to match.
 
 **Q: Why can't I deactivate this tour?**
 A: The system blocks deactivation while the tour has an active booking, an active waitlist booking, an inactive supplement still attached, or a tour guide assigned. Resolve whichever one applies, then try again — the error message names the specific blocker.

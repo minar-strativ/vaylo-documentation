@@ -1236,7 +1236,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/tours.md",
-      "documented_at_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
+      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
       "evidence": {
         "what_it_does_and_how_it_works": [
           "tour/services/tour_service.py:create_tour",
@@ -1245,7 +1245,8 @@
           "tour/services/tour_service.py:update_draft",
           "tour/services/tour_service.py:update_tour_departure_status",
           "tour/services/tour_service.py:remove_tour_reservation",
-          "tour/services/tour_service.py:get_public_tour_queryset"
+          "tour/services/tour_service.py:get_public_tour_queryset",
+          "tour/services/tour_service.py:TourService.create,update"
         ],
         "who_uses_it": [
           "tour/views/tour_view.py:TourAPIViewSet",
@@ -1264,7 +1265,8 @@
         "related_features": [
           "tour/services/tour_service.py:update_status",
           "tour/models/tour_model.py:tour_type",
-          "tour/models/tour_model.py:default_profile"
+          "tour/models/tour_model.py:default_profile",
+          "dynamic_form/services/custom_field_service.py:CustomFormFieldService.create_tour_custom_fields"
         ]
       },
       "audited_at_commit": null,
@@ -1302,6 +1304,10 @@
           {
             "fact": "Draft status can also be toggled via a dedicated API-key-authenticated endpoint (TourDraftUpdateAPIView) independent of the main update flow.",
             "evidence": "tour/views/tour_view.py:TourDraftUpdateAPIView"
+          },
+          {
+            "fact": "Creating a tour clones its booking-form and passenger-form custom fields from its tour type's (or the tenant's default) collections; changing which collection a tour uses later re-syncs its fields to match, without disturbing tour-specific fields added by hand.",
+            "evidence": "tour/services/tour_service.py:TourService.create,update,dynamic_form/services/custom_field_service.py:CustomFormFieldService.create_tour_custom_fields,update_tour_custom_fields"
           }
         ],
         "rules": [

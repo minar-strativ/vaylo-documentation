@@ -1,11 +1,3 @@
 {
-  "mode": "maintain",
-  "run_anchor_commit": "f47cf806f",
-  "affected": [
-    "tours"
-  ],
-  "new_features": [],
-  "current_feature": "tours",
-  "current_step": "update",
-  "notes": "Impact analysis via diff-since.sh against 20675c05c..f47cf806f (production fast-forward pull). new_paths judged as shared plumbing already owned by existing docs. Re-anchored without doc edits: flights-tickets, flights-tickets/pnr-tickets (backfill script only), hotels/accounting(+2 children)/suppliers (mechanical import reorder only), yacht-booking/supplements/products/gift-cards/widget/notes-todos/user-access/notifications (multi-language shared-module false-positive fan-out, own dirs unchanged). Updated: dynamic-forms (major rewrite), booking (payment deadlines), passengers (custom field responses). Remaining: tours, tour-types."
+  "mode": "idle"
 }
