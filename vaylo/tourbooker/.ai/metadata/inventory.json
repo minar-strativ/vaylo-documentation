@@ -5321,33 +5321,33 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/dynamic-forms.md",
-      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
       "evidence": {
         "What it does": [
-          "dynamic_form/services.py:CustomFormFieldService.create_custom_form_field,create_static_fields_for_content_object",
-          "booking/serializers/booking_passenger_serializer.py:BookingPassengerSerializer.validate",
-          "booking/models/booking_passenger_model.py:BookingPassenger.custom_fields"
+          "dynamic_form/models/custom_field_models.py:Collection,Group",
+          "dynamic_form/services/custom_field_collection_service.py:CollectionService.create_collection,get_default_collection",
+          "dynamic_form/services/custom_field_service.py:CustomFormFieldService.create_tour_custom_fields,update_tour_custom_fields,sync_collection_custom_fields",
+          "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService.create_responses,process_automation"
         ],
         "How it works": [
-          "dynamic_form/services.py:CustomFormFieldService.create_static_fields_for_content_object,create_custom_form_field,validate_custom_field_submission",
-          "dynamic_form/models/custom_field_models.py:CustomFormField.is_only_primary_passenger,portal"
+          "dynamic_form/services/custom_field_collection_service.py:CollectionService.create_collection,set_default",
+          "tour_type/services/tour_type_services.py:TourTypeService.apply_default_collections",
+          "tour/services/tour_service.py:TourService.create,update",
+          "dynamic_form/services/custom_field_service.py:CustomFormFieldService.create_tour_custom_fields,update_tour_custom_fields,sync_collection_custom_fields,create_custom_field",
+          "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService.create_responses,_build_field_info,process_automation",
+          "passenger/serializers/passenger_serializer.py:PassengerDetailSerializer.get_custom_fields",
+          "dynamic_form/services/onboarding_service.py:DynamicFormOnboardingService.create_onboarding_data"
         ],
         "Rules & Edge Cases": [
-          "dynamic_form/services.py:CustomFormFieldService.create_custom_form_field",
-          "dynamic_form/services.py:CustomFormFieldService.validate_custom_field_submission",
-          "dynamic_form/services.py:CustomFormFieldService.update_content_object_based_custom_form_fields"
-        ],
-        "Limitations": [
-          "dynamic_form/models/custom_field_models.py:Collection,Group",
-          "dynamic_form/models/custom_field_response_models.py:CustomFieldResponse"
+          "dynamic_form/services/custom_field_service.py:CustomFormFieldService.create_custom_field,update_tour_custom_fields,sync_collection_custom_fields,validate_custom_field_submission",
+          "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService.validate_submission_against_responses"
         ],
         "Related Features": [
-          "booking/models/booking_passenger_model.py:BookingPassenger.custom_fields"
+          "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService._create_task_for_response,_send_email_for_response,save_responses_to_client_profile"
         ],
         "FAQ": [
-          "dynamic_form/services.py:CustomFormFieldService.create_static_fields_for_content_object",
-          "booking/serializers/booking_public_serializer.py",
-          "dynamic_form/constants.py:PortalTypes"
+          "dynamic_form/services/custom_field_service.py:CustomFormFieldService.sync_collection_custom_fields",
+          "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService._build_field_info,process_automation"
         ]
       },
       "audited_at_commit": null,
@@ -5355,72 +5355,113 @@
       "analysis": {
         "workflows": [
           {
-            "fact": "Staff add custom fields to a tour's booking/passenger form \u2014 choosing a field type (text, number, date, dropdown, checkbox, file, and others), label, whether it's required, and validation limits like min/max length or value.",
-            "evidence": "dynamic_form/services.py:CustomFormFieldService.create_custom_form_field"
+            "fact": "Staff group reusable custom fields into named Collections, each scoped to one form (Booking, or Booking Passenger) and \u2014 for passenger collections \u2014 one booking type (Tour or FIT); fields within a passenger collection are further organized into named Groups for display.",
+            "evidence": "dynamic_form/models/custom_field_models.py:Collection,Group,dynamic_form/services/custom_field_collection_service.py:CollectionService.create_collection"
           },
           {
-            "fact": "Creating a new tour automatically seeds it with the platform's standard passenger fields (name, email, address, and similar) as its starting set of fields, which staff can then add to.",
-            "evidence": "dynamic_form/services.py:CustomFormFieldService.create_static_fields_for_content_object,dynamic_form/dtos/booking_passenger_dtos.py:BookingPassengerStaticFieldDefinitions"
+            "fact": "A Tour, or the Tour Type it's built from, can each be given a booking-level and a passenger-level collection; if staff don't pick one, the tenant's default collection for that form/booking-type combination is used automatically.",
+            "evidence": "tour_type/services/tour_type_services.py:TourTypeService.apply_default_collections,dynamic_form/services/custom_field_collection_service.py:CollectionService.get_default_collection"
           },
           {
-            "fact": "Staff can bulk-update an existing set of a tour's custom fields (label, requirement, order, and other settings) in one request.",
-            "evidence": "dynamic_form/services.py:CustomFormFieldService.update_content_object_based_custom_form_fields"
+            "fact": "Creating a tour clones every field from its attached collection(s) onto the tour itself; editing a tour's chosen collections re-syncs its fields \u2014 adding fields from a newly attached collection and removing fields whose collection was detached \u2014 without touching tour-specific fields added by hand or fields whose collection is still attached.",
+            "evidence": "tour/services/tour_service.py:TourService.create,update,dynamic_form/services/custom_field_service.py:CustomFormFieldService.create_tour_custom_fields,update_tour_custom_fields"
           },
           {
-            "fact": "When a passenger is added to a booking (whether by staff, on the public site, or through the passenger portal), whatever values they submit for that tour's custom fields are checked against the tour's field definitions before the booking can be saved.",
-            "evidence": "booking/serializers/booking_passenger_serializer.py:BookingPassengerSerializer.validate,booking/serializers/booking_public_serializer.py"
+            "fact": "Editing a field's settings directly on a Collection (its master copy) can be pushed out to every Tour or Tour Type that collection is attached to, updating the matching field wherever it was cloned and adding it to any attached tour that's missing it \u2014 departed tours are always skipped so a completed tour is never changed retroactively.",
+            "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.sync_collection_custom_fields"
           },
           {
-            "fact": "A passenger's submitted custom-field answers are stored directly on their own booking-passenger record.",
-            "evidence": "booking/models/booking_passenger_model.py:BookingPassenger.custom_fields"
+            "fact": "A booking-passenger custom field is automatically created for the public widget, the passenger portal, and the admin, in one step; a booking-level field is created for the widget only.",
+            "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.create_custom_field"
+          },
+          {
+            "fact": "When a passenger (or a booking) submits its custom field answers, each answer is saved as its own response record with a snapshot of that field's label, type, and options at the moment of submission \u2014 so editing or removing the field later doesn't change what was recorded.",
+            "evidence": "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService.create_responses,_build_field_info"
+          },
+          {
+            "fact": "A field can be flagged to automatically create a follow-up task for the admin, send the admin an email notification, and/or save the answer onto the customer's own profile, whenever a response for it is submitted.",
+            "evidence": "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService.process_automation,_create_task_for_response,_send_email_for_response,save_responses_to_client_profile"
+          },
+          {
+            "fact": "Staff viewing a passenger's own detail page see that passenger's submitted custom field answers.",
+            "evidence": "passenger/serializers/passenger_serializer.py:PassengerDetailSerializer.get_custom_fields"
+          },
+          {
+            "fact": "A new tenant is automatically seeded with a starter set of passenger-field groups and three default collections (booking, tour passenger, FIT passenger) so custom fields work out of the box before any staff configuration.",
+            "evidence": "dynamic_form/services/onboarding_service.py:DynamicFormOnboardingService.create_onboarding_data"
           }
         ],
         "rules": [
           {
-            "fact": "Two custom fields on the same tour can't share the same label.",
-            "evidence": "dynamic_form/services.py:CustomFormFieldService.create_custom_form_field"
+            "fact": "Two custom fields can't share the same label on the same tour, booking, or collection.",
+            "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.create_custom_field"
           },
           {
-            "fact": "A required custom field must have a value submitted, and a field with a maximum length rejects any answer longer than that limit.",
-            "evidence": "dynamic_form/services.py:CustomFormFieldService.validate_custom_field_submission"
+            "fact": "A booking-level (not passenger-level) field can never be assigned to a display group \u2014 grouping only applies to passenger fields.",
+            "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.create_custom_field"
           },
           {
-            "fact": "Any submitted answer for a field that isn't actually defined on that tour is silently dropped rather than causing an error or being saved.",
-            "evidence": "dynamic_form/services.py:CustomFormFieldService.validate_custom_field_submission"
+            "fact": "Resyncing a tour's fields after its collections change never wipes fields added directly to that tour by hand, and never duplicates fields from a collection that's still attached.",
+            "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.update_tour_custom_fields"
           },
           {
-            "fact": "A field's own internal name can't be changed once it's created \u2014 only its label, requirement, order, and other settings can be updated afterward.",
-            "evidence": "dynamic_form/services.py:CustomFormFieldService.update_content_object_based_custom_form_fields"
+            "fact": "A departed tour is always excluded when pushing a collection-wide field edit out to its attached tours, so a tour that has already run never changes retroactively.",
+            "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.sync_collection_custom_fields,_attached_target_keys"
+          },
+          {
+            "fact": "A required custom field must have a value submitted, and a field with a maximum length rejects any answer longer than that limit \u2014 unchanged from before.",
+            "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.validate_custom_field_submission"
+          },
+          {
+            "fact": "An answer submitted for a field that isn't actually defined for that tour/booking is silently dropped rather than causing an error.",
+            "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.validate_custom_field_submission"
+          },
+          {
+            "fact": "When staff edit a passenger's or booking's already-submitted answers, clearing a field that was flagged required when it was first answered is rejected \u2014 even if the field's own definition has since changed.",
+            "evidence": "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService.validate_submission_against_responses"
           }
         ],
         "validations": [],
         "permissions": [
           {
-            "fact": "Adding or reconfiguring a tour's custom fields from the admin requires an authenticated staff user with standard staff model permissions.",
-            "evidence": "dynamic_form/views.py:TourCustomFormFieldListCreateConfigUpdateAPIView"
+            "fact": "Managing collections, groups, and a tour's own custom fields from the admin all require an authenticated staff user, with collection/group create-edit-delete additionally requiring standard staff model permissions.",
+            "evidence": "dynamic_form/views/custom_field_collection_views.py:CollectionListCreateAPIView,dynamic_form/views/custom_field_group_views.py:GroupListCreateAPIView"
+          },
+          {
+            "fact": "A tour's public-facing custom field definitions can be fetched with no login at all, since the public booking widget needs them to render its form.",
+            "evidence": "dynamic_form/views/public_tour_custom_field_views.py:_PublicTourCustomFieldsBaseAPIView"
           }
         ],
         "field_meanings": [
           {
-            "fact": "A field's \"portal\" says where it's meant to be filled in \u2014 the public booking widget, the passenger portal, or the staff admin \u2014 so the same tour can offer different fields depending on where the booking is made.",
-            "evidence": "dynamic_form/constants.py:PortalTypes"
+            "fact": "A field's \"portal\" says where it's meant to be filled in \u2014 the public booking widget, the passenger portal, or the staff admin.",
+            "evidence": "dynamic_form/constants.py"
           },
           {
-            "fact": "\"Only for primary passenger\" restricts a field to the one passenger designated as the booking's main contact, rather than every passenger on the booking.",
-            "evidence": "dynamic_form/models/custom_field_models.py:CustomFormField.is_only_primary_passenger"
+            "fact": "A Collection's \"booking type\" (Tour or FIT) scopes which kind of booking it applies to \u2014 a FIT booking with no tour falls back to the tenant's default FIT passenger collection instead of a tour's own collection.",
+            "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.get_passenger_fields_for_booking"
           },
           {
-            "fact": "A \"static\" field is one of the platform's own standard passenger fields (like name or email), seeded automatically on every tour, as opposed to a custom field staff added themselves.",
-            "evidence": "dynamic_form/models/custom_field_models.py:CustomFormField.is_static_field"
+            "fact": "\"Is default\" marks the one collection the platform falls back to for a given form/booking-type combination when a tour or tour type hasn't picked one explicitly; only one collection can be default per combination.",
+            "evidence": "dynamic_form/services/custom_field_collection_service.py:CollectionService.set_default"
           }
         ],
         "journeys": [
           {
-            "fact": "A customer books a tour and fills in whatever fields that tour's form asks for \u2014 the platform's standard passenger details plus any extra fields staff added \u2014 and the booking is rejected with a specific message if a required field is missing or an answer is too long.",
-            "evidence": "booking/serializers/booking_public_serializer.py"
+            "fact": "Staff build a reusable set of passenger questions once as a Collection, attach it to a tour type, and every tour built from that type automatically gets the same questions on its booking form \u2014 with a one-click way to push a later edit out to every tour still using that collection.",
+            "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.sync_collection_custom_fields"
+          },
+          {
+            "fact": "A customer fills in a tour's custom fields when booking; their answers are recorded as individual responses, and if a field is flagged for it, a follow-up task lands with the admin or an email notification goes out automatically the moment the answer is submitted.",
+            "evidence": "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService.process_automation"
           }
         ],
-        "side_effects": []
+        "side_effects": [
+          {
+            "fact": "A flagged custom field response can create a Todo task and send an email through the platform's own Notes/Todos and Notifications systems.",
+            "evidence": "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService._create_task_for_response,_send_email_for_response"
+          }
+        ]
       }
     },
     {

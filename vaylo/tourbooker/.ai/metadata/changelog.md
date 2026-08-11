@@ -48,3 +48,5 @@ Append-only. One line per event:
 2026-08-11 | notes-todos | created | last-but-one feature in the 26-feature backlog | 20675c05c
 2026-08-11 | reservation-service | created | final pending feature in the full 31-feature inventory | 20675c05c
 2026-08-11 | create run completed | 35 features documented (43 docs, several split into parent+children); 1 flagged needs_review (rewards — unreleased, no doc); 0 skipped | 20675c05c
+2026-08-11 | maintain run started | impact analysis via diff-since.sh, 20 features flagged changed after production fast-forward pull (20675c05c..f47cf806f) | f47cf806f
+2026-08-11 | dynamic-forms | updated | major rewrite — Collections/Groups now fully wired (tour/tour-type default collections, cloning, cross-tour sync), booking-level fields, CustomFieldResponse snapshots + automation (task/email/save-to-profile) | f47cf806f
