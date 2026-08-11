@@ -1,6 +1,6 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (36 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs); 21 documented, 1 flagged needs-review (Rewards & Loyalty — unreleased) so far.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (38 docs, since Flights & Ticketing, Yacht Booking, and Accounting Integration each split into a parent + 2 child docs); 22 documented, 1 flagged needs-review (Rewards & Loyalty — unreleased) so far.
 
 ## Bookings & Catalog
 
@@ -32,7 +32,9 @@ Generated and maintained by Canopy. One page per business capability — see eac
 - [Gift Cards](gift-cards.md) — Purchasable and staff-issued vouchers with greeting texts/images, spendable against bookings.
 - Rewards & Loyalty — Loyalty point accounts, reward tiers, and a point ledger. *(needs review — data model only, no services/views/urls exist yet; likely unreleased, see `.ai/metadata/inventory.json`)*
 - [VAT & Tax Classes](vat.md) — Tax rate setup (VAT classes/types) and the accounting accounts they post to.
-- Accounting Integration — Integration with external accounting providers: projects, VAT codes, customers, cost centers, event sync. *(pending)*
+- [Accounting Integration](accounting.md) — Connecting an external accounting provider and auto-posting business events to it.
+  - [Accounting Provider Setup & Reference Data](accounting-provider-setup.md) — Connecting a provider and syncing/mapping its projects, cost centers, tax codes and accounts.
+  - [Accounting Vouchers & Logs](accounting-vouchers-and-logs.md) — Automatic voucher posting on business events, logging, and manual/batch resend.
 - Suppliers — Suppliers, supplier types, supplier invoices and their financial/VAT accounts. *(pending)*
 
 ## Communication & Content

@@ -4342,15 +4342,32 @@
       ],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/accounting.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "accounting_service/services/accounting_provider_services.py:AccountingProviderService.configure_accounting_provider",
+          "accounting_service/services/accounting_service_factory.py:AccountingServiceFactory"
+        ],
+        "Related Features": [
+          "accounting_service/services/resend_accounting_service_log.py",
+          "gift_card/services/gift_card_accounting_service.py"
+        ],
+        "FAQ": [
+          "accounting_service/services/accounting_provider_services.py:AccountingProviderService.disable_other_accounting_service_providers"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
       "analysis": {
-        "workflows": [],
+        "workflows": [
+          {
+            "fact": "The tenant connects to one external accounting/bookkeeping system at a time (Fortnox or PowerOffice); once connected, the platform automatically records business events there as accounting vouchers and keeps a log of every attempt.",
+            "evidence": "accounting_service/services/accounting_provider_services.py:AccountingProviderService.configure_accounting_provider,accounting_service/services/accounting_service_factory.py:AccountingServiceFactory"
+          }
+        ],
         "rules": [],
         "validations": [],
         "permissions": [],
@@ -5195,6 +5212,211 @@
         "field_meanings": [],
         "journeys": [],
         "side_effects": []
+      }
+    },
+    {
+      "id": "accounting/provider-setup",
+      "name": "Accounting Provider Setup & Reference Data",
+      "summary": "Connecting an accounting provider (Fortnox/PowerOffice), syncing its projects/cost centers/VAT codes/customers, and mapping event accounts.",
+      "files": [
+        "accounting_service/services/accounting_provider_services.py",
+        "accounting_service/services/accounting_provider_configuration_services.py",
+        "accounting_service/services/accounting_service_project_services.py",
+        "accounting_service/services/accounting_service_cost_center_services.py",
+        "accounting_service/services/accounting_provider_account_services.py",
+        "accounting_service/services/accounting_customer_services.py",
+        "accounting_service/services/fortnox/**",
+        "accounting_service/services/power_office/**"
+      ],
+      "depends_on": [
+        "accounting"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "completed",
+      "skip_reason": null,
+      "doc": "docs/product/accounting-provider-setup.md",
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "accounting_service/services/accounting_provider_services.py:AccountingProviderService.configure_accounting_provider",
+          "accounting_service/models/accounting_provider_account_model.py:AccountingProviderAccount"
+        ],
+        "How it works": [
+          "accounting_service/services/accounting_provider_services.py:AccountingProviderService.configure_accounting_provider,generate_fortnox_state,disable_other_accounting_service_providers",
+          "accounting_service/views/accounting_service_project_views.py:AccountingServiceProjectSyncAPIView",
+          "accounting_service/views/accounting_service_cost_center_views.py:AccountingServiceCostCenterSyncAPIView",
+          "accounting_service/services/accounting_service_interface.py:AccountingServiceInterface.get_accounts"
+        ],
+        "Rules & Edge Cases": [
+          "accounting_service/services/accounting_provider_services.py:AccountingProviderService.disable_other_accounting_service_providers",
+          "accounting_service/services/accounting_provider_configuration_services.py:AccountingProviderConfigurationService.configure_fortnox"
+        ],
+        "Related Features": [
+          "accounting_service/models/accounting_service_vat_code_model.py:AccountingServiceVatCode"
+        ],
+        "FAQ": [
+          "accounting_service/services/accounting_provider_services.py:AccountingProviderService.disable_other_accounting_service_providers",
+          "accounting_service/models/accounting_service_project_model.py:AccountingServiceProject",
+          "accounting_service/models/accounting_provider_scenario_model.py:AccountingProviderScenario"
+        ]
+      },
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "Staff pick and connect one accounting provider (Fortnox or PowerOffice) by authorizing the connection with that provider; the platform stores the connection's access credentials and keeps them refreshed automatically.",
+            "evidence": "accounting_service/services/accounting_provider_services.py:AccountingProviderService.configure_accounting_provider,generate_fortnox_state"
+          },
+          {
+            "fact": "Connecting a new provider automatically disconnects and deactivates any other provider that was previously configured \u2014 only one can be active for the tenant at a time.",
+            "evidence": "accounting_service/services/accounting_provider_services.py:AccountingProviderService.disable_other_accounting_service_providers,accounting_service/services/accounting_provider_configuration_services.py:AccountingProviderConfigurationService.disable_all_accounting_service_config_except_requested_one"
+          },
+          {
+            "fact": "Once connected, staff sync reference data from the accounting system into the platform: its projects, its cost centers, its VAT/tax codes, and its customer records.",
+            "evidence": "accounting_service/views/accounting_service_project_views.py:AccountingServiceProjectSyncAPIView,accounting_service/views/accounting_service_cost_center_views.py:AccountingServiceCostCenterSyncAPIView,accounting_service/models/accounting_service_vat_code_model.py:AccountingServiceVatCode"
+          },
+          {
+            "fact": "Staff map each business event (like a new booking or a gift card sale) and scenario to the specific debit/credit accounts in the connected accounting system, optionally per currency, so postings land in the right place in the books.",
+            "evidence": "accounting_service/models/accounting_provider_account_model.py:AccountingProviderAccount,AccountingProviderAccountNumber,accounting_service/services/accounting_service_interface.py:AccountingServiceInterface.get_accounts"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "Only one accounting provider connection can be active for a tenant at any time; activating one automatically deactivates all others.",
+            "evidence": "accounting_service/services/accounting_provider_services.py:AccountingProviderService.disable_other_accounting_service_providers"
+          },
+          {
+            "fact": "Connection credentials are refreshed automatically on a schedule so the connection doesn't silently expire; each refresh has its own expiry window.",
+            "evidence": "accounting_service/services/accounting_provider_configuration_services.py:AccountingProviderConfigurationService.configure_fortnox,accounting_service/services/accounting_provider_services.py:AccountingProviderService.configure_accounting_provider"
+          }
+        ],
+        "validations": [],
+        "permissions": [
+          {
+            "fact": "Connecting, configuring, and syncing reference data for an accounting provider all require an authenticated staff user, generally with the standard staff model permissions; a few internal sync endpoints run as the system itself via a machine API key rather than as a staff action.",
+            "evidence": "accounting_service/views/accounting_provider_configuration_views.py:AccountingProviderConfigurationAPIViewSet,accounting_service/views/accounting_service_provider_views.py:AdminAccountingServiceProviderSyncAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A \"project\" and \"cost center\" are the accounting system's own way of tagging where revenue or cost belongs (for example, by department or initiative); this feature only mirrors them in so staff can assign postings to the right one.",
+            "evidence": "accounting_service/models/accounting_service_project_model.py:AccountingServiceProject,accounting_service/models/accounting_service_cost_center_model.py:AccountingServiceCostCenter"
+          },
+          {
+            "fact": "A \"scenario\" groups the specific set of accounts a business event should post to \u2014 the same event (for example, a booking) can post differently depending on which scenario applies.",
+            "evidence": "accounting_service/models/accounting_provider_scenario_model.py:AccountingProviderScenario,accounting_service/models/accounting_provider_account_model.py:AccountingProviderAccount"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "Staff connect their accounting software once, sync its projects/cost centers/VAT codes into the platform, and map each business event's accounts \u2014 after that, the platform posts to the books automatically without staff repeating any of this setup per transaction.",
+            "evidence": "accounting_service/services/accounting_provider_services.py:AccountingProviderService.configure_accounting_provider"
+          }
+        ],
+        "side_effects": []
+      }
+    },
+    {
+      "id": "accounting/vouchers-and-logs",
+      "name": "Accounting Vouchers & Logs",
+      "summary": "Automatic voucher posting on business events, request/response logging, and manual/batch resend.",
+      "files": [
+        "accounting_service/services/resend_accounting_service_log.py",
+        "accounting_service/services/accounting_provider_log_service.py",
+        "accounting_service/services/fortnox/fortnox_voucher_service.py",
+        "accounting_service/services/power_office/power_office_voucher_service.py",
+        "accounting_service/models/accounting_service_log_model.py"
+      ],
+      "depends_on": [
+        "accounting",
+        "accounting/provider-setup"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "completed",
+      "skip_reason": null,
+      "doc": "docs/product/accounting-vouchers-and-logs.md",
+      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "evidence": {
+        "What it does": [
+          "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService.prepare_voucher_data",
+          "accounting_service/services/accounting_provider_log_service.py:AccountingProviderLogService.update_log"
+        ],
+        "How it works": [
+          "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService.resend_accounting_log,update_service_status"
+        ],
+        "Rules & Edge Cases": [
+          "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService.resend_accounting_log,resend_all_logs"
+        ],
+        "Related Features": [
+          "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService"
+        ],
+        "FAQ": [
+          "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService.resend_accounting_log,update_service_status"
+        ]
+      },
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "When a tracked business event happens (for example, a booking is created, a tour departs, a gift card is sold or redeemed, or an invoice is settled), the platform automatically builds an accounting voucher and sends it to the connected accounting provider.",
+            "evidence": "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService.prepare_voucher_data,gift_card/services/gift_card_accounting_service.py:GiftCardAccountingService._create_voucher"
+          },
+          {
+            "fact": "Every attempt to post to the accounting provider is logged with the request sent and the response received, whether it succeeded, and which business event, booking, or transaction it relates to.",
+            "evidence": "accounting_service/services/accounting_provider_log_service.py:AccountingProviderLogService.update_log"
+          },
+          {
+            "fact": "If posting a voucher failed (or needs to be re-sent for another reason), staff can resend that specific log, or resend every log matching a filter, from within the platform.",
+            "evidence": "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService.resend_accounting_log,resend_all_logs"
+          },
+          {
+            "fact": "Whether a voucher successfully reached the accounting provider updates the related booking's or transaction's own accounting status, so staff can see at a glance whether it made it to the books.",
+            "evidence": "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService.update_service_status"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A log that has already been successfully resent cannot be resent again \u2014 the system rejects a repeat attempt.",
+            "evidence": "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService.resend_accounting_log"
+          },
+          {
+            "fact": "Logs for the automatic post-departure event (tour or yacht) can never be resent manually \u2014 those are only ever sent again by the platform's own automatic process, not by a staff click.",
+            "evidence": "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService.resend_accounting_log"
+          },
+          {
+            "fact": "Bulk-resending logs by filter always skips the post-departure, invoice-payment, and settlement-invoice event types, since those are handled automatically rather than by manual resend.",
+            "evidence": "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService.resend_all_logs"
+          }
+        ],
+        "validations": [],
+        "permissions": [
+          {
+            "fact": "Viewing accounting logs and triggering a resend (single or batch) require an authenticated staff user; browsing the full internal log list additionally requires standard staff model permissions.",
+            "evidence": "accounting_service/views/accounting_provider_log_views.py:AccountingProviderLogAPIViewSet,ResendAccountingProviderLogAPIView,ResendAccountingProviderLogBatchAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A log's success flag reflects whether the connected accounting provider accepted the posting \u2014 not whether the underlying business event itself succeeded.",
+            "evidence": "accounting_service/services/accounting_provider_log_service.py:AccountingProviderLogService.update_log"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A booking is created, departs, or gets paid; behind the scenes the platform posts the matching voucher to the connected accounting system and records the attempt as a log. If something goes wrong, staff can spot the failed log and resend it without redoing the underlying business action.",
+            "evidence": "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "A successful or failed accounting post is reflected back onto the related booking or payment transaction as an accounting-sent status, which other features can read.",
+            "evidence": "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService._update_booking_service_status,update_service_status"
+          }
+        ]
       }
     }
   ],

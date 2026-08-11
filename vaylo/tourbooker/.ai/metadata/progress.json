@@ -2,9 +2,9 @@
   "mode": "create",
   "run_started_at": "2026-07-29",
   "run_anchor_commit": "7c0869fa1f34a28e92428225874f2206e3ca5b46",
-  "current_feature": "accounting",
+  "current_feature": "suppliers",
   "current_step": "analyze",
   "scope_this_run": [],
-  "notes": "vat documented (17 of 26 remaining). Next pending feature in plan order: accounting.",
-  "run_processed_count": 22
+  "notes": "accounting split into parent + provider-setup + vouchers-and-logs, all documented (19 of 26 remaining). Next pending feature in plan order: suppliers.",
+  "run_processed_count": 24
 }

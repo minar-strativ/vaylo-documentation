@@ -31,3 +31,6 @@ Append-only. One line per event:
 2026-08-11 | gift-cards | created | 15 of 26 remaining features | 20675c05c
 2026-08-11 | rewards | needs_review | model-only scaffolding (no services/views/urls, nothing references it) — no doc written, flagged as likely unreleased per denylist; 16 of 26 remaining features | 20675c05c
 2026-08-11 | vat | created | 17 of 26 remaining features | 20675c05c
+2026-08-11 | accounting | split | analysis revealed >7 workflows across two distinct areas (~5,900 lines, two external providers); split into parent overview + accounting/provider-setup + accounting/vouchers-and-logs | 20675c05c
+2026-08-11 | accounting/provider-setup | created | 18 of 26 remaining features | 20675c05c
+2026-08-11 | accounting/vouchers-and-logs | created | 19 of 26 remaining features | 20675c05c
