@@ -1,7 +1,7 @@
 ---
 feature: dynamic-forms
 status: completed
-updated: 2026-08-11
+updated: 2026-08-18
 review_note: ""
 ---
 
@@ -60,6 +60,7 @@ A new tenant is automatically seeded with a starter set of passenger-field group
 - A required field must have a value submitted; a field with a maximum length rejects any answer longer than that.
 - An answer submitted for a field that isn't actually defined for that tour or booking is silently dropped rather than causing an error.
 - Editing an already-submitted answer can't clear a field that was required when it was first answered, even if the field's own definition has since changed.
+- Some fields are built into the platform rather than staff-created; editing one of these only lets staff change its label and display group (and, for a field that isn't otherwise mandatory, whether it's required or restricted to the primary passenger) — its underlying type and behavior can't be changed.
 
 ## Limitations
 

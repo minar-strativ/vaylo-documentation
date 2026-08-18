@@ -29,7 +29,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/booking.md",
-      "documented_at_commit": "167353f10cb4bea8a4ee107fbf39e5991df5b58b",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "what_it_does_and_how_it_works": [
           "booking/booking_validators/rules.py:BookingClientRequiredRule",
@@ -618,7 +618,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/flights-tickets.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "overview": [
           "ticket_management/models/ticket_model.py:Pnr"
@@ -659,7 +659,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/flights-tickets-pnr-tickets.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "what_it_does": [
           "ticket_management/models/ticket_model.py"
@@ -966,7 +966,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/flights-tickets-booking-assignment.md",
-      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "what_it_does": [
           "booking/models/booking_flight_itinerary_model.py",
@@ -1236,7 +1236,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/tours.md",
-      "documented_at_commit": "167353f10cb4bea8a4ee107fbf39e5991df5b58b",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "what_it_does_and_how_it_works": [
           "tour/services/tour_service.py:create_tour",
@@ -1431,7 +1431,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/tour-types.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "what_it_does": [
           "tour_type/models/tour_type_model.py"
@@ -2070,7 +2070,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/hotels.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "what_it_does_and_how_it_works": [
           "hotel/services/hotel_service.py:create",
@@ -2234,7 +2234,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/yacht-booking.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "overview": [
           "yacht_booking/models/yacht_models.py:Yacht"
@@ -2784,7 +2784,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/supplements.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "what_it_does": [
           "supplement/models/supplement.py"
@@ -3033,7 +3033,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/products.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "what_it_does": [
           "product/models/product.py"
@@ -3730,7 +3730,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/billing.md",
-      "documented_at_commit": "167353f10cb4bea8a4ee107fbf39e5991df5b58b",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "what_it_does_and_how_it_works": [
           "billing/models/billing_line_model.py:BillingLine",
@@ -4058,7 +4058,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/gift-cards.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "What it does": [
           "gift_card/services/gift_card_service.py:GiftCardService.create",
@@ -4392,7 +4392,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/accounting.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "What it does": [
           "accounting_service/services/accounting_provider_services.py:AccountingProviderService.configure_accounting_provider",
@@ -4439,7 +4439,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/suppliers.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "What it does": [
           "supplier/services/supplier_services.py:SupplierService",
@@ -5002,7 +5002,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/notifications.md",
-      "documented_at_commit": "167353f10cb4bea8a4ee107fbf39e5991df5b58b",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "What it does": [
           "email_service/models/email_event_model.py:EmailEvent,EmailEventTemplate",
@@ -5257,7 +5257,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/widget.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "What it does": [
           "core/models/configuration.py:WidgetConfiguration",
@@ -5368,7 +5368,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/dynamic-forms.md",
-      "documented_at_commit": "167353f10cb4bea8a4ee107fbf39e5991df5b58b",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "What it does": [
           "dynamic_form/models/custom_field_models.py:Collection,Group",
@@ -5395,6 +5395,9 @@
         "FAQ": [
           "dynamic_form/services/custom_field_service.py:CustomFormFieldService.sync_collection_custom_fields",
           "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService._build_field_info,process_automation"
+        ],
+        "rules_and_edge_cases": [
+          "dynamic_form/services/custom_field_service.py:CustomFormFieldService.update_custom_form_field"
         ]
       },
       "audited_at_commit": null,
@@ -5466,6 +5469,10 @@
           {
             "fact": "When staff edit a passenger's or booking's already-submitted answers, clearing a field that was flagged required when it was first answered is rejected — even if the field's own definition has since changed.",
             "evidence": "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService.validate_submission_against_responses"
+          },
+          {
+            "fact": "A static (built-in) custom field can only have its label, display group, and (if not itself mandatory) required/primary-passenger-only flags edited — its other properties are locked.",
+            "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.update_custom_form_field"
           }
         ],
         "validations": [],
@@ -5527,7 +5534,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/user-access.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "What it does": [
           "user/services/user_service.py:UserService._set_superuser_data,_set_admin_user_data,_set_passenger_user_data,_set_tour_guide_user_data"
@@ -5660,7 +5667,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/subscription.md",
-      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "What it does": [
           "subscription/models.py:SubscriptionPlan",
@@ -5846,7 +5853,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/notes-todos.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "5609d882b",
       "evidence": {
         "What it does": [
           "note/services/note_services.py:NoteService.prepare_data",
@@ -6541,7 +6548,10 @@
         "core/migrations/0103_cancellationrulegroupmultilanguage_and_more.py",
         "booking/models/booking_cancellation_group.py",
         "booking/migrations/0160_bookingcancellationrulegrouphistory_and_more.py",
-        "booking/migrations/0162_remove_booking_applied_cancellation_rule_data_and_more.py"
+        "booking/migrations/0162_remove_booking_applied_cancellation_rule_data_and_more.py",
+        "tour/migrations/0074_tour_cancellation_rule_group.py",
+        "tour_type/models/tour_type_model.py",
+        "tour_type/migrations/0027_tourtype_cancellation_rule_group.py"
       ],
       "depends_on": [],
       "shared_modules": [],
@@ -6593,6 +6603,62 @@
         "journeys": [],
         "side_effects": []
       }
+    },
+    {
+      "id": "tour-flights",
+      "name": "Tour Flights",
+      "summary": "Optional flights bundled into a tour (with their own seats and price layers) that passengers select and pay for as part of a booking, alongside the tour itself.",
+      "files": [
+        "tour/models/tour_flight.py",
+        "tour/serializers/tour_flight_serializer.py",
+        "tour/services/tour_flight_service.py",
+        "tour/views/tour_flight_views.py",
+        "tour/views/public_tour_flight_views.py",
+        "tour/errors/tour_flight_error.py",
+        "tour/migrations/0073_vay_3790_tour_and_booking_flights.py",
+        "tour/tests/test_tour_flight_*.py",
+        "booking/models/booking_tour_flight.py",
+        "booking/serializers/booking_tour_flight_serializer.py",
+        "booking/services/booking_tour_flight_service.py",
+        "booking/services/tour_flight_itinerary_service.py",
+        "booking/errors/flight_financial_line_error.py",
+        "booking/errors/tour_flight_price_locked_error.py",
+        "booking/errors/tour_flight_selection_error.py",
+        "booking/migrations/0159_vay_3790_tour_and_booking_flights.py",
+        "booking/migrations/0163_bookingtourflight.py",
+        "booking/migrations/0164_remove_bookingtourflight_unique_booking_tour_flight_and_more.py",
+        "booking/tests/*flight*.py",
+        "booking/tests/test_orphan_tour_flight_segments.py",
+        "billing/services/no_flight_fee_billing_service.py",
+        "billing/migrations/0015_billingline_booking_tour_flight.py",
+        "ticket_management/tests/test_tour_flight_seat_accounting.py",
+        "ticket_management/filters/ticket_filter.py",
+        "ticket_management/models/assign_ticket_model.py",
+        "ticket_management/models/ticket_model.py",
+        "ticket_management/services/assigned_ticket_services.py",
+        "ticket_management/services/booking_ticket_services.py",
+        "ticket_management/services/pnr_service.py",
+        "ticket_management/migrations/0038_vay_3790_tour_and_booking_flights.py",
+        "ticket_management/migrations/0039_bookingticket_is_seat_reserved.py",
+        "email_service/services/booking_email_service/booking_email_data_service.py",
+        "email_service/services/booking_email_service/booking_email_service.py"
+      ],
+      "depends_on": [
+        "tours",
+        "booking",
+        "billing",
+        "ticket-management"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/tour-flights.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {}
     }
   ],
   "shared_modules": [
