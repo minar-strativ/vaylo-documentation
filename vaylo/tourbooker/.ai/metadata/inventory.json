@@ -6509,6 +6509,90 @@
           }
         ]
       }
+    },
+    {
+      "id": "shuttle-timetable",
+      "name": "Shuttle Timetable",
+      "summary": "Bus/shuttle route timetables with stoppages, importable in bulk, for ground transport scheduling.",
+      "files": [
+        "shuttle_timetable/**"
+      ],
+      "depends_on": [],
+      "shared_modules": [
+        "multi-language"
+      ],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/shuttle-timetable.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {}
+    },
+    {
+      "id": "cancellation-rules",
+      "name": "Cancellation Rule Groups",
+      "summary": "Reusable tiered cancellation-fee schedules (day-before-departure bands, each with its own fee percentage) attachable to tour types, tours, and bookings.",
+      "files": [
+        "core/models/cancellation_rule.py",
+        "core/migrations/0094_cancellationrule.py",
+        "core/migrations/0103_cancellationrulegroupmultilanguage_and_more.py",
+        "booking/models/booking_cancellation_group.py",
+        "booking/migrations/0160_bookingcancellationrulegrouphistory_and_more.py",
+        "booking/migrations/0162_remove_booking_applied_cancellation_rule_data_and_more.py"
+      ],
+      "depends_on": [],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "pending",
+      "skip_reason": null,
+      "doc": "docs/product/cancellation-rules.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {}
+    },
+    {
+      "id": "crm",
+      "name": "CRM Sync Log",
+      "summary": "Internal audit log of sync attempts (contacts/courses/associations) to an external CRM via the reservation-service provider integration.",
+      "files": [
+        "crm/**"
+      ],
+      "depends_on": [
+        "reservation-service"
+      ],
+      "shared_modules": [],
+      "existing_docs": [],
+      "status": "needs_review",
+      "skip_reason": null,
+      "doc": "docs/product/crm.md",
+      "documented_at_commit": null,
+      "evidence": {},
+      "audited_at_commit": null,
+      "full_audits_skipped": 0,
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "No workflow exists yet: crm/services/__init__.py imports CRMLogService from crm/services/crm_log_service.py, but that file does not exist in the codebase -- a broken import. Nothing outside the app references the CRMLog model.",
+            "evidence": "crm/services/__init__.py,crm/models/crm_log_model.py"
+          }
+        ],
+        "rules": [],
+        "validations": [],
+        "permissions": [],
+        "field_meanings": [
+          {
+            "fact": "CRMLog anticipates logging create/update/delete/cancel/backfill sync operations for contact/course/association objects against an external CRM (tied to subscription plans hubspot_crm flag and a reservation-service provider), with retry chaining via parent_log.",
+            "evidence": "crm/models/crm_log_model.py,crm/constant.py,subscription/models.py:hubspot_crm"
+          }
+        ],
+        "journeys": [],
+        "side_effects": []
+      }
     }
   ],
   "shared_modules": [
