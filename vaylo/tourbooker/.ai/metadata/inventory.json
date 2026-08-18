@@ -4787,7 +4787,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/transport.md",
-      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "documented_at_commit": "167353f10cb4bea8a4ee107fbf39e5991df5b58b",
       "evidence": {
         "What it does": [
           "vehicle/models.py",
@@ -5002,7 +5002,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/notifications.md",
-      "documented_at_commit": "f47cf806f326fe35550bbc1d7c2ce92bef3e3086",
+      "documented_at_commit": "167353f10cb4bea8a4ee107fbf39e5991df5b58b",
       "evidence": {
         "What it does": [
           "email_service/models/email_event_model.py:EmailEvent,EmailEventTemplate",
