@@ -2,7 +2,6 @@
   "mode": "maintain",
   "run_anchor_commit": "167353f10cb4bea8a4ee107fbf39e5991df5b58b",
   "affected": [
-    "tours",
     "billing",
     "transport",
     "notifications",
@@ -12,7 +11,7 @@
   "current_feature": null,
   "current_step": "update",
   "notes": {
-    "run_processed_count": 1,
+    "run_processed_count": 2,
     "a3_note": "new_paths=['templates/payment/billing_invoice_payment.html'] predates the prior anchor (exists at 7c0869fa1) and is scope growth of the existing 'billing' feature (glob gap, not new code) -- fold 'templates/payment/**' into billing's files glob during its update pass, no new pending feature."
   }
 }
