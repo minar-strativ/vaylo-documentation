@@ -6629,7 +6629,7 @@
     {
       "id": "cancellation-rules",
       "name": "Cancellation Rule Groups",
-      "summary": "Reusable tiered cancellation-fee schedules (day-before-departure bands, each with its own fee percentage) attachable to tour types, tours, and bookings.",
+      "summary": "Tiered cancellation-fee schedule model (day-window -> fee% bands), with FKs wired onto Tour/TourType/BookingCancellationGroup, but no service, view, or serializer anywhere reads or computes from it yet.",
       "files": [
         "core/models/cancellation_rule.py",
         "core/migrations/0094_cancellationrule.py",
@@ -6644,14 +6644,21 @@
       "depends_on": [],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "needs_review",
       "skip_reason": null,
       "doc": "docs/product/cancellation-rules.md",
       "documented_at_commit": null,
       "evidence": {},
       "audited_at_commit": null,
       "full_audits_skipped": 0,
-      "analysis": {}
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "No workflow exists yet: CancellationRuleGroup/CancellationRule are pure data models (plus multilanguage tables) wired via FK onto Tour, TourType, and a new BookingCancellationGroup snapshot table, but no service/view/serializer anywhere reads, writes, or computes a fee from them.",
+            "evidence": "core/models/cancellation_rule.py,tour/models/tour_model.py:cancellation_rule_group,tour_type/models/tour_type_model.py:cancellation_rule_group,booking/models/booking_cancellation_group.py"
+          }
+        ]
+      }
     },
     {
       "id": "crm",

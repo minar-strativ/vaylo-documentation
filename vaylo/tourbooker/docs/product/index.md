@@ -1,6 +1,6 @@
 # Product Knowledge Base
 
-Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 31 business capabilities discovered total (43 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs, Accounting Integration into a parent + 2 child docs, and Suppliers and User & Access Management each into a parent + 1 child doc). 35 documented; 1 flagged needs-review (Rewards & Loyalty — unreleased, no doc). All other discovered features are now documented.
+Generated and maintained by Canopy. One page per business capability — see each feature's own doc for details. 33 business capabilities discovered total (45 docs, since Flights & Ticketing and Yacht Booking each split into a parent + 2 child docs, Accounting Integration into a parent + 2 child docs, and Suppliers and User & Access Management each into a parent + 1 child doc). 37 documented; 3 flagged needs-review (Rewards & Loyalty, Cancellation Rule Groups, CRM Sync Log — all unreleased model-only scaffolding, no docs). All other discovered features are now documented.
 
 ## Bookings & Catalog
 
@@ -59,3 +59,5 @@ Generated and maintained by Canopy. One page per business capability — see eac
 ## Needs review
 
 - **Rewards & Loyalty** — `reward/` is model-only scaffolding (no services, views, or urls, and nothing else in the codebase references it). No doc was written since there's no live workflow to document and it risks documenting an unreleased feature. Revisit once the feature is actually built out — see `.ai/metadata/inventory.json` for details.
+- **Cancellation Rule Groups** — `core/models/cancellation_rule.py` (plus FKs on Tour, TourType, and a new BookingCancellationGroup snapshot table) is model-only scaffolding; no service, view, or serializer anywhere reads or computes a cancellation fee from it. No doc was written. Revisit once it's actually wired up.
+- **CRM Sync Log** — `crm/` logs sync attempts to an external CRM, but `crm/services/__init__.py` imports a `crm_log_service` module that doesn't exist (a broken import), and nothing references the `CRMLog` model. No doc was written. Revisit once it's actually built out.

@@ -1,36 +1,3 @@
 {
-  "mode": "create",
-  "run_anchor_commit": "5609d882b",
-  "affected": [
-    "booking",
-    "flights-tickets",
-    "flights-tickets/pnr-tickets",
-    "flights-tickets/booking-assignment",
-    "tours",
-    "tour-types",
-    "hotels",
-    "yacht-booking",
-    "supplements",
-    "products",
-    "billing",
-    "gift-cards",
-    "accounting",
-    "suppliers",
-    "notifications",
-    "widget",
-    "dynamic-forms",
-    "user-access",
-    "subscription",
-    "notes-todos"
-  ],
-  "new_features": [
-    "shuttle-timetable",
-    "cancellation-rules"
-  ],
-  "current_feature": "cancellation-rules",
-  "current_step": "analyze",
-  "notes": {
-    "run_processed_count": 0,
-    "a3_note": "58 new_paths triaged: shuttle_timetable/** is a fully-wired new app (models/services/views/urls/tests, mounted in tourbooker/urls.py) -> new pending feature 'shuttle-timetable'. core/models/cancellation_rule.py (+ multilang + migrations) is a reusable tiered cancellation-fee-schedule entity used by tour/tour_type/booking with real business rules (day-window -> fee% bands) -> new pending feature 'cancellation-rules', related to existing booking/tours dynamic-cancellation content. crm/** is model-only scaffolding -- crm/services/__init__.py imports crm_log_service.CRMLogService but that file does not exist (broken import, nothing else references CRMLog) -> treat like 'rewards': needs_review, no doc, likely unreleased/in-progress. Remaining new_paths (core/utils.py, core/services/excel_generator_service.py, core/serializers/configuration_serializer.py, core/services/configuration_service.py, core/models/__init__.py, core/tests/factories.py, tourbooker/settings.py, tourbooker/urls.py, .gitignore, .claude/agents/doc-converter.md) are shared plumbing/tooling with no business rules of their own -> no feature ownership, will surface as dependencies inside whichever feature's own diff actually uses them."
-  }
+  "mode": "idle"
 }
