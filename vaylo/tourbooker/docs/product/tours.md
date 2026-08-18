@@ -1,7 +1,7 @@
 ---
 feature: tours
 status: completed
-updated: 2026-07-30
+updated: 2026-08-18
 review_note: ""
 ---
 
@@ -64,6 +64,7 @@ Until a tour is ready to sell, staff can leave it as a **Draft** — invisible t
 - [Tour Types](tour-types.md) — a tour can be based on a reusable tour type, from which it inherits its default images and its default custom-field collections.
 - [Pricing & Price Manager](pricing.md) — the minimum/maximum price bounds enforced on a tour come from this feature's configuration.
 - [Dynamic Forms & Custom Fields](dynamic-forms.md) — the source of a tour's booking-form and passenger-form custom fields.
+- [Tour Flights](tour-flights.md) — the flights, no-flight option, and custom flight request settings a tour can offer are configured through this feature.
 
 ## FAQ
 

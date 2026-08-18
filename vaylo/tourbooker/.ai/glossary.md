@@ -37,3 +37,15 @@ Format: **Term** — definition in one or two sentences, primary-reader language
 **Pricing Run** — One batch of tours the external pricing engine is actively re-pricing together, with its own active date range. (not: pricing project)
 
 **Price Suggestion** — A new price the external pricing engine proposes for a tour, pending a staff decision to apply or reject it, or automatic application if enabled. (not: pricing log)
+
+**Tour Flight** — A flight attached to a specific tour that customers can select as part of booking it, backed by either a Group Flight or a Freesale Flight.
+
+**Group Flight** — A tour flight backed by a block of seats already reserved on an existing group PNR.
+
+**Freesale Flight** — A tour flight backed by a one-off flight record entered directly for that tour, normally with no fixed seat limit.
+
+**Price Layer** — The frozen rate a booking's flight (or no-flight) seats were bought at; a booking can hold several layers of the same flight if seats were added at different times, at different prices.
+
+**No-Flight Transfer Fee** — The fee a tour can charge a customer who books it without taking any of its flights.
+
+**Custom Flight Request** — A free-text flight request a customer submits instead of picking a listed tour flight, routed to staff to arrange manually.

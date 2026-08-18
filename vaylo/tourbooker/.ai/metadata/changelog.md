@@ -78,3 +78,4 @@ Append-only. One line per event:
 2026-08-18 | suppliers | re-anchored | new SupplierCategory model (+ multilanguage) is model-only scaffolding, not referenced by any service/view/serializer yet; no client-visible behavior to document | 5609d882b
 2026-08-18 | notifications | re-anchored | admin "custom flight request" email belongs to new pending feature tour-flights | 5609d882b
 2026-08-18 | subscription | re-anchored | hubspot_crm is one more plan add-on flag, already covered generically by the doc's existing "list of add-on features, each on or off" description | 5609d882b
+2026-08-18 | tour-flights | created | new feature: flights (group/freesale) a tour offers, price layers, no-flight transfer fee, custom flight requests; cross-referenced from booking, tours, flights-tickets, billing, notifications, notes-todos | 5609d882b

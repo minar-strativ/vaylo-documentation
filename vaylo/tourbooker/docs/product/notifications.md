@@ -1,7 +1,7 @@
 ---
 feature: notifications
 status: completed
-updated: 2026-08-11
+updated: 2026-08-18
 review_note: ""
 ---
 
@@ -71,6 +71,7 @@ Customers only ever receive the resulting emails — they have no direct interac
 
 - [Bookings](booking.md) — the source of most notification triggers (confirmations, reminders, ticket updates) and the scheduled emails tied to a booking's own dates.
 - [Payments](payments.md) — payment deadline reminders are scheduled and rescheduled through this feature as a booking's payment dates change.
+- [Tour Flights](tour-flights.md) — a customer's custom flight request can trigger an admin email through this feature.
 
 ## FAQ
 

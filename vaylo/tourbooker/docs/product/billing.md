@@ -1,7 +1,7 @@
 ---
 feature: billing
 status: completed
-updated: 2026-07-30
+updated: 2026-08-18
 review_note: ""
 ---
 
@@ -50,6 +50,7 @@ Every chargeable item on a booking becomes a **Billing Line** — one line per c
 - [Tours](tours.md) — tour pricing feeds into a booking's billing lines.
 - [Payments](payments.md) — payments recorded against a booking are what move an invoice from Unpaid toward Paid.
 - Coupons — coupon discounts appear as adjustments on billing lines. (not in this run's scope)
+- [Tour Flights](tour-flights.md) — flight and no-flight-fee charges reach an invoice as billing lines, following this feature's same issue/lock rules.
 
 ## FAQ
 

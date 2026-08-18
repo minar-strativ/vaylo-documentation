@@ -1,7 +1,7 @@
 ---
 feature: flights-tickets
 status: completed
-updated: 2026-08-06
+updated: 2026-08-18
 review_note: ""
 ---
 
@@ -16,3 +16,4 @@ Flight tickets are managed as PNR records — flight-booking references, either 
 
 - [Bookings](booking.md) — a booking's flight tickets are reserved and assigned here, and flight cost changes feed back into the booking's totals.
 - [Passengers](passengers.md) — individual seat assignments are made to a booking's own traveler records.
+- [Tour Flights](tour-flights.md) — flights sold as part of a tour booking are backed by the same PNR/ticket records this feature manages; tour-specific PNRs are hidden from this feature's general PNR list.

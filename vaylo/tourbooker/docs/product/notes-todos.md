@@ -1,7 +1,7 @@
 ---
 feature: notes-todos
 status: completed
-updated: 2026-08-11
+updated: 2026-08-18
 review_note: ""
 ---
 
@@ -60,6 +60,7 @@ Three related tools for day-to-day operations: staff notes on a booking or tour,
 
 - [Bookings](booking.md) and [Tours](tours.md) — the records notes, todos, and much of the travel information are attached to.
 - [Notifications (Email)](notifications.md) — todo creation, reassignment, and reminder emails are sent through this feature's own templated email system.
+- [Tour Flights](tour-flights.md) — a customer's custom flight request can create a follow-up staff task here.
 
 ## FAQ
 

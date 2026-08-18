@@ -6651,14 +6651,140 @@
       ],
       "shared_modules": [],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/tour-flights.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "5609d882b",
+      "evidence": {
+        "what_it_does_and_how_it_works": [
+          "tour/services/tour_flight_service.py",
+          "booking/services/booking_tour_flight_service.py",
+          "booking/services/tour_flight_itinerary_service.py",
+          "billing/services/no_flight_fee_billing_service.py"
+        ],
+        "who_uses_it": [
+          "tour/views/tour_flight_views.py",
+          "tour/views/public_tour_flight_views.py"
+        ],
+        "rules_and_edge_cases": [
+          "booking/validators.py:validate_tour_flight_reservations,validate_tour_flight_layer_prices,apply_flight_selection",
+          "tour/services/tour_flight_service.py"
+        ],
+        "related_features": [
+          "booking/services/tour_booking_service.py:_handle_custom_flight_request",
+          "todo/services/todo_services.py:TodoService.create_custom_flight_request_task"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
-      "analysis": {}
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "Staff attach a Group Flight (existing group PNR + seat block) or a Freesale Flight (new one-off flight, no fixed seat ceiling by default) to a tour, each with its own price per passenger.",
+            "evidence": "tour/services/tour_flight_service.py:TourFlightService.create_tour_flights,_create_group_tour_flight,_create_freesale_tour_flight"
+          },
+          {
+            "fact": "A tours first flight can only be added while it has no active booking; every subsequent flight can be added regardless.",
+            "evidence": "tour/services/tour_flight_service.py:TourFlightService._check_tour_has_no_active_booking,create_tour_flights"
+          },
+          {
+            "fact": "A booking either puts every passenger on the same flight (or all on no flight) or, for per-passenger bookings, assigns different passenger types to different flights/no-flight at possibly different seat counts.",
+            "evidence": "booking/validators.py:apply_flight_selection,validate_tour_flight_reservations"
+          },
+          {
+            "fact": "A quoted price for a new flight/no-flight selection is rejected unless it matches the tours current price; an existing price layer rate can only have its seat count changed, never its price.",
+            "evidence": "booking/validators.py:validate_tour_flight_layer_prices"
+          },
+          {
+            "fact": "Seats and price layers are automatically reconciled to what a booking actually holds whenever it changes (waitlist acceptance, passenger changes, cancellation) -- new seats open a new layer at todays rate, existing layers only grow/shrink.",
+            "evidence": "booking/services/booking_tour_flight_service.py:BookingTourFlightService.sync_booking_tour_flights,_reconcile_layers,_grow,_shrink"
+          },
+          {
+            "fact": "Flight and no-flight billing lines are reconciled to each price layer; once part of a layer cost is invoiced, further changes add a correction/credit line instead of rewriting the issued amount.",
+            "evidence": "booking/services/tour_flight_itinerary_service.py:TourFlightItineraryService._reconcile_layer_lines,_create_correction_line;billing/services/no_flight_fee_billing_service.py:NoFlightTransferFeeBillingLineService.sync_no_flight_transfer_fee_billing_line"
+          },
+          {
+            "fact": "A customer can submit a free-text custom flight request instead of picking a listed flight; depending on tour configuration this emails the tour admin, creates a follow-up staff task due a few days later, or both.",
+            "evidence": "booking/services/tour_booking_service.py:_handle_custom_flight_request;todo/services/todo_services.py:TodoService.create_custom_flight_request_task;email_service/services/booking_email_service/booking_email_service.py:BookingEmailService.send_email_to_admin_custom_flight_request"
+          },
+          {
+            "fact": "Staff can detach a flight only once no booking still holds seats on it; turning off a tour no-flight option is blocked the same way while any booking still carries that fee.",
+            "evidence": "tour/services/tour_flight_service.py:TourFlightService._check_tour_flight_has_no_booking,_check_no_booking_carries_no_flight_cost"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "A Group Flight requires an existing group PNR and a seat block that can never be reduced below seats already booked on it.",
+            "evidence": "tour/services/tour_flight_service.py:TourFlightService._apply_group_seat_change,_validate_group_pnr"
+          },
+          {
+            "fact": "A Freesale Flight requires its own schedule, a billing supplier, and a cost per passenger; it has no seat ceiling unless staff cap the number of tickets.",
+            "evidence": "tour/serializers/tour_flight_serializer.py:TourFlightCreateSerializer._validate_freesale"
+          },
+          {
+            "fact": "The same group PNR cannot be attached to the same tour twice.",
+            "evidence": "tour/services/tour_flight_service.py:TourFlightService._validate_group_pnr"
+          },
+          {
+            "fact": "On a per-passenger booking, seats requested for a passenger type can never exceed that types headcount, and must exactly equal it unless the tour allows going without a flight.",
+            "evidence": "booking/validators.py:validate_tour_flight_reservations"
+          },
+          {
+            "fact": "A tour flight only appears to customers on the public site/widget while marked active; inactive flights stay attached but hidden.",
+            "evidence": "tour/services/tour_flight_service.py:TourFlightService.get_public_tour_flights"
+          },
+          {
+            "fact": "The no-flight transfer fee is billed per head not holding a flight seat, computed from the booking total headcount rather than a count of passenger records on file.",
+            "evidence": "billing/services/no_flight_fee_billing_service.py:NoFlightTransferFeeBillingLineService"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "Booking-level flight selection (same for all) requires either a flight id or, if the tour allows it, an explicit no-flight choice.",
+            "evidence": "booking/validators.py:apply_flight_selection"
+          },
+          {
+            "fact": "A booking-level flight id is rejected on a per-passenger booking, and per-passenger reservations are rejected on a same-for-all booking.",
+            "evidence": "booking/validators.py:apply_flight_selection"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "Attaching, editing, deleting, and configuring a tour flights requires staff authentication plus Django model permissions; the public flight list for a tour requires no authentication.",
+            "evidence": "tour/views/tour_flight_views.py:TourFlightListCreateAPIView;tour/views/public_tour_flight_views.py:PublicTourFlightListAPIView"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "A price layer records the frozen rate, exchange rate and VAT percentage a batch of seats was bought at; only its quantity and total ever change afterward.",
+            "evidence": "booking/models/booking_tour_flight.py:BookingTourFlight"
+          },
+          {
+            "fact": "A price layer with no linked flight represents the no-flight transfer fee, its quantity being the headcount not taking any flight.",
+            "evidence": "booking/models/booking_tour_flight.py:BookingTourFlight"
+          }
+        ],
+        "journeys": [
+          {
+            "fact": "A customer booking a tour picks one of its active flights (or opts out, or requests a custom one) as part of checkout; the price shown is re-validated against the tour current pricing before the booking is created.",
+            "evidence": "tour/views/public_tour_flight_views.py:PublicTourFlightListAPIView;booking/validators.py:validate_tour_flight_layer_prices"
+          },
+          {
+            "fact": "If a customer requests a custom flight, staff are notified (email and/or a task) and arrange it manually outside the platform.",
+            "evidence": "booking/services/tour_booking_service.py:_handle_custom_flight_request"
+          }
+        ],
+        "side_effects": [
+          {
+            "fact": "Cancelling a booking releases its held flight seats and credits back any already-invoiced flight/no-flight cost no longer owed.",
+            "evidence": "booking/services/booking_cancel_service.py:BookingCancelService.cancel_booking"
+          },
+          {
+            "fact": "A tour-specific freesale PNR is excluded from the general PNR list shown for flight/ticket management.",
+            "evidence": "ticket_management/services/pnr_service.py:PNRService"
+          }
+        ]
+      }
     }
   ],
   "shared_modules": [

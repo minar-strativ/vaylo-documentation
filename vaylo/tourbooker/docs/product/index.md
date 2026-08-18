@@ -21,6 +21,7 @@ Generated and maintained by Canopy. One page per business capability — see eac
 - [Tour Guides](tour-guides.md) — Tour guides, guide types and their time-slot availability.
 - [Vehicles, Carriers & Stations](transport.md) — Transport logistics: vehicles and types, home bases, carriers and pickup/drop stations.
 - [Booking Widget](widget.md) — Embeddable widget configuration: defaults, theme, redirects, and its search-filter catalog.
+- [Tour Flights](tour-flights.md) — Flights (group or freesale) a tour offers that customers select and pay for as part of booking it, plus the no-flight transfer fee and custom flight requests.
 
 ## Pricing & Payments
 

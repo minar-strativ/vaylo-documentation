@@ -1,7 +1,7 @@
 ---
 feature: booking
 status: completed
-updated: 2026-07-30
+updated: 2026-08-18
 review_note: ""
 ---
 
@@ -59,6 +59,7 @@ A booking ties together a departure (tour, hotel room, or yacht), the passengers
 - [Billing & Invoicing](billing.md) — invoices are generated from booking financial lines.
 - [Dynamic Forms & Custom Fields](dynamic-forms.md) — a booking's and its passengers' custom-field answers are validated and stored through this feature.
 - [Notifications (Email)](notifications.md) — payment deadline reminder emails are scheduled to match a booking's payment deadlines and rescheduled automatically when they move.
+- [Tour Flights](tour-flights.md) — a booking's flight (or no-flight) choice is set and kept in sync here as the booking changes.
 
 ## FAQ
 
