@@ -63,7 +63,7 @@
       "analysis": {
         "workflows": [
           {
-            "fact": "A booking reserves a tour, hotel room, or yacht for one or more passengers, one of whom must be marked as the booking client (the primary contact) \u2014 exactly one, never zero or more than one.",
+            "fact": "A booking reserves a tour, hotel room, or yacht for one or more passengers, one of whom must be marked as the booking client (the primary contact) — exactly one, never zero or more than one.",
             "evidence": "booking/booking_validators/rules.py:BookingClientRequiredRule"
           },
           {
@@ -75,7 +75,7 @@
             "evidence": "booking/views/booking_public_view.py:TourBookingCreatePublicAPIView"
           },
           {
-            "fact": "A booking can be placed on a Waitlist when the tour/room is full; accepting a waitlist booking re-checks room inventory availability, consumes the inventory/pickup-location/vehicle seats, applies any coupon, and moves the booking to Booked \u2014 rejecting waitlist acceptance if inventory is no longer available. Rejecting a waitlist booking cancels it outright.",
+            "fact": "A booking can be placed on a Waitlist when the tour/room is full; accepting a waitlist booking re-checks room inventory availability, consumes the inventory/pickup-location/vehicle seats, applies any coupon, and moves the booking to Booked — rejecting waitlist acceptance if inventory is no longer available. Rejecting a waitlist booking cancels it outright.",
             "evidence": "booking/services/booking_waitlist_service.py:update_waitlist_status"
           },
           {
@@ -91,7 +91,7 @@
             "evidence": "booking/services/booking_service.py:update_reservation_status"
           },
           {
-            "fact": "A booking's payment can be split into up to three deadlines \u2014 first, second, and residue \u2014 each computed from the tenant's configured number of days after booking (first) or before departure (second, residue); any stage the booking doesn't actually use (for example, no second payment at all) is left out of the schedule.",
+            "fact": "A booking's payment can be split into up to three deadlines — first, second, and residue — each computed from the tenant's configured number of days after booking (first) or before departure (second, residue); any stage the booking doesn't actually use (for example, no second payment at all) is left out of the schedule.",
             "evidence": "booking/services/payment_deadline_service.py:PaymentDeadlineService.get_booking_payment_deadline_dates,compute_payment_deadline_dates,resolve_payment_flags"
           },
           {
@@ -117,11 +117,11 @@
             "evidence": "booking/services/booking_service.py:check_amount_is_valid_for_refund"
           },
           {
-            "fact": "A booking carries its own booking fee percentage (defaulting to 40%, mirroring the tour's default), a second/balance payment portion, and a cancellation fee percentage \u2014 each can override the tour-level defaults per booking.",
+            "fact": "A booking carries its own booking fee percentage (defaulting to 40%, mirroring the tour's default), a second/balance payment portion, and a cancellation fee percentage — each can override the tour-level defaults per booking.",
             "evidence": "booking/models/booking.py:booking_fee_percent"
           },
           {
-            "fact": "A booking can be flagged for dynamic cancellation pricing instead of a flat cancellation fee \u2014 mirroring the same option on the Tours feature.",
+            "fact": "A booking can be flagged for dynamic cancellation pricing instead of a flat cancellation fee — mirroring the same option on the Tours feature.",
             "evidence": "booking/models/booking.py:is_dynamic_cancellation"
           },
           {
@@ -129,11 +129,11 @@
             "evidence": "booking/services/payment_deadline_service.py:PaymentDeadlineService.compute_payment_deadline_dates"
           },
           {
-            "fact": "Payment deadlines are always kept in order \u2014 the second payment date can never fall before the first, and the residue date can never fall before the second.",
+            "fact": "Payment deadlines are always kept in order — the second payment date can never fall before the first, and the residue date can never fall before the second.",
             "evidence": "booking/services/payment_deadline_service.py:PaymentDeadlineService._enforce_deadline_ordering"
           },
           {
-            "fact": "If staff push a tour's own accounting project onto its bookings, only the bookings still pointing at a different project are updated \u2014 bookings already matching are left untouched.",
+            "fact": "If staff push a tour's own accounting project onto its bookings, only the bookings still pointing at a different project are updated — bookings already matching are left untouched.",
             "evidence": "booking/services/booking_service.py:BookingService.sync_bookings_project_with_tour"
           }
         ],
@@ -179,7 +179,7 @@
         ],
         "field_meanings": [
           {
-            "fact": "booking_status distinguishes Booked, Cancelled, Pending, Quote Cancelled, and Waitlist \u2014 Waitlist bookings reuse the quote-status field to track their acceptance/rejection since they follow the same flow as a quote once accepted.",
+            "fact": "booking_status distinguishes Booked, Cancelled, Pending, Quote Cancelled, and Waitlist — Waitlist bookings reuse the quote-status field to track their acceptance/rejection since they follow the same flow as a quote once accepted.",
             "evidence": "booking/constants.py:BookingStatus"
           },
           {
@@ -447,91 +447,91 @@
         ],
         "field_meanings": [
           {
-            "fact": "First Name / Last Name \u2014 the passenger's everyday given and family name, required.",
+            "fact": "First Name / Last Name — the passenger's everyday given and family name, required.",
             "evidence": "passenger/models/passenger_model.py:Passenger.first_name/last_name"
           },
           {
-            "fact": "Email \u2014 the passenger's unique contact email; used to detect the same client across separate bookings and imports.",
+            "fact": "Email — the passenger's unique contact email; used to detect the same client across separate bookings and imports.",
             "evidence": "passenger/models/passenger_model.py:Passenger.email"
           },
           {
-            "fact": "Salutation \u2014 Mr, Mrs, or Ms.",
+            "fact": "Salutation — Mr, Mrs, or Ms.",
             "evidence": "passenger/constants.py:NAME_TITLE_CHOICE"
           },
           {
-            "fact": "Address, Post Code, City \u2014 home/mailing address; Address is shown and edited as one combined field.",
+            "fact": "Address, Post Code, City — home/mailing address; Address is shown and edited as one combined field.",
             "evidence": "passenger/models/passenger_model.py:Passenger.address"
           },
           {
-            "fact": "Gender \u2014 Male or Female.",
+            "fact": "Gender — Male or Female.",
             "evidence": "passenger/constants.py:GENDER_CHOICE"
           },
           {
-            "fact": "Date of Birth \u2014 the passenger's birthdate.",
+            "fact": "Date of Birth — the passenger's birthdate.",
             "evidence": "passenger/models/passenger_model.py:Passenger.date_of_birth"
           },
           {
-            "fact": "National ID Number \u2014 the passenger's national identity/personnummer.",
+            "fact": "National ID Number — the passenger's national identity/personnummer.",
             "evidence": "passenger/models/passenger_model.py:Passenger.personal_identity_number"
           },
           {
-            "fact": "Passport Number / Passport Expiry Date \u2014 the passenger's travel document identifiers and validity.",
+            "fact": "Passport Number / Passport Expiry Date — the passenger's travel document identifiers and validity.",
             "evidence": "passenger/models/passenger_model.py:Passenger.passport_number/passport_expiry_date"
           },
           {
-            "fact": "Passport Name (Given Name / Surname) \u2014 the name exactly as printed on the passport, kept separate from the everyday First/Last Name.",
+            "fact": "Passport Name (Given Name / Surname) — the name exactly as printed on the passport, kept separate from the everyday First/Last Name.",
             "evidence": "passenger/models/passenger_model.py:Passenger.given_name/surname"
           },
           {
-            "fact": "Passport Birth City \u2014 city of birth as shown on the passport.",
+            "fact": "Passport Birth City — city of birth as shown on the passport.",
             "evidence": "passenger/models/passenger_model.py:Passenger.passport_birth_city"
           },
           {
-            "fact": "Nationality \u2014 the passenger's nationality/citizenship.",
+            "fact": "Nationality — the passenger's nationality/citizenship.",
             "evidence": "passenger/models/passenger_model.py:Passenger.nationality"
           },
           {
-            "fact": "Telephone Number \u2014 the passenger's primary contact phone number.",
+            "fact": "Telephone Number — the passenger's primary contact phone number.",
             "evidence": "passenger/models/passenger_model.py:Passenger.telephone_number"
           },
           {
-            "fact": "Allergy / Allergy Description \u2014 whether the passenger has a known allergy and a free-text description.",
+            "fact": "Allergy / Allergy Description — whether the passenger has a known allergy and a free-text description.",
             "evidence": "passenger/models/passenger_model.py:Passenger.allergy/allergy_description"
           },
           {
-            "fact": "Additional Information \u2014 free-text notes relevant to the passenger's travel (e.g. meal preference).",
+            "fact": "Additional Information — free-text notes relevant to the passenger's travel (e.g. meal preference).",
             "evidence": "passenger/models/passenger_model.py:Passenger.additional_info"
           },
           {
-            "fact": "Emergency Contact Name / Telephone / Email / Relation \u2014 next-of-kin contact details.",
+            "fact": "Emergency Contact Name / Telephone / Email / Relation — next-of-kin contact details.",
             "evidence": "passenger/models/passenger_model.py:Passenger.emergency_contact_name/_telephone_number/_email/_relation"
           },
           {
-            "fact": "Preferred Language, Currency, Country of Residence \u2014 the passenger's communication and billing preferences.",
+            "fact": "Preferred Language, Currency, Country of Residence — the passenger's communication and billing preferences.",
             "evidence": "passenger/models/passenger_model.py:Passenger.language/currency/country"
           },
           {
-            "fact": "Newsletter Subscription (and date) \u2014 whether the passenger has opted into marketing communication, and when.",
+            "fact": "Newsletter Subscription (and date) — whether the passenger has opted into marketing communication, and when.",
             "evidence": "passenger/models/passenger_model.py:Passenger.newsletter_subscription/newsletter_subscription_date"
           },
           {
-            "fact": "Organizations \u2014 companies or organizations this passenger is associated with (e.g. a corporate travel client).",
+            "fact": "Organizations — companies or organizations this passenger is associated with (e.g. a corporate travel client).",
             "evidence": "passenger/models/passenger_model.py:Passenger.organizations"
           },
           {
-            "fact": "Linked Account \u2014 the login account this passenger uses to access the customer portal, if any; deactivating one deactivates the other.",
+            "fact": "Linked Account — the login account this passenger uses to access the customer portal, if any; deactivating one deactivates the other.",
             "evidence": "passenger/models/passenger_model.py:Passenger.user"
           },
           {
-            "fact": "Tags \u2014 free-form labels used to categorize passengers (e.g. 'VIP', 'Frequent').",
+            "fact": "Tags — free-form labels used to categorize passengers (e.g. 'VIP', 'Frequent').",
             "evidence": "passenger/models/passenger_model.py:Passenger.tags"
           },
           {
-            "fact": "Active/Inactive Status (with changed-by and changed-at) \u2014 whether the passenger record is active; deactivating is the only form of 'deleting' a passenger, and every change is logged with who did it and when.",
+            "fact": "Active/Inactive Status (with changed-by and changed-at) — whether the passenger record is active; deactivating is the only form of 'deleting' a passenger, and every change is logged with who did it and when.",
             "evidence": "passenger/models/passenger_model.py:Passenger.is_active/status_changed_by/status_changed_timestamp"
           },
           {
-            "fact": "A Co-Passenger is a separate, lightweight 'known traveler' entry saved under a customer's own account, distinct from the master Passenger/client record \u2014 used to speed up adding the same travel companions to future bookings.",
+            "fact": "A Co-Passenger is a separate, lightweight 'known traveler' entry saved under a customer's own account, distinct from the master Passenger/client record — used to speed up adding the same travel companions to future bookings.",
             "evidence": "booking/models/co_passenger_model.py:CoPassenger.primary_passenger"
           },
           {
@@ -575,7 +575,7 @@
         ],
         "side_effects": [
           {
-            "fact": "Adding travelers to a booking reuses an existing passenger record by matching email, and creates a new one only if there's no match \u2014 so the same client across multiple bookings stays as one passenger record.",
+            "fact": "Adding travelers to a booking reuses an existing passenger record by matching email, and creates a new one only if there's no match — so the same client across multiple bookings stays as one passenger record.",
             "evidence": "passenger/services/passenger_service.py:PassengerService.create_passengers"
           },
           {
@@ -603,7 +603,7 @@
     },
     {
       "id": "flights-tickets",
-      "name": "Flights & Ticketing (PNR) \u2014 Overview",
+      "name": "Flights & Ticketing (PNR) — Overview",
       "summary": "Overview of PNR/flight-ticket records and how they get linked to bookings; see child docs for detail.",
       "files": [
         "ticket_management/**",
@@ -638,7 +638,7 @@
         "permissions": [],
         "field_meanings": [
           {
-            "fact": "PNR \u2014 a single flight-ticket booking reference (from an airline/GDS or entered manually) that can be linked to one or more bookings.",
+            "fact": "PNR — a single flight-ticket booking reference (from an airline/GDS or entered manually) that can be linked to one or more bookings.",
             "evidence": "ticket_management/models/ticket_model.py:Pnr"
           }
         ],
@@ -740,7 +740,7 @@
             "evidence": "ticket_management/serializers/ticket_file_serializers.py:TicketsFileSerializers.MAX_FILE_SIZE_BYTES"
           },
           {
-            "fact": "A bulk-import row needs values for PNR reference, whether it's a group PNR, passenger count, departure and destination, departure/arrival dates, and departure/arrival times, plus the supplier \u2014 all of these are mandatory.",
+            "fact": "A bulk-import row needs values for PNR reference, whether it's a group PNR, passenger count, departure and destination, departure/arrival dates, and departure/arrival times, plus the supplier — all of these are mandatory.",
             "evidence": "ticket_management/services/ticket_file_services.py:TicketsFileService.validate_rows"
           },
           {
@@ -764,7 +764,7 @@
             "evidence": "ticket_management/services/pnr_ticket_service.py:PnrTicketService.create_or_update_pnr_tickets_gds/change_ticket_status"
           },
           {
-            "fact": "Seat/ticket counts never go negative \u2014 reducing an allocation below zero is floored at zero instead of erroring.",
+            "fact": "Seat/ticket counts never go negative — reducing an allocation below zero is floored at zero instead of erroring.",
             "evidence": "ticket_management/services/pnr_service.py:PNRService.reduce_number_of_allocated_tickets_quantity"
           },
           {
@@ -776,7 +776,7 @@
             "evidence": "ticket_management/services/ticket_supplier_service.py:TicketSupplierService.check_this_ticket_supplier_has_active_ticket"
           },
           {
-            "fact": "An error PNR is tracked separately per combination of PNR reference, source system, and status \u2014 so the same PNR can have more than one open error if it fails for different reasons or from different systems.",
+            "fact": "An error PNR is tracked separately per combination of PNR reference, source system, and status — so the same PNR can have more than one open error if it fails for different reasons or from different systems.",
             "evidence": "ticket_management/models/error_pnr_model.py"
           },
           {
@@ -832,7 +832,7 @@
         ],
         "permissions": [
           {
-            "fact": "Uploading a bulk ticket Excel file only requires being logged in \u2014 no specific ticket-management permission is checked.",
+            "fact": "Uploading a bulk ticket Excel file only requires being logged in — no specific ticket-management permission is checked.",
             "evidence": "ticket_management/views/ticket_file_views.py:TicketsFileViewSet"
           },
           {
@@ -848,57 +848,57 @@
             "evidence": "ticket_management/views/ticket_supplier_views.py:TicketSupplierAPIViewSet"
           },
           {
-            "fact": "Ticket types can only be viewed by regular staff \u2014 creating or editing them is only possible from the platform's central administration console.",
+            "fact": "Ticket types can only be viewed by regular staff — creating or editing them is only possible from the platform's central administration console.",
             "evidence": "ticket_management/views/ticket_type_views.py:TicketTypeAPIViewSet; ticket_management/views/admin_ticket_type_views.py"
           }
         ],
         "field_meanings": [
           {
-            "fact": "PNR Reference \u2014 the airline/GDS booking reference code for this ticket record.",
+            "fact": "PNR Reference — the airline/GDS booking reference code for this ticket record.",
             "evidence": "ticket_management/models/ticket_model.py:Pnr.pnr"
           },
           {
-            "fact": "Source \u2014 whether the PNR was synced automatically from the airline/GDS system or entered manually by staff.",
+            "fact": "Source — whether the PNR was synced automatically from the airline/GDS system or entered manually by staff.",
             "evidence": "ticket_management/models/ticket_model.py:Pnr.ticket_source_type"
           },
           {
-            "fact": "Upload Method \u2014 how the PNR entered the system: bulk Excel upload, manual entry, or automatic GDS sync.",
+            "fact": "Upload Method — how the PNR entered the system: bulk Excel upload, manual entry, or automatic GDS sync.",
             "evidence": "ticket_management/constant.py:TicketUploadType"
           },
           {
-            "fact": "Total Tickets / Allocated Tickets \u2014 how many seats the PNR holds in total, and how many of those are already reserved against bookings; the remainder is what's still available.",
+            "fact": "Total Tickets / Allocated Tickets — how many seats the PNR holds in total, and how many of those are already reserved against bookings; the remainder is what's still available.",
             "evidence": "ticket_management/models/ticket_model.py:Pnr.number_of_tickets/number_of_allocated_tickets"
           },
           {
-            "fact": "Group PNR \u2014 marks a PNR as a block/group booking of shared seats rather than individually tracked passenger tickets.",
+            "fact": "Group PNR — marks a PNR as a block/group booking of shared seats rather than individually tracked passenger tickets.",
             "evidence": "ticket_management/models/ticket_model.py:Pnr.is_group_pnr"
           },
           {
-            "fact": "Deadline, Reminder Days, Reminder Email \u2014 when action (e.g. ticketing) is due, how many days beforehand to send a reminder, and who receives it.",
+            "fact": "Deadline, Reminder Days, Reminder Email — when action (e.g. ticketing) is due, how many days beforehand to send a reminder, and who receives it.",
             "evidence": "ticket_management/models/ticket_model.py:Pnr.deadline/reminder_days/reminder_email"
           },
           {
-            "fact": "Departure/Destination \u2014 the overall trip's starting and final point, worked out automatically from the individual flight segments.",
+            "fact": "Departure/Destination — the overall trip's starting and final point, worked out automatically from the individual flight segments.",
             "evidence": "ticket_management/services/pnr_service.py:TicketDestinationService.get_destination_from_round_trip_itineraries"
           },
           {
-            "fact": "Flight Segment (Itinerary) fields \u2014 flight number, departure/arrival airport, date and time, carrier, cabin class, number of stops, and aircraft type for one leg of the trip.",
+            "fact": "Flight Segment (Itinerary) fields — flight number, departure/arrival airport, date and time, carrier, cabin class, number of stops, and aircraft type for one leg of the trip.",
             "evidence": "ticket_management/models/ticket_model.py:Itinerary"
           },
           {
-            "fact": "Named Passenger (PNR Passenger) \u2014 a traveler's name, type (e.g. adult/child), date of birth, and how many tickets they hold on this PNR.",
+            "fact": "Named Passenger (PNR Passenger) — a traveler's name, type (e.g. adult/child), date of birth, and how many tickets they hold on this PNR.",
             "evidence": "ticket_management/models/ticket_model.py:PnrPassenger"
           },
           {
-            "fact": "Ticket Line (PNR Ticket) \u2014 one issued e-ticket: ticket number, traveler name, fare amounts, carrier, issue date, and its status (Issued, Void, or Refund).",
+            "fact": "Ticket Line (PNR Ticket) — one issued e-ticket: ticket number, traveler name, fare amounts, carrier, issue date, and its status (Issued, Void, or Refund).",
             "evidence": "ticket_management/models/ticket_model.py:PnrTicket"
           },
           {
-            "fact": "Ticket Supplier \u2014 the airline or ticketing supplier a flight segment's ticket was bought through.",
+            "fact": "Ticket Supplier — the airline or ticketing supplier a flight segment's ticket was bought through.",
             "evidence": "ticket_management/models/ticket_supplier_model.py:TicketSupplier"
           },
           {
-            "fact": "Error PNR status \u2014 Failed to Retrieve (the initial automatic fetch didn't work), In Error Queue (waiting on retry), or Resolved.",
+            "fact": "Error PNR status — Failed to Retrieve (the initial automatic fetch didn't work), In Error Queue (waiting on retry), or Resolved.",
             "evidence": "ticket_management/constant.py"
           }
         ],
@@ -912,7 +912,7 @@
             "evidence": "ticket_management/services/pnr_service.py:PNRService.create"
           },
           {
-            "fact": "For a PNR that came from an automatic GDS sync, staff can only adjust its deadline and add remarks to its flight segments \u2014 everything else stays under GDS control.",
+            "fact": "For a PNR that came from an automatic GDS sync, staff can only adjust its deadline and add remarks to its flight segments — everything else stays under GDS control.",
             "evidence": "ticket_management/services/pnr_service.py:PNRService.update"
           },
           {
@@ -1021,7 +1021,7 @@
             "evidence": "ticket_management/serializers/assigned_ticket_serializes.py:GroupAssignTicketSerializer"
           },
           {
-            "fact": "A seat reservation can't be removed once any passenger has been assigned to it \u2014 staff must unassign passengers first.",
+            "fact": "A seat reservation can't be removed once any passenger has been assigned to it — staff must unassign passengers first.",
             "evidence": "ticket_management/views/assigned_ticket_views.py:BookingTicketsAPIViewSet.destroy"
           },
           {
@@ -1047,7 +1047,7 @@
             "evidence": "ticket_management/serializers/booking_ticket_serializers.py:BookingTicketCreateSerializer.validate_number_of_tickets"
           },
           {
-            "fact": "Only one seat reservation is allowed per booking-and-PNR combination \u2014 a second attempt is rejected.",
+            "fact": "Only one seat reservation is allowed per booking-and-PNR combination — a second attempt is rejected.",
             "evidence": "ticket_management/services/booking_ticket_services.py:BookingTicketService.create"
           },
           {
@@ -1055,7 +1055,7 @@
             "evidence": "ticket_management/services/booking_ticket_services.py:BookingTicketService.update"
           },
           {
-            "fact": "Only one passenger can be assigned per seat reservation slot \u2014 the same passenger can't be assigned twice to the same reservation, and the same seat slot can't hold two passengers.",
+            "fact": "Only one passenger can be assigned per seat reservation slot — the same passenger can't be assigned twice to the same reservation, and the same seat slot can't hold two passengers.",
             "evidence": "ticket_management/serializers/assigned_ticket_serializes.py:AssignTicketCreateSerializer"
           },
           {
@@ -1063,7 +1063,7 @@
             "evidence": "ticket_management/services/assigned_ticket_services.py:AssignedTicketService.create"
           },
           {
-            "fact": "One-click group assignment only works when the reservation's seat count, the number of passengers needing transport, and the booking's total passenger count are all exactly equal \u2014 any mismatch, or an already-fully-assigned reservation, blocks the action.",
+            "fact": "One-click group assignment only works when the reservation's seat count, the number of passengers needing transport, and the booking's total passenger count are all exactly equal — any mismatch, or an already-fully-assigned reservation, blocks the action.",
             "evidence": "ticket_management/serializers/assigned_ticket_serializes.py:GroupAssignTicketSerializer.validate"
           },
           {
@@ -1071,7 +1071,7 @@
             "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.sync_booking_flight_itineraries"
           },
           {
-            "fact": "Removing a PNR from a booking is refused outright if any billing line exists on its flight segments \u2014 issued or not \u2014 and refused with a more specific message if that billing has already been issued.",
+            "fact": "Removing a PNR from a booking is refused outright if any billing line exists on its flight segments — issued or not — and refused with a more specific message if that billing has already been issued.",
             "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.delete_booking_itinerary_pnr/validate_segments_financial_lines_before_deletion"
           },
           {
@@ -1135,7 +1135,7 @@
         ],
         "permissions": [
           {
-            "fact": "Reserving seats from a PNR, assigning/reassigning/unassigning passengers, group-assigning, and downloading passenger manifests all only require the staff member to be logged in \u2014 no dedicated permission beyond that.",
+            "fact": "Reserving seats from a PNR, assigning/reassigning/unassigning passengers, group-assigning, and downloading passenger manifests all only require the staff member to be logged in — no dedicated permission beyond that.",
             "evidence": "ticket_management/views/assigned_ticket_views.py"
           },
           {
@@ -1149,33 +1149,33 @@
         ],
         "field_meanings": [
           {
-            "fact": "Reserved Seats / Assigned Seats \u2014 how many seats a booking has reserved from a PNR, and how many of those have actually been given to a named passenger so far.",
+            "fact": "Reserved Seats / Assigned Seats — how many seats a booking has reserved from a PNR, and how many of those have actually been given to a named passenger so far.",
             "evidence": "ticket_management/models/assign_ticket_model.py:BookingTicket"
           },
           {
-            "fact": "Seat Assignment \u2014 the link between one reserved seat and the specific traveling passenger it belongs to.",
+            "fact": "Seat Assignment — the link between one reserved seat and the specific traveling passenger it belongs to.",
             "evidence": "ticket_management/models/assign_ticket_model.py:AssignedTicket"
           },
           {
-            "fact": "Booking's Flight Segment \u2014 a copy of a PNR's flight-leg details (times, airports, carrier) kept on the booking itself, so viewing or printing a booking's itinerary doesn't depend on the master PNR staying unchanged.",
+            "fact": "Booking's Flight Segment — a copy of a PNR's flight-leg details (times, airports, carrier) kept on the booking itself, so viewing or printing a booking's itinerary doesn't depend on the master PNR staying unchanged.",
             "evidence": "booking/models/booking_flight_itinerary_model.py"
           },
           {
-            "fact": "Show in Itinerary \u2014 lets staff hide a flight segment from the customer-facing itinerary/printout without deleting it from the booking.",
+            "fact": "Show in Itinerary — lets staff hide a flight segment from the customer-facing itinerary/printout without deleting it from the booking.",
             "evidence": "booking/models/booking_flight_itinerary_model.py"
           },
           {
-            "fact": "Manually Added \u2014 marks a flight segment or ticket line that a staff member entered directly on the booking, rather than one that came from syncing a PNR.",
+            "fact": "Manually Added — marks a flight segment or ticket line that a staff member entered directly on the booking, rather than one that came from syncing a PNR.",
             "evidence": "booking/models/booking_flight_itinerary_model.py; booking/models/booking_pnr_ticket_model.py"
           }
         ],
         "journeys": [
           {
-            "fact": "To get a passenger flying: staff first reserve however many seats they need from an active PNR against the confirmed booking (blocked if the booking isn't Booked, the PNR is inactive, or there aren't enough seats/passengers to justify it) \u2014 this also fills in the booking's own flight-segment display right away.",
+            "fact": "To get a passenger flying: staff first reserve however many seats they need from an active PNR against the confirmed booking (blocked if the booking isn't Booked, the PNR is inactive, or there aren't enough seats/passengers to justify it) — this also fills in the booking's own flight-segment display right away.",
             "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.link_pnr_booking_passengers"
           },
           {
-            "fact": "Staff then assign each traveling passenger to one of the reserved seats one at a time, or \u2014 if the numbers line up exactly \u2014 assign everyone in a single group action instead.",
+            "fact": "Staff then assign each traveling passenger to one of the reserved seats one at a time, or — if the numbers line up exactly — assign everyone in a single group action instead.",
             "evidence": "ticket_management/serializers/assigned_ticket_serializes.py:AssignTicketCreateSerializer, GroupAssignTicketSerializer"
           },
           {
@@ -1187,7 +1187,7 @@
             "evidence": "booking/views/booking_itinerary_views.py:BookingFlightItineraryPnrRecreateSegmentsAPIView; booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.resync_booking_itineraries"
           },
           {
-            "fact": "To remove a flight from a booking entirely, staff remove the linked PNR \u2014 but this is refused if any billing has already been created from those flight segments, so staff need to resolve the billing first.",
+            "fact": "To remove a flight from a booking entirely, staff remove the linked PNR — but this is refused if any billing has already been created from those flight segments, so staff need to resolve the billing first.",
             "evidence": "booking/services/booking_flight_itinerary_service.py:BookingFlightItineraryService.delete_booking_itinerary_pnr"
           }
         ],
@@ -1286,7 +1286,7 @@
             "evidence": "tour/services/tour_service.py:create_tour"
           },
           {
-            "fact": "Activating/deactivating a tour (update_status) is blocked with a specific error if the tour has an active booking, an active waitlist booking, any inactive supplements attached, or assigned tour guides \u2014 staff must resolve each condition first.",
+            "fact": "Activating/deactivating a tour (update_status) is blocked with a specific error if the tour has an active booking, an active waitlist booking, any inactive supplements attached, or assigned tour guides — staff must resolve each condition first.",
             "evidence": "tour/services/tour_service.py:update_status"
           },
           {
@@ -1312,7 +1312,7 @@
         ],
         "rules": [
           {
-            "fact": "A tour's standard_price must be greater than or equal to its transfer_price (transport cost) \u2014 zero-priced tours are explicitly allowed, but the tour price can never be cheaper than the transfer cost.",
+            "fact": "A tour's standard_price must be greater than or equal to its transfer_price (transport cost) — zero-priced tours are explicitly allowed, but the tour price can never be cheaper than the transfer cost.",
             "evidence": "tour/services/tour_service.py:validate_standard_price"
           },
           {
@@ -1320,7 +1320,7 @@
             "evidence": "tour/services/tour_service.py:validate_standard_price"
           },
           {
-            "fact": "Setting a tour to draft (is_draft=True) always forces it inactive (is_active=False); taking it out of draft always forces it active \u2014 draft and active status are mutually coupled, both at creation and via the dedicated draft-toggle endpoint.",
+            "fact": "Setting a tour to draft (is_draft=True) always forces it inactive (is_active=False); taking it out of draft always forces it active — draft and active status are mutually coupled, both at creation and via the dedicated draft-toggle endpoint.",
             "evidence": "tour/services/tour_service.py:create_tour"
           },
           {
@@ -1328,11 +1328,11 @@
             "evidence": "tour/models/tour_model.py:booking_fee_percent"
           },
           {
-            "fact": "A tour can price its cancellation either as a static cancel_fee/cancel_fee_percent, or opt into dynamic cancellation pricing (is_dynamic_cancellation) \u2014 the dynamic calculation itself is part of the Booking feature's cancellation logic, not the tour record.",
+            "fact": "A tour can price its cancellation either as a static cancel_fee/cancel_fee_percent, or opt into dynamic cancellation pricing (is_dynamic_cancellation) — the dynamic calculation itself is part of the Booking feature's cancellation logic, not the tour record.",
             "evidence": "tour/models/tour_model.py:cancel_fee"
           },
           {
-            "fact": "Public/customer-facing tour listings only show a tour if it has no allowed_hosts restriction (visible on every brand) or the requesting domain is explicitly in its allowed_hosts \u2014 this is the multi-brand visibility gate for the booking widget and public site.",
+            "fact": "Public/customer-facing tour listings only show a tour if it has no allowed_hosts restriction (visible on every brand) or the requesting domain is explicitly in its allowed_hosts — this is the multi-brand visibility gate for the booking widget and public site.",
             "evidence": "tour/services/tour_service.py:get_public_tour_queryset"
           }
         ],
@@ -1352,11 +1352,11 @@
         ],
         "permissions": [
           {
-            "fact": "Staff tour CRUD (TourAPIViewSet) requires authentication plus Django model permissions (add/change/delete_tour) \u2014 standard staff-role gating.",
+            "fact": "Staff tour CRUD (TourAPIViewSet) requires authentication plus Django model permissions (add/change/delete_tour) — standard staff-role gating.",
             "evidence": "tour/views/tour_view.py:permission_classes"
           },
           {
-            "fact": "Public tour browsing (PublicTourViewSet, availability, search, room-type preview) has no authentication requirement \u2014 open to anyone, gated only by the allowed_hosts domain filter above, not by login.",
+            "fact": "Public tour browsing (PublicTourViewSet, availability, search, room-type preview) has no authentication requirement — open to anyone, gated only by the allowed_hosts domain filter above, not by login.",
             "evidence": "tour/views/public_tour_view.py:PublicTourViewSet"
           },
           {
@@ -1402,7 +1402,7 @@
         ],
         "side_effects": [
           {
-            "fact": "Creating a tour triggers an admin email notification, creates passenger-type and multilanguage records for the tour, applies default/requested pickup locations, and sets local prices \u2014 all as part of the same create step.",
+            "fact": "Creating a tour triggers an admin email notification, creates passenger-type and multilanguage records for the tour, applies default/requested pickup locations, and sets local prices — all as part of the same create step.",
             "evidence": "tour/services/tour_service.py:create_tour"
           },
           {
@@ -1535,7 +1535,7 @@
             "evidence": "tour_type/services/tour_type_services.py:TourTypeService.create"
           },
           {
-            "fact": "The total seats assigned across all of a tour type's pickup locations can't exceed the tour type's overall capacity \u2014 for example, a tour type with a capacity of 20 can't have pickup locations adding up to 25 seats.",
+            "fact": "The total seats assigned across all of a tour type's pickup locations can't exceed the tour type's overall capacity — for example, a tour type with a capacity of 20 can't have pickup locations adding up to 25 seats.",
             "evidence": "tour_type/serializers/tour_type_serializer.py:TourTypeSerializer.validate_pickup_locations"
           },
           {
@@ -1551,7 +1551,7 @@
             "evidence": "tour_type/services/tour_type_vehicle_services.py:create_or_update_tour_type_vehicle"
           },
           {
-            "fact": "Supplements, vehicles, and accommodations assigned to a tour type must all be active \u2014 inactive ones are rejected.",
+            "fact": "Supplements, vehicles, and accommodations assigned to a tour type must all be active — inactive ones are rejected.",
             "evidence": "tour_type/serializers/tour_type_serializer.py:TourTypeSerializer.validate_supplements/validate_vehicles/validate_accommodations"
           },
           {
@@ -1621,67 +1621,67 @@
         ],
         "field_meanings": [
           {
-            "fact": "Name / Description / Tour Information \u2014 the tour template's default-language display name, description, and operational information shown to staff and customers.",
+            "fact": "Name / Description / Tour Information — the tour template's default-language display name, description, and operational information shown to staff and customers.",
             "evidence": "tour_type/models/tour_type_model.py"
           },
           {
-            "fact": "Duration \u2014 the length of the tour.",
+            "fact": "Duration — the length of the tour.",
             "evidence": "tour_type/models/tour_type_model.py"
           },
           {
-            "fact": "Capacity \u2014 the maximum total number of passengers this tour template supports, used to cap how many pickup-location seats can be assigned.",
+            "fact": "Capacity — the maximum total number of passengers this tour template supports, used to cap how many pickup-location seats can be assigned.",
             "evidence": "tour_type/models/tour_type_model.py"
           },
           {
-            "fact": "Standard Price / Transfer Price \u2014 the base price for the tour, and the portion of that price allocated to transport; the standard price can never be lower than the transfer price.",
+            "fact": "Standard Price / Transfer Price — the base price for the tour, and the portion of that price allocated to transport; the standard price can never be lower than the transfer price.",
             "evidence": "tour_type/models/tour_type_model.py"
           },
           {
-            "fact": "Fee Type \u2014 whether booking, second-payment, cancellation, and travel-insurance fees are calculated as a percentage of the price or as flat amounts.",
+            "fact": "Fee Type — whether booking, second-payment, cancellation, and travel-insurance fees are calculated as a percentage of the price or as flat amounts.",
             "evidence": "tour_type/models/tour_type_model.py"
           },
           {
-            "fact": "Booking Fee, Second Payment, Cancellation Fee, Travel Insurance Fee \u2014 the calculated deposit, balance payment, cancellation charge, and insurance charge for tours built from this template.",
+            "fact": "Booking Fee, Second Payment, Cancellation Fee, Travel Insurance Fee — the calculated deposit, balance payment, cancellation charge, and insurance charge for tours built from this template.",
             "evidence": "tour_type/models/tour_type_model.py"
           },
           {
-            "fact": "Territory / Country / Location \u2014 where the tour operates geographically.",
+            "fact": "Territory / Country / Location — where the tour operates geographically.",
             "evidence": "tour_type/models/tour_type_model.py"
           },
           {
-            "fact": "Supplements \u2014 optional paid add-ons customers can book alongside a tour of this type.",
+            "fact": "Supplements — optional paid add-ons customers can book alongside a tour of this type.",
             "evidence": "tour_type/models/tour_type_model.py"
           },
           {
-            "fact": "Accommodations \u2014 hotel/lodging options linked to this tour type.",
+            "fact": "Accommodations — hotel/lodging options linked to this tour type.",
             "evidence": "tour_type/models/tour_type_model.py"
           },
           {
-            "fact": "VAT Class \u2014 the tax classification applied to this tour type's pricing; defaults to \"No VAT\" if not set.",
+            "fact": "VAT Class — the tax classification applied to this tour type's pricing; defaults to \"No VAT\" if not set.",
             "evidence": "tour_type/models/tour_type_model.py"
           },
           {
-            "fact": "Allowed Hosts \u2014 which whitelabel sites/domains are permitted to show and sell this tour type.",
+            "fact": "Allowed Hosts — which whitelabel sites/domains are permitted to show and sell this tour type.",
             "evidence": "tour_type/models/tour_type_model.py"
           },
           {
-            "fact": "Tour Description URL \u2014 an external web page with more marketing detail about the tour.",
+            "fact": "Tour Description URL — an external web page with more marketing detail about the tour.",
             "evidence": "tour_type/models/tour_type_model.py"
           },
           {
-            "fact": "Pickup Location, Price, Seats, Remaining Seats \u2014 a specific pickup point available for the tour, any extra price for choosing it, how many seats are allocated there, and how many are still available.",
+            "fact": "Pickup Location, Price, Seats, Remaining Seats — a specific pickup point available for the tour, any extra price for choosing it, how many seats are allocated there, and how many are still available.",
             "evidence": "tour_type/models/tour_type_pickup_locations.py"
           },
           {
-            "fact": "Vehicle Assignment (Capacity, Active) \u2014 a specific vehicle usable for this tour type, how many seats it provides, and whether the assignment is currently in use.",
+            "fact": "Vehicle Assignment (Capacity, Active) — a specific vehicle usable for this tour type, how many seats it provides, and whether the assignment is currently in use.",
             "evidence": "tour_type/models/tour_type_vehicle.py"
           },
           {
-            "fact": "Translation (Name, Description, Tour Information) \u2014 the tour type's content shown to customers in a specific language.",
+            "fact": "Translation (Name, Description, Tour Information) — the tour type's content shown to customers in a specific language.",
             "evidence": "tour_type/models/tour_type_multi_language.py"
           },
           {
-            "fact": "Cost Center / Accounting Project \u2014 which internal accounting bucket this tour type's costs and revenue are attributed to.",
+            "fact": "Cost Center / Accounting Project — which internal accounting bucket this tour type's costs and revenue are attributed to.",
             "evidence": "tour_type/models/tour_type_model.py"
           }
         ],
@@ -1691,7 +1691,7 @@
             "evidence": "tour_type/services/tour_type_services.py:TourTypeService.create"
           },
           {
-            "fact": "To build out a tour type's presentation: staff add images afterward \u2014 the first one becomes the cover image automatically \u2014 and can change the cover image or delete images at any time.",
+            "fact": "To build out a tour type's presentation: staff add images afterward — the first one becomes the cover image automatically — and can change the cover image or delete images at any time.",
             "evidence": "tour_type/services/tour_type_image_service.py:create_tour_type_image"
           },
           {
@@ -1703,7 +1703,7 @@
             "evidence": "tour_type/services/tour_type_vehicle_services.py:create_or_update_tour_type_vehicle"
           },
           {
-            "fact": "To retire a tour type: staff deactivate it, which is blocked while any active Tour is still built from that template \u2014 the template first needs its dependent tours addressed.",
+            "fact": "To retire a tour type: staff deactivate it, which is blocked while any active Tour is still built from that template — the template first needs its dependent tours addressed.",
             "evidence": "tour_type/services/tour_type_services.py:update_status"
           }
         ],
@@ -1713,7 +1713,7 @@
             "evidence": "tour_type/services/tour_type_services.py:prepare_data"
           },
           {
-            "fact": "Resaving a tour type's pickup-location list removes any pickup location no longer included, and resets remaining seats to full for the ones that stay \u2014 so previously consumed seat counts are not preserved across an update.",
+            "fact": "Resaving a tour type's pickup-location list removes any pickup location no longer included, and resets remaining seats to full for the ones that stay — so previously consumed seat counts are not preserved across an update.",
             "evidence": "tour_type/services/tour_type_pickup_location_service.py:update_tour_type_pickup_locations"
           },
           {
@@ -1800,7 +1800,7 @@
             "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create"
           },
           {
-            "fact": "Staff can preview the full cost breakdown of an offer at any time \u2014 either using an offer that's already saved, or with raw pricing/capacity/supplement figures before anything is saved at all.",
+            "fact": "Staff can preview the full cost breakdown of an offer at any time — either using an offer that's already saved, or with raw pricing/capacity/supplement figures before anything is saved at all.",
             "evidence": "custom_tour_offer/services/custom_tour_offer_cost_preview_service.py:get_cost_previews_rows"
           },
           {
@@ -1850,7 +1850,7 @@
             "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create_tour_from_custom_tour_offer"
           },
           {
-            "fact": "Only an active offer can be converted into a booking \u2014 a deactivated, expired, or already-converted offer can't be.",
+            "fact": "Only an active offer can be converted into a booking — a deactivated, expired, or already-converted offer can't be.",
             "evidence": "custom_tour_offer/views/custom_tour_offer_views.py:BookingCreateFromCustomTourOfferAPIView.post"
           },
           {
@@ -1862,7 +1862,7 @@
             "evidence": "custom_tour_offer/services/wetu_itinerary_service.py:create_custom_tour_offer_from_wetu_itinerary"
           },
           {
-            "fact": "Only the staff member who created an internal note can edit it later \u2014 anyone else attempting to edit it is refused.",
+            "fact": "Only the staff member who created an internal note can edit it later — anyone else attempting to edit it is refused.",
             "evidence": "custom_tour_offer/services/custom_tour_offer_note_service.py:update"
           },
           {
@@ -1940,63 +1940,63 @@
         ],
         "field_meanings": [
           {
-            "fact": "Tour Name / Description / Tour Information \u2014 the display name, description, and detailed information about the bespoke tour package shown to the customer.",
+            "fact": "Tour Name / Description / Tour Information — the display name, description, and detailed information about the bespoke tour package shown to the customer.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
           },
           {
-            "fact": "Duration / Capacity / Departure & Return Date \u2014 the trip length in days, how many passengers it's sized for, and the trip's start/end dates.",
+            "fact": "Duration / Capacity / Departure & Return Date — the trip length in days, how many passengers it's sized for, and the trip's start/end dates.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
           },
           {
-            "fact": "Standard Price / Transfer Price \u2014 the base per-person tour price and the per-person cost of the pickup/transfer option.",
+            "fact": "Standard Price / Transfer Price — the base per-person tour price and the per-person cost of the pickup/transfer option.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
           },
           {
-            "fact": "Booking Currency / Conversion Rate \u2014 the currency the customer is actually charged in, and the exchange rate used to convert the offer's base price into that currency.",
+            "fact": "Booking Currency / Conversion Rate — the currency the customer is actually charged in, and the exchange rate used to convert the offer's base price into that currency.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
           },
           {
-            "fact": "Discounted / Discount Type / Discount Amount \u2014 whether a discount applies, whether it's a flat amount or a percentage, and its value.",
+            "fact": "Discounted / Discount Type / Discount Amount — whether a discount applies, whether it's a flat amount or a percentage, and its value.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_models.py; custom_tour_offer/constants.py"
           },
           {
-            "fact": "Grand Total \u2014 the final calculated total price of the offer after supplements, pickup, transfer, and discount, in the customer's billing currency.",
+            "fact": "Grand Total — the final calculated total price of the offer after supplements, pickup, transfer, and discount, in the customer's billing currency.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
           },
           {
-            "fact": "Offer Origin \u2014 whether the offer was created directly by staff or generated from an imported Wetu itinerary.",
+            "fact": "Offer Origin — whether the offer was created directly by staff or generated from an imported Wetu itinerary.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
           },
           {
-            "fact": "Draft / Active \u2014 whether the offer is still being worked on (draft) and whether it's currently usable/convertible (active); an offer is automatically deactivated once converted into a booking.",
+            "fact": "Draft / Active — whether the offer is still being worked on (draft) and whether it's currently usable/convertible (active); an offer is automatically deactivated once converted into a booking.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
           },
           {
-            "fact": "Tour and Booking Created \u2014 whether this offer has already been turned into a real Tour and Booking.",
+            "fact": "Tour and Booking Created — whether this offer has already been turned into a real Tour and Booking.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
           },
           {
-            "fact": "Email Sent \u2014 whether the offer has been emailed to the customer at least once.",
+            "fact": "Email Sent — whether the offer has been emailed to the customer at least once.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
           },
           {
-            "fact": "Duplicated From \u2014 a reference back to the original offer this one was copied from, if it's a duplicate.",
+            "fact": "Duplicated From — a reference back to the original offer this one was copied from, if it's a duplicate.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_models.py"
           },
           {
-            "fact": "Note / Edit History \u2014 an internal staff comment on the offer, along with a record of everything it said before each edit.",
+            "fact": "Note / Edit History — an internal staff comment on the offer, along with a record of everything it said before each edit.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_note.py"
           },
           {
-            "fact": "Pickup Location, Price, Seats, Remaining Seats \u2014 a specific pickup point offered with this deal, any extra price for it, and how many seats are allotted/available there.",
+            "fact": "Pickup Location, Price, Seats, Remaining Seats — a specific pickup point offered with this deal, any extra price for it, and how many seats are allotted/available there.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_pickup_locations.py"
           },
           {
-            "fact": "Supplement, Price, Quantity, Mandatory \u2014 an add-on included in the offer (e.g. a flight or hotel), its price and quantity, and whether it's required as part of the deal.",
+            "fact": "Supplement, Price, Quantity, Mandatory — an add-on included in the offer (e.g. a flight or hotel), its price and quantity, and whether it's required as part of the deal.",
             "evidence": "custom_tour_offer/models/custom_tour_offer_supplement.py"
           },
           {
-            "fact": "Wetu Itinerary Status \u2014 the booking status of the itinerary as recorded in Wetu; only an itinerary marked \"Booked\" there can become a custom tour offer.",
+            "fact": "Wetu Itinerary Status — the booking status of the itinerary as recorded in Wetu; only an itinerary marked \"Booked\" there can become a custom tour offer.",
             "evidence": "custom_tour_offer/models/wetu_model.py"
           }
         ],
@@ -2014,7 +2014,7 @@
             "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:send_custom_tour_offer_to_requested_user"
           },
           {
-            "fact": "Once the customer accepts, staff convert the offer directly into a real Tour and Booking in one action \u2014 after which the offer itself is locked and can't be converted again.",
+            "fact": "Once the customer accepts, staff convert the offer directly into a real Tour and Booking in one action — after which the offer itself is locked and can't be converted again.",
             "evidence": "custom_tour_offer/services/custom_tour_offer_service.py:create_tour_from_custom_tour_offer"
           },
           {
@@ -2106,11 +2106,11 @@
             "evidence": "hotel/services/hotel_service.py:create"
           },
           {
-            "fact": "Deactivating a hotel is blocked if any of its room types is currently used as allotment inventory on an active tour \u2014 staff must remove that dependency first.",
+            "fact": "Deactivating a hotel is blocked if any of its room types is currently used as allotment inventory on an active tour — staff must remove that dependency first.",
             "evidence": "hotel/services/hotel_service.py:check_is_used"
           },
           {
-            "fact": "Room-type inventory is tracked per date, per room type, split into two pools: a Fixed allotment (contracted rooms) and a Call-off allotment (rooms available on request/on-demand) \u2014 each with its own available/booked counts.",
+            "fact": "Room-type inventory is tracked per date, per room type, split into two pools: a Fixed allotment (contracted rooms) and a Call-off allotment (rooms available on request/on-demand) — each with its own available/booked counts.",
             "evidence": "hotel/models/room_type_inventory.py:RoomTypeInventory"
           },
           {
@@ -2140,11 +2140,11 @@
             "evidence": "hotel/services/hotel_service.py:check_is_used"
           },
           {
-            "fact": "A room type's total available rooms (fixed + call-off) can never be set lower than what's already booked plus reserved against it \u2014 validated per date and, for bulk edits, across the whole date range.",
+            "fact": "A room type's total available rooms (fixed + call-off) can never be set lower than what's already booked plus reserved against it — validated per date and, for bulk edits, across the whole date range.",
             "evidence": "hotel/services/room_type_inventory_service.py:validate_inventory"
           },
           {
-            "fact": "Fixed available rooms can never be set below fixed booked rooms, and call-off available rooms can never be set below call-off booked rooms \u2014 each pool is validated independently as well as in total.",
+            "fact": "Fixed available rooms can never be set below fixed booked rooms, and call-off available rooms can never be set below call-off booked rooms — each pool is validated independently as well as in total.",
             "evidence": "hotel/services/room_type_inventory_service.py:validate_inventory"
           },
           {
@@ -2168,7 +2168,7 @@
         ],
         "permissions": [
           {
-            "fact": "All hotel and room-type management (list/create/update/activate-deactivate) requires authentication plus Django model permissions \u2014 standard staff-role gating, no public access.",
+            "fact": "All hotel and room-type management (list/create/update/activate-deactivate) requires authentication plus Django model permissions — standard staff-role gating, no public access.",
             "evidence": "hotel/views/hotel_view.py:HotelListCreateAPIView"
           },
           {
@@ -2186,7 +2186,7 @@
             "evidence": "hotel/models/room_type_inventory.py:reserved_rooms"
           },
           {
-            "fact": "total_available_rooms (a computed property) is fixed + call-off available, minus reserved holds and total booked rooms \u2014 the number actually sellable right now for that date.",
+            "fact": "total_available_rooms (a computed property) is fixed + call-off available, minus reserved holds and total booked rooms — the number actually sellable right now for that date.",
             "evidence": "hotel/models/room_type_inventory.py:total_available_rooms"
           },
           {
@@ -2196,7 +2196,7 @@
         ],
         "journeys": [
           {
-            "fact": "Staff add a hotel (created inactive by default), attach its room types and inventory, then activate it once at least one room type exists \u2014 from then on it's eligible to be used in tour allotments.",
+            "fact": "Staff add a hotel (created inactive by default), attach its room types and inventory, then activate it once at least one room type exists — from then on it's eligible to be used in tour allotments.",
             "evidence": "hotel/services/hotel_service.py:create"
           },
           {
@@ -2218,7 +2218,7 @@
     },
     {
       "id": "yacht-booking",
-      "name": "Yacht Booking \u2014 Overview",
+      "name": "Yacht Booking — Overview",
       "summary": "Overview of the yacht charter catalog and booking flow; see child docs for detail.",
       "files": [
         "yacht_booking/**"
@@ -2325,7 +2325,7 @@
             "evidence": "yacht_booking/views/yacht.py:YachtListView/YachtRetrieveUpdateView"
           },
           {
-            "fact": "Staff manage reference data (world regions, sailing areas, shipyards, countries, companies, equipment) \u2014 viewing lists, toggling active/inactive, and triggering a re-sync from the provider.",
+            "fact": "Staff manage reference data (world regions, sailing areas, shipyards, countries, companies, equipment) — viewing lists, toggling active/inactive, and triggering a re-sync from the provider.",
             "evidence": "yacht_booking/views/world_region.py; yacht_booking/views/sailing_area.py; yacht_booking/views/shipyard.py; yacht_booking/views/company.py"
           },
           {
@@ -2351,7 +2351,7 @@
         ],
         "rules": [
           {
-            "fact": "A full catalog sync automatically deactivates any yacht (or other catalog entry) from that provider that's no longer present in the latest sync, unless it was added manually by staff \u2014 manually added entries are never touched by sync.",
+            "fact": "A full catalog sync automatically deactivates any yacht (or other catalog entry) from that provider that's no longer present in the latest sync, unless it was added manually by staff — manually added entries are never touched by sync.",
             "evidence": "yacht_booking/services/sync/generic.py:GenericSyncService.sync_multiple"
           },
           {
@@ -2363,7 +2363,7 @@
             "evidence": "yacht_booking/views/price_sheet.py:YachtPriceSheetCompanyListAPIView/YachtPriceSheetAPIView"
           },
           {
-            "fact": "Some catalog reference data \u2014 pricing measurement units, seasons, and services \u2014 is only available through one of the two charter providers; requesting it from the other is rejected outright.",
+            "fact": "Some catalog reference data — pricing measurement units, seasons, and services — is only available through one of the two charter providers; requesting it from the other is rejected outright.",
             "evidence": "yacht_booking/views/yacht.py:YachtPriceMeasurementListAPIView/YachtSeasonListAPIView/YachtServiceListAPIView"
           },
           {
@@ -2409,55 +2409,55 @@
         ],
         "field_meanings": [
           {
-            "fact": "Name, Model, Build Year, Shipyard \u2014 the yacht's identifying details and who built it.",
+            "fact": "Name, Model, Build Year, Shipyard — the yacht's identifying details and who built it.",
             "evidence": "yacht_booking/models/yacht_models.py"
           },
           {
-            "fact": "Kind (Yacht Type) \u2014 the category of yacht, such as sailing yacht or catamaran.",
+            "fact": "Kind (Yacht Type) — the category of yacht, such as sailing yacht or catamaran.",
             "evidence": "yacht_booking/models/yacht_models.py"
           },
           {
-            "fact": "Home Base, Chartering Company \u2014 the marina the yacht departs/returns from, and the operating company that owns/manages it.",
+            "fact": "Home Base, Chartering Company — the marina the yacht departs/returns from, and the operating company that owns/manages it.",
             "evidence": "yacht_booking/models/yacht_models.py"
           },
           {
-            "fact": "Cabins, Berths, Toilets \u2014 the yacht's sleeping and washroom capacity.",
+            "fact": "Cabins, Berths, Toilets — the yacht's sleeping and washroom capacity.",
             "evidence": "yacht_booking/models/yacht_models.py"
           },
           {
-            "fact": "Maximum People On Board \u2014 the total passenger capacity cap for the yacht.",
+            "fact": "Maximum People On Board — the total passenger capacity cap for the yacht.",
             "evidence": "yacht_booking/models/yacht_models.py"
           },
           {
-            "fact": "Minimum/Maximum Charter Duration \u2014 the shortest and longest booking length the yacht allows.",
+            "fact": "Minimum/Maximum Charter Duration — the shortest and longest booking length the yacht allows.",
             "evidence": "yacht_booking/models/yacht_models.py"
           },
           {
-            "fact": "Standard Check-In Day/Time and Check-Out Time \u2014 the yacht's usual charter turnover schedule.",
+            "fact": "Standard Check-In Day/Time and Check-Out Time — the yacht's usual charter turnover schedule.",
             "evidence": "yacht_booking/models/yacht_models.py"
           },
           {
-            "fact": "Equipment \u2014 the onboard equipment and amenities available on the yacht.",
+            "fact": "Equipment — the onboard equipment and amenities available on the yacht.",
             "evidence": "yacht_booking/models/yacht_models.py"
           },
           {
-            "fact": "Manually Added \u2014 marks a yacht that staff added by hand rather than one kept in sync with an external provider; such yachts are never auto-deactivated or overwritten by sync.",
+            "fact": "Manually Added — marks a yacht that staff added by hand rather than one kept in sync with an external provider; such yachts are never auto-deactivated or overwritten by sync.",
             "evidence": "yacht_booking/models/yacht_models.py"
           },
           {
-            "fact": "Removed \u2014 marks a yacht that's disappeared from the external provider's feed.",
+            "fact": "Removed — marks a yacht that's disappeared from the external provider's feed.",
             "evidence": "yacht_booking/models/yacht_models.py"
           },
           {
-            "fact": "World Region, Country, Sailing Area, Shipyard \u2014 the geographic and manufacturer classification used to browse and filter the catalog.",
+            "fact": "World Region, Country, Sailing Area, Shipyard — the geographic and manufacturer classification used to browse and filter the catalog.",
             "evidence": "yacht_booking/models/world_region_models.py; yacht_booking/models/country_models.py; yacht_booking/models/sailing_area_models.py; yacht_booking/models/shipyard_models.py"
           },
           {
-            "fact": "Price, Provider Discount, Staff Discount \u2014 a yacht's listed price for a given week, any discount the provider already applied, and an additional discount staff can layer on top.",
+            "fact": "Price, Provider Discount, Staff Discount — a yacht's listed price for a given week, any discount the provider already applied, and an additional discount staff can layer on top.",
             "evidence": "yacht_booking/models/yacht_price_models.py"
           },
           {
-            "fact": "Available \u2014 whether the yacht is actually bookable for a given week, tracked separately from its price.",
+            "fact": "Available — whether the yacht is actually bookable for a given week, tracked separately from its price.",
             "evidence": "yacht_booking/models/yacht_price_models.py"
           }
         ],
@@ -2602,11 +2602,11 @@
         ],
         "rules": [
           {
-            "fact": "A booking can't be placed unless the exact requested date range is confirmed available with the charter provider \u2014 unless it's a manually-entered booking, which skips this check.",
+            "fact": "A booking can't be placed unless the exact requested date range is confirmed available with the charter provider — unless it's a manually-entered booking, which skips this check.",
             "evidence": "yacht_booking/services/booking.py:YachtBookingService._check_yacht_availability"
           },
           {
-            "fact": "A manually-entered booking must have its price entered by staff \u2014 it isn't calculated automatically.",
+            "fact": "A manually-entered booking must have its price entered by staff — it isn't calculated automatically.",
             "evidence": "yacht_booking/serializers/booking.py:YachtBookingCostPreviewSerializer.validate"
           },
           {
@@ -2696,27 +2696,27 @@
         ],
         "field_meanings": [
           {
-            "fact": "Number of Passengers / Number Who Took Transfer \u2014 how many people are traveling on the booking, and how many of them opted into the paid pickup/transfer service.",
+            "fact": "Number of Passengers / Number Who Took Transfer — how many people are traveling on the booking, and how many of them opted into the paid pickup/transfer service.",
             "evidence": "yacht_booking/services/booking.py:prepare_data"
           },
           {
-            "fact": "Sub Total / Discount / Grand Total / Due \u2014 the total price before any discount, the combined discount applied, the final payable total, and how much is still owed.",
+            "fact": "Sub Total / Discount / Grand Total / Due — the total price before any discount, the combined discount applied, the final payable total, and how much is still owed.",
             "evidence": "yacht_booking/services/booking.py:prepare_data"
           },
           {
-            "fact": "First Payment Deadline / Remaining Balance Deadline \u2014 the dates by which the deposit and the remaining balance are due, set from the charter provider's own payment schedule.",
+            "fact": "First Payment Deadline / Remaining Balance Deadline — the dates by which the deposit and the remaining balance are due, set from the charter provider's own payment schedule.",
             "evidence": "yacht_booking/services/booking.py:_set_payment_deadline_dates"
           },
           {
-            "fact": "Manually Added Booking \u2014 a booking for a yacht entered by staff outside the normal provider catalog, which skips live availability checks and uses a staff-entered price instead of a calculated one.",
+            "fact": "Manually Added Booking — a booking for a yacht entered by staff outside the normal provider catalog, which skips live availability checks and uses a staff-entered price instead of a calculated one.",
             "evidence": "yacht_booking/services/booking.py:YachtBookingService.create"
           },
           {
-            "fact": "Departed \u2014 marks a booking whose trip start date has passed, set automatically once that date arrives.",
+            "fact": "Departed — marks a booking whose trip start date has passed, set automatically once that date arrives.",
             "evidence": "yacht_booking/services/booking.py:make_booking_departed"
           },
           {
-            "fact": "Booking Status (Pending, Booked, Cancelled) \u2014 a yacht booking starts Pending, becomes Booked once staff confirm the reservation with the charter provider, and becomes Cancelled if the reservation fails, the payment deadline passes, or it's cancelled outright.",
+            "fact": "Booking Status (Pending, Booked, Cancelled) — a yacht booking starts Pending, becomes Booked once staff confirm the reservation with the charter provider, and becomes Cancelled if the reservation fails, the payment deadline passes, or it's cancelled outright.",
             "evidence": "yacht_booking/services/booking.py:create/confirm_booking"
           }
         ],
@@ -2840,7 +2840,7 @@
             "evidence": "supplement/views/supplement_views.py:SupplementImageUpdateAPIView/SupplementImageDeleteAPIView"
           },
           {
-            "fact": "Staff deactivate a supplement rather than deleting it outright \u2014 there's no delete action available for supplements or categories, only status toggling.",
+            "fact": "Staff deactivate a supplement rather than deleting it outright — there's no delete action available for supplements or categories, only status toggling.",
             "evidence": "supplement/views/supplement_views.py:SupplementAPIViewSet.http_method_names"
           },
           {
@@ -2854,7 +2854,7 @@
         ],
         "rules": [
           {
-            "fact": "A supplement category's name must be unique \u2014 a duplicate is rejected outright rather than merged or overwritten.",
+            "fact": "A supplement category's name must be unique — a duplicate is rejected outright rather than merged or overwritten.",
             "evidence": "supplement/services/supplement_category_service.py:SupplementCategoryService.create"
           },
           {
@@ -2866,7 +2866,7 @@
             "evidence": "supplement/models/supplement.py:Supplement.unit_type"
           },
           {
-            "fact": "A supplement can be marked as not contributing to the total price even though it's still listed \u2014 useful for informational or already-included items.",
+            "fact": "A supplement can be marked as not contributing to the total price even though it's still listed — useful for informational or already-included items.",
             "evidence": "supplement/services/supplement_service.py:get_supplements_with_price"
           },
           {
@@ -2932,51 +2932,51 @@
         ],
         "field_meanings": [
           {
-            "fact": "Name / Description \u2014 the display name and detail text for the add-on.",
+            "fact": "Name / Description — the display name and detail text for the add-on.",
             "evidence": "supplement/models/supplement.py"
           },
           {
-            "fact": "Price \u2014 the supplement's base price in the tenant's own currency, from which all other currency prices are derived.",
+            "fact": "Price — the supplement's base price in the tenant's own currency, from which all other currency prices are derived.",
             "evidence": "supplement/models/supplement.py"
           },
           {
-            "fact": "Pricing Unit \u2014 how the supplement is charged: once per booking, per day, per week, or per night, each either flat or multiplied by passenger count.",
+            "fact": "Pricing Unit — how the supplement is charged: once per booking, per day, per week, or per night, each either flat or multiplied by passenger count.",
             "evidence": "supplement/models/supplement.py:Supplement.unit_type"
           },
           {
-            "fact": "Mandatory \u2014 whether the supplement must always be included wherever it's offered, with no option to remove it.",
+            "fact": "Mandatory — whether the supplement must always be included wherever it's offered, with no option to remove it.",
             "evidence": "supplement/models/supplement.py"
           },
           {
-            "fact": "Contributes to Total \u2014 whether the supplement's price is counted in the overall total, even when it's still shown to the customer.",
+            "fact": "Contributes to Total — whether the supplement's price is counted in the overall total, even when it's still shown to the customer.",
             "evidence": "supplement/models/supplement.py"
           },
           {
-            "fact": "Complimentary \u2014 marks the supplement as free of charge.",
+            "fact": "Complimentary — marks the supplement as free of charge.",
             "evidence": "supplement/models/supplement.py"
           },
           {
-            "fact": "Sales Cut-Off \u2014 an optional rule limiting how close to departure the supplement can still be sold.",
+            "fact": "Sales Cut-Off — an optional rule limiting how close to departure the supplement can still be sold.",
             "evidence": "supplement/models/supplement.py"
           },
           {
-            "fact": "Category \u2014 the catalog grouping this supplement belongs to, which can itself sit under a parent category.",
+            "fact": "Category — the catalog grouping this supplement belongs to, which can itself sit under a parent category.",
             "evidence": "supplement/models/supplement_category.py"
           },
           {
-            "fact": "Supplier \u2014 the external supplier who provides or fulfills this add-on, if any.",
+            "fact": "Supplier — the external supplier who provides or fulfills this add-on, if any.",
             "evidence": "supplement/models/supplement.py"
           },
           {
-            "fact": "Tax Class \u2014 the tax rule applied to this supplement's price; defaults to \"No VAT\" if not set.",
+            "fact": "Tax Class — the tax rule applied to this supplement's price; defaults to \"No VAT\" if not set.",
             "evidence": "supplement/models/supplement.py"
           },
           {
-            "fact": "Supplement Group (Single/Multiple Choice, Required) \u2014 a cluster of related supplements presented together, either as a single choice or multiple choices, optionally required.",
+            "fact": "Supplement Group (Single/Multiple Choice, Required) — a cluster of related supplements presented together, either as a single choice or multiple choices, optionally required.",
             "evidence": "supplement/models/supplement_group.py"
           },
           {
-            "fact": "Translation (Name, Description) \u2014 the supplement's or category's content shown to customers in a specific language.",
+            "fact": "Translation (Name, Description) — the supplement's or category's content shown to customers in a specific language.",
             "evidence": "supplement/models/supplement_multi_language.py; supplement/models/supplement_category_multi_language.py"
           }
         ],
@@ -2998,13 +2998,13 @@
             "evidence": "supplement/serializers/supplement_multi_language_serializer.py:validate_language"
           },
           {
-            "fact": "To retire a supplement: staff deactivate it, which is blocked while it's still attached to any active booking, tour, or custom tour offer \u2014 those need to be resolved first.",
+            "fact": "To retire a supplement: staff deactivate it, which is blocked while it's still attached to any active booking, tour, or custom tour offer — those need to be resolved first.",
             "evidence": "supplement/services/supplement_service.py:update_status"
           }
         ],
         "side_effects": [
           {
-            "fact": "A supplement's catalog entry is shared across features \u2014 it's referenced from Tours, Bookings, and Custom Tour Offers, which is exactly why deactivating an in-use supplement is blocked.",
+            "fact": "A supplement's catalog entry is shared across features — it's referenced from Tours, Bookings, and Custom Tour Offers, which is exactly why deactivating an in-use supplement is blocked.",
             "evidence": "supplement/services/supplement_service.py:check_this_supplement_used_in_any_active_booking/tour/custom_tour"
           },
           {
@@ -3106,7 +3106,7 @@
         ],
         "rules": [
           {
-            "fact": "A product or category can only have one translation per language \u2014 a duplicate is rejected.",
+            "fact": "A product or category can only have one translation per language — a duplicate is rejected.",
             "evidence": "product/serializers/product_serializers.py:ProductMultilanguageSerializer.validate"
           },
           {
@@ -3156,7 +3156,7 @@
             "evidence": "product/models/product.py:ProductFile.file"
           },
           {
-            "fact": "Attaching a file without giving it a name is rejected \u2014 a name is required alongside the file.",
+            "fact": "Attaching a file without giving it a name is rejected — a name is required alongside the file.",
             "evidence": "product/serializers/product_serializers.py:ProductFileUploadSerializer"
           }
         ],
@@ -3168,43 +3168,43 @@
         ],
         "field_meanings": [
           {
-            "fact": "Name / Description / Remarks \u2014 the product's display name, customer-facing description, and internal notes text (Remarks is separate from the internal Notes list).",
+            "fact": "Name / Description / Remarks — the product's display name, customer-facing description, and internal notes text (Remarks is separate from the internal Notes list).",
             "evidence": "product/models/product.py"
           },
           {
-            "fact": "Supplier Type / Supplier \u2014 the kind of vendor this product comes from, and the actual vendor(s) fulfilling it; a product can be linked to more than one supplier.",
+            "fact": "Supplier Type / Supplier — the kind of vendor this product comes from, and the actual vendor(s) fulfilling it; a product can be linked to more than one supplier.",
             "evidence": "product/models/product.py"
           },
           {
-            "fact": "Contact Person Name / Email \u2014 the point of contact at the supplier or location for this product.",
+            "fact": "Contact Person Name / Email — the point of contact at the supplier or location for this product.",
             "evidence": "product/models/product.py"
           },
           {
-            "fact": "Location, Territory, Address \u2014 where the product is physically located or delivered from.",
+            "fact": "Location, Territory, Address — where the product is physically located or delivered from.",
             "evidence": "product/models/product.py"
           },
           {
-            "fact": "Map URL \u2014 a link to an external map pinpointing the product's location.",
+            "fact": "Map URL — a link to an external map pinpointing the product's location.",
             "evidence": "product/models/product.py"
           },
           {
-            "fact": "Image / Primary Image \u2014 a picture in the product's gallery, with one optionally marked as the main image.",
+            "fact": "Image / Primary Image — a picture in the product's gallery, with one optionally marked as the main image.",
             "evidence": "product/models/product.py:ProductImage"
           },
           {
-            "fact": "File / File Name \u2014 a downloadable document attached to the product, such as a contract or spec sheet.",
+            "fact": "File / File Name — a downloadable document attached to the product, such as a contract or spec sheet.",
             "evidence": "product/models/product.py:ProductFile"
           },
           {
-            "fact": "Note \u2014 a free-text internal comment about the product, visible only to staff.",
+            "fact": "Note — a free-text internal comment about the product, visible only to staff.",
             "evidence": "product/models/product.py:ProductNote"
           },
           {
-            "fact": "Category \u2014 a grouping under one specific product, used to organize what's sellable under it; each category belongs to exactly one product.",
+            "fact": "Category — a grouping under one specific product, used to organize what's sellable under it; each category belongs to exactly one product.",
             "evidence": "product/models/product_category.py"
           },
           {
-            "fact": "Active/Inactive \u2014 whether the product or category is currently published, toggled only through its dedicated status action.",
+            "fact": "Active/Inactive — whether the product or category is currently published, toggled only through its dedicated status action.",
             "evidence": "product/models/product.py"
           }
         ],
@@ -3232,7 +3232,7 @@
         ],
         "side_effects": [
           {
-            "fact": "A product exists purely as a standalone catalog/directory entry \u2014 it does not attach to bookings, tours, hotels, yacht charters, or custom tour offers, and has no pricing or tax configuration of its own.",
+            "fact": "A product exists purely as a standalone catalog/directory entry — it does not attach to bookings, tours, hotels, yacht charters, or custom tour offers, and has no pricing or tax configuration of its own.",
             "evidence": "product/models/product.py"
           }
         ]
@@ -3334,7 +3334,7 @@
             "evidence": "price_manager/services/pricing_log_service.py:PricingLogService.get_applicable_pricing_log_ids"
           },
           {
-            "fact": "Automatic (unattended) apply additionally requires the log to have been created in the same scheduling run as today's automatic sync \u2014 older pending logs are left for manual review.",
+            "fact": "Automatic (unattended) apply additionally requires the log to have been created in the same scheduling run as today's automatic sync — older pending logs are left for manual review.",
             "evidence": "price_manager/services/pricing_log_service.py:PricingLogService.get_applicable_pricing_log_ids"
           },
           {
@@ -3366,7 +3366,7 @@
             "evidence": "price_manager/views/pricing_log_view.py:PricingLogAPIView,ApplyPricingLogAPIView,RejectPricingLogAPIView"
           },
           {
-            "fact": "The webhook that receives events from the external pricing engine, and the scheduled automatic-apply job, authenticate as the system itself (not as a staff user) \u2014 they are machine-to-machine endpoints, not something a staff member calls directly.",
+            "fact": "The webhook that receives events from the external pricing engine, and the scheduled automatic-apply job, authenticate as the system itself (not as a staff user) — they are machine-to-machine endpoints, not something a staff member calls directly.",
             "evidence": "price_manager/views/price_sync_view.py:PricingLogEventAPIView,price_manager/views/pricing_log_view.py:AutoApplyPricingLogAPIView"
           }
         ],
@@ -3382,7 +3382,7 @@
         ],
         "journeys": [
           {
-            "fact": "Staff open the pending pricing queue, see each tour's current price next to the newly suggested one, and either apply the suggestion (optionally with a note) or reject it (optionally with a note) \u2014 nothing changes on the tour until one of those actions happens, unless automatic sync is on.",
+            "fact": "Staff open the pending pricing queue, see each tour's current price next to the newly suggested one, and either apply the suggestion (optionally with a note) or reject it (optionally with a note) — nothing changes on the tour until one of those actions happens, unless automatic sync is on.",
             "evidence": "price_manager/views/pricing_log_view.py:PendingPricingLogsAPIView,ApplyPricingLogAPIView,RejectPricingLogAPIView"
           },
           {
@@ -3444,7 +3444,7 @@
       "analysis": {
         "workflows": [
           {
-            "fact": "A payment can be applied to a booking, a ResPay account, an invoice, or a gift card \u2014 each routed to its own handler, but all recorded as a Transaction.",
+            "fact": "A payment can be applied to a booking, a ResPay account, an invoice, or a gift card — each routed to its own handler, but all recorded as a Transaction.",
             "evidence": "payment/handlers/registry.py:PaymentHandlerRegistry"
           },
           {
@@ -3466,7 +3466,7 @@
         ],
         "rules": [
           {
-            "fact": "A refund can't be processed through a payment method that isn't configured for the tenant \u2014 except when the refund is being triggered automatically as part of cancelling a booking, which is allowed regardless.",
+            "fact": "A refund can't be processed through a payment method that isn't configured for the tenant — except when the refund is being triggered automatically as part of cancelling a booking, which is allowed regardless.",
             "evidence": "payment/services/refund/refund_payment_service.py:create_refund_payment_transaction"
           },
           {
@@ -3504,7 +3504,7 @@
             "evidence": "payment/models/transaction_model.py:pending_amount"
           },
           {
-            "fact": "A transaction can be linked to a booking, a ResPay account, a billing invoice, or a gift card \u2014 which one it's linked to determines what business impact processing it has.",
+            "fact": "A transaction can be linked to a booking, a ResPay account, a billing invoice, or a gift card — which one it's linked to determines what business impact processing it has.",
             "evidence": "payment/models/transaction_model.py:booking"
           }
         ],
@@ -3592,7 +3592,7 @@
             "evidence": "res_pay/views/res_pay_view.py:ResPayPaymentListCreateAPIView.post"
           },
           {
-            "fact": "Creating the request generates a unique payment code and a payment link, and \u2014 if requested \u2014 immediately sends the customer an email containing that link; a reminder is also scheduled ahead of the due date.",
+            "fact": "Creating the request generates a unique payment code and a payment link, and — if requested — immediately sends the customer an email containing that link; a reminder is also scheduled ahead of the due date.",
             "evidence": "res_pay/views/res_pay_view.py:ResPayPaymentListCreateAPIView.post,res_pay/services/res_pay_service.py:ResPayService.create_scheduled_reminder"
           },
           {
@@ -3646,7 +3646,7 @@
             "evidence": "res_pay/services/res_pay_email_service.py:ResPayEmailService.send_payment_reminder"
           },
           {
-            "fact": "A request's public payment page and payment link stop working once the request is no longer active, has passed its due date, or has already been paid \u2014 the customer sees a not-found/expired message instead.",
+            "fact": "A request's public payment page and payment link stop working once the request is no longer active, has passed its due date, or has already been paid — the customer sees a not-found/expired message instead.",
             "evidence": "res_pay/services/res_pay_service.py:ResPayService.get_validated_payment,res_pay/views/res_pay_public_view.py:ResPayPublicPaymentInfoAPIView.post"
           },
           {
@@ -3670,7 +3670,7 @@
             "evidence": "res_pay/views/res_pay_view.py:ResPayPaymentListCreateAPIView,ResPayCancelAPIView,ResPayAccountedAPIView,ResPayPaymentRetrieveAPIView"
           },
           {
-            "fact": "The public payment page and the customer's checkout endpoints (Klarna, Trustly, Altapay) need no staff login at all \u2014 they identify the request purely by its unique payment code, so anyone with the link's code can view and pay it.",
+            "fact": "The public payment page and the customer's checkout endpoints (Klarna, Trustly, Altapay) need no staff login at all — they identify the request purely by its unique payment code, so anyone with the link's code can view and pay it.",
             "evidence": "res_pay/views/res_pay_public_view.py:ResPayPublicPaymentInfoAPIView,res_pay/views/klarna/klarna_payment_view.py:KlarnaPaymentRequestAPIView"
           },
           {
@@ -3715,7 +3715,9 @@
       "name": "Billing & Invoicing",
       "summary": "Billing lines and account invoices generated from bookings.",
       "files": [
-        "billing/**"
+        "billing/**",
+        "templates/payment/**",
+        "templates/payment/billing_invoice_payment.html"
       ],
       "depends_on": [
         "booking"
@@ -3728,7 +3730,7 @@
       "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/billing.md",
-      "documented_at_commit": "20675c05cf7e75df8f7b4088396273f43cfdabed",
+      "documented_at_commit": "167353f10cb4bea8a4ee107fbf39e5991df5b58b",
       "evidence": {
         "what_it_does_and_how_it_works": [
           "billing/models/billing_line_model.py:BillingLine",
@@ -3758,7 +3760,7 @@
             "evidence": "billing/models/billing_line_model.py:BillingLine"
           },
           {
-            "fact": "An invoice starts as a Draft and is editable in that state; issuing it locks it (no longer editable), assigns it a permanent invoice number and a payment reference number, and \u2014 if the tenant has accounting integration enabled \u2014 sends it there.",
+            "fact": "An invoice starts as a Draft and is editable in that state; issuing it locks it (no longer editable), assigns it a permanent invoice number and a payment reference number, and — if the tenant has accounting integration enabled — sends it there.",
             "evidence": "billing/services/invoice_service.py:issue_invoice"
           },
           {
@@ -3766,7 +3768,7 @@
             "evidence": "billing/services/invoice_service.py:issue_invoice"
           },
           {
-            "fact": "An issued invoice can be voided (unlinking its billing lines and marking it void) or credited (generating a credit note that reverses its billing lines) \u2014 both only apply to invoices that are actually in Issued status.",
+            "fact": "An issued invoice can be voided (unlinking its billing lines and marking it void) or credited (generating a credit note that reverses its billing lines) — both only apply to invoices that are actually in Issued status.",
             "evidence": "billing/services/invoice_service.py:void_invoice"
           },
           {
@@ -3776,7 +3778,7 @@
         ],
         "rules": [
           {
-            "fact": "An invoice cannot be issued twice \u2014 issuing an already-issued invoice is rejected outright.",
+            "fact": "An invoice cannot be issued twice — issuing an already-issued invoice is rejected outright.",
             "evidence": "billing/services/invoice_service.py:issue_invoice"
           },
           {
@@ -3784,7 +3786,7 @@
             "evidence": "billing/services/invoice_service.py:issue_invoice"
           },
           {
-            "fact": "An invoice can only be voided if it's currently Issued, and only if it hasn't been paid or partially paid \u2014 a paid invoice must be credited, not voided.",
+            "fact": "An invoice can only be voided if it's currently Issued, and only if it hasn't been paid or partially paid — a paid invoice must be credited, not voided.",
             "evidence": "billing/services/invoice_service.py:void_invoice"
           },
           {
@@ -3826,7 +3828,7 @@
         ],
         "field_meanings": [
           {
-            "fact": "An invoice's status (Draft, Issued, Void) is separate from its payment status (Unpaid, Partially Paid, Paid) \u2014 an invoice can be Issued and still Unpaid, or Issued and fully Paid.",
+            "fact": "An invoice's status (Draft, Issued, Void) is separate from its payment status (Unpaid, Partially Paid, Paid) — an invoice can be Issued and still Unpaid, or Issued and fully Paid.",
             "evidence": "billing/models/account_invoice_model.py:status"
           },
           {
@@ -3834,13 +3836,13 @@
             "evidence": "billing/models/billing_line_model.py:content_type"
           },
           {
-            "fact": "An invoice is only editable while it's in Draft status \u2014 once issued, its content is locked.",
+            "fact": "An invoice is only editable while it's in Draft status — once issued, its content is locked.",
             "evidence": "billing/models/account_invoice_model.py:is_editable"
           }
         ],
         "journeys": [
           {
-            "fact": "Staff review a booking's accumulated billing lines, generate a draft invoice, and issue it once it's correct \u2014 issuing locks the invoice, generates its final numbering, and (if enabled) pushes it to the connected accounting system.",
+            "fact": "Staff review a booking's accumulated billing lines, generate a draft invoice, and issue it once it's correct — issuing locks the invoice, generates its final numbering, and (if enabled) pushes it to the connected accounting system.",
             "evidence": "billing/services/invoice_service.py:issue_invoice"
           },
           {
@@ -3952,11 +3954,11 @@
         ],
         "rules": [
           {
-            "fact": "A coupon's discount can never be set to 0 \u2014 creating or updating one with a zero discount is rejected.",
+            "fact": "A coupon's discount can never be set to 0 — creating or updating one with a zero discount is rejected.",
             "evidence": "coupon/services/coupon_service.py:CouponService.create"
           },
           {
-            "fact": "A coupon applies either to every tour (\"all tour\") or to a specific list of tours the staff member picks \u2014 not a mix decided per booking.",
+            "fact": "A coupon applies either to every tour (\"all tour\") or to a specific list of tours the staff member picks — not a mix decided per booking.",
             "evidence": "coupon/models.py:Coupon.coupon_type,coupon/services/coupon_service.py:CouponService.validate_coupon"
           },
           {
@@ -3964,11 +3966,11 @@
             "evidence": "coupon/services/coupon_service.py:CouponService.create"
           },
           {
-            "fact": "Once a coupon has been used at least once, its code, discount, and discount type can no longer be edited \u2014 only its validity dates, use limit, tours, description, and active status can still change.",
+            "fact": "Once a coupon has been used at least once, its code, discount, and discount type can no longer be edited — only its validity dates, use limit, tours, description, and active status can still change.",
             "evidence": "coupon/services/coupon_service.py:CouponService.update"
           },
           {
-            "fact": "A coupon's active status cannot be changed by hand once its use limit has been reached \u2014 the system reports that the limit has been exceeded.",
+            "fact": "A coupon's active status cannot be changed by hand once its use limit has been reached — the system reports that the limit has been exceeded.",
             "evidence": "coupon/services/coupon_service.py:CouponService.update_status"
           },
           {
@@ -3976,7 +3978,7 @@
             "evidence": "coupon/models.py:Coupon.use_limit,coupon/services/coupon_service.py:CouponService.update_coupon_status_after_usage"
           },
           {
-            "fact": "For a fixed-amount coupon, the discount applied on a booking never exceeds the booking's own cost \u2014 a coupon can bring a booking to zero but never below it.",
+            "fact": "For a fixed-amount coupon, the discount applied on a booking never exceeds the booking's own cost — a coupon can bring a booking to zero but never below it.",
             "evidence": "coupon/services/coupon_service.py:CouponService.get_coupon_discount"
           },
           {
@@ -4000,7 +4002,7 @@
             "evidence": "coupon/views/coupon_views.py:CouponListCreateAPIView,CouponRetrieveUpdateAPIView,CouponUpdateStatusView,coupon/views/coupon_bookings_views.py:CouponBookingListAPIView"
           },
           {
-            "fact": "Checking whether a coupon code is valid for a tour is a public action \u2014 no staff login is required, since customers use it while browsing a tour.",
+            "fact": "Checking whether a coupon code is valid for a tour is a public action — no staff login is required, since customers use it while browsing a tour.",
             "evidence": "coupon/views/coupon_views.py:ValidateTourCouponAPIView"
           }
         ],
@@ -4106,7 +4108,7 @@
             "evidence": "gift_card/services/gift_card_service.py:GiftCardService.create,generate_gift_card_pdf_attachment"
           },
           {
-            "fact": "A publicly purchased gift card's expiry date is always set automatically from the tenant's configured number of expiry days from the purchase date \u2014 the customer cannot choose it.",
+            "fact": "A publicly purchased gift card's expiry date is always set automatically from the tenant's configured number of expiry days from the purchase date — the customer cannot choose it.",
             "evidence": "gift_card/services/gift_card_service.py:GiftCardService.prepare_public_create_defaults"
           },
           {
@@ -4136,11 +4138,11 @@
         ],
         "rules": [
           {
-            "fact": "A gift card can only be spent on bookings priced in SEK \u2014 it cannot be applied to a booking in any other currency.",
+            "fact": "A gift card can only be spent on bookings priced in SEK — it cannot be applied to a booking in any other currency.",
             "evidence": "gift_card/services/gift_card_service.py:GiftCardService.is_validate_gift_card_for_booking"
           },
           {
-            "fact": "The amount applied from a gift card to a booking is capped at whichever is smallest: the amount requested, the card's remaining balance, or the booking's outstanding due amount \u2014 it can never exceed any of those.",
+            "fact": "The amount applied from a gift card to a booking is capped at whichever is smallest: the amount requested, the card's remaining balance, or the booking's outstanding due amount — it can never exceed any of those.",
             "evidence": "gift_card/services/gift_card_service.py:GiftCardService.apply_gift_card_to_booking"
           },
           {
@@ -4152,7 +4154,7 @@
             "evidence": "gift_card/services/gift_card_service.py:GiftCardService.get_valid_gift_card"
           },
           {
-            "fact": "Once a gift card is no longer a Draft, most of its details (recipient, amount, code) can no longer be changed \u2014 only its expiry date, note, image, and greeting text remain editable.",
+            "fact": "Once a gift card is no longer a Draft, most of its details (recipient, amount, code) can no longer be changed — only its expiry date, note, image, and greeting text remain editable.",
             "evidence": "gift_card/services/gift_card_service.py:GiftCardService.update"
           },
           {
@@ -4190,7 +4192,7 @@
             "evidence": "gift_card/constants.py:GiftCardStatus"
           },
           {
-            "fact": "\"Remaining amount\" is the card's total value minus what's already been spent \u2014 the balance still available to redeem.",
+            "fact": "\"Remaining amount\" is the card's total value minus what's already been spent — the balance still available to redeem.",
             "evidence": "gift_card/models/gift_card_models.py:GiftCard.remaining_amount"
           },
           {
@@ -4301,7 +4303,7 @@
       "analysis": {
         "workflows": [
           {
-            "fact": "Staff create VAT classes \u2014 a name, a tax percentage, whether it should appear on invoices, and which VAT type(s) it belongs to \u2014 for use when pricing tours, supplements, and other sellable items.",
+            "fact": "Staff create VAT classes — a name, a tax percentage, whether it should appear on invoices, and which VAT type(s) it belongs to — for use when pricing tours, supplements, and other sellable items.",
             "evidence": "vat_class/services.py:VATClassService.create"
           },
           {
@@ -4315,15 +4317,15 @@
         ],
         "rules": [
           {
-            "fact": "A VAT type can only have one VAT class at any given tax percentage \u2014 creating or editing a class into a percentage that's already used by another class of the same type is rejected.",
+            "fact": "A VAT type can only have one VAT class at any given tax percentage — creating or editing a class into a percentage that's already used by another class of the same type is rejected.",
             "evidence": "vat_class/services.py:VATClassService._validate_vat_class_types"
           },
           {
-            "fact": "The built-in \"No VAT\" class's name and tax percentage can never be changed, and its active/inactive status can never be changed either \u2014 it's a fixed, permanent option.",
+            "fact": "The built-in \"No VAT\" class's name and tax percentage can never be changed, and its active/inactive status can never be changed either — it's a fixed, permanent option.",
             "evidence": "vat_class/services.py:VATClassService.update,VATClassService.update_status"
           },
           {
-            "fact": "A VAT class currently selected on any active tour or active supplement cannot have its status changed \u2014 it must first be removed from every active tour and supplement before it can be deactivated (or reactivated).",
+            "fact": "A VAT class currently selected on any active tour or active supplement cannot have its status changed — it must first be removed from every active tour and supplement before it can be deactivated (or reactivated).",
             "evidence": "vat_class/services.py:VATClassService.update_status,check_if_vat_class_is_selected_in_any_active_supplement,check_if_vat_class_is_selected_in_any_active_tour"
           },
           {
@@ -4339,7 +4341,7 @@
         ],
         "permissions": [
           {
-            "fact": "Creating, editing, listing, and changing the status of VAT classes, VAT types, VAT accounts, and cost accounts all require an authenticated staff user with the standard staff model permissions \u2014 there is no customer-facing access to any of this.",
+            "fact": "Creating, editing, listing, and changing the status of VAT classes, VAT types, VAT accounts, and cost accounts all require an authenticated staff user with the standard staff model permissions — there is no customer-facing access to any of this.",
             "evidence": "vat_class/views.py:VATClassListCreateAPIView,VATClassTypeListAPIView,VatAccountCreateView,CostAccountCreateView"
           }
         ],
@@ -4363,7 +4365,7 @@
         ],
         "journeys": [
           {
-            "fact": "Staff set up the tenant's tax categories once (VAT types, VAT classes with their percentages, and the accounting accounts they post to), then simply pick the right VAT class when pricing a tour or supplement elsewhere \u2014 customers never interact with VAT classes directly.",
+            "fact": "Staff set up the tenant's tax categories once (VAT types, VAT classes with their percentages, and the accounting accounts they post to), then simply pick the right VAT class when pricing a tour or supplement elsewhere — customers never interact with VAT classes directly.",
             "evidence": "vat_class/services.py:VATClassService.create,vat_class/models.py:VATClass"
           }
         ],
@@ -4674,47 +4676,47 @@
         ],
         "field_meanings": [
           {
-            "fact": "Guide Type \u2014 the category of guide (e.g. driver-guide, local guide), configured by staff and used both to find available guides and to enforce one-guide-per-type-per-vehicle.",
+            "fact": "Guide Type — the category of guide (e.g. driver-guide, local guide), configured by staff and used both to find available guides and to enforce one-guide-per-type-per-vehicle.",
             "evidence": "tour_guide/models/tour_guide_models.py:TourGuideType"
           },
           {
-            "fact": "Name, Position, Employee ID \u2014 the guide's identifying and role details.",
+            "fact": "Name, Position, Employee ID — the guide's identifying and role details.",
             "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
           },
           {
-            "fact": "License / License Number \u2014 the guide's professional license type and number.",
+            "fact": "License / License Number — the guide's professional license type and number.",
             "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
           },
           {
-            "fact": "Home Base \u2014 the guide's home station or location they're normally based out of.",
+            "fact": "Home Base — the guide's home station or location they're normally based out of.",
             "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
           },
           {
-            "fact": "Contract File, Flight Ticket File, Profile Picture \u2014 documents and photo uploaded for the guide.",
+            "fact": "Contract File, Flight Ticket File, Profile Picture — documents and photo uploaded for the guide.",
             "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
           },
           {
-            "fact": "Passport / Personal ID details, Allergy info, Emergency Contact \u2014 the guide's travel and safety details, mirrored into their linked profile.",
+            "fact": "Passport / Personal ID details, Allergy info, Emergency Contact — the guide's travel and safety details, mirrored into their linked profile.",
             "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
           },
           {
-            "fact": "Feedback \u2014 free-text notes recording feedback about the guide's performance.",
+            "fact": "Feedback — free-text notes recording feedback about the guide's performance.",
             "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
           },
           {
-            "fact": "Active/Inactive \u2014 whether the guide is currently employable and assignable; a guide can't be deactivated while still assigned to an active tour.",
+            "fact": "Active/Inactive — whether the guide is currently employable and assignable; a guide can't be deactivated while still assigned to an active tour.",
             "evidence": "tour_guide/models/tour_guide_models.py:TourGuide"
           },
           {
-            "fact": "Availability Window (Start Date, End Date) \u2014 the date range during which a guide has said they're available to be assigned to a tour.",
+            "fact": "Availability Window (Start Date, End Date) — the date range during which a guide has said they're available to be assigned to a tour.",
             "evidence": "tour_guide/models/time_slot_model.py:TimeSlot"
           },
           {
-            "fact": "Available \u2014 whether an availability window is currently open for new assignment; it's automatically closed alongside deactivating the window itself.",
+            "fact": "Available — whether an availability window is currently open for new assignment; it's automatically closed alongside deactivating the window itself.",
             "evidence": "tour_guide/models/time_slot_model.py:TimeSlot"
           },
           {
-            "fact": "Assigned Tours (on a window) \u2014 which tour(s) have actually been booked into a given availability window.",
+            "fact": "Assigned Tours (on a window) — which tour(s) have actually been booked into a given availability window.",
             "evidence": "tour_guide/models/time_slot_model.py:TimeSlot"
           }
         ],
@@ -4728,7 +4730,7 @@
             "evidence": "tour_guide/services/time_slot_services.py:TimeSlotService.create"
           },
           {
-            "fact": "To staff a tour: staff search for guides of the needed type who are available for the tour's exact dates, then assign one \u2014 optionally also linking them to a specific vehicle on that tour.",
+            "fact": "To staff a tour: staff search for guides of the needed type who are available for the tour's exact dates, then assign one — optionally also linking them to a specific vehicle on that tour.",
             "evidence": "tour_guide/services/tour_guide_services.py:add_tour_to_tour_guide"
           },
           {
@@ -4750,7 +4752,7 @@
             "evidence": "tour_guide/services/tour_guide_services.py:get_or_create_tour_guide_user/get_or_create_tour_guide_user_profile"
           },
           {
-            "fact": "Assigning a guide to a tour updates the guide's own tour list, their availability window's assigned-tours list, and \u2014 if a vehicle was chosen \u2014 the tour's vehicle roster, all together in one action.",
+            "fact": "Assigning a guide to a tour updates the guide's own tour list, their availability window's assigned-tours list, and — if a vehicle was chosen — the tour's vehicle roster, all together in one action.",
             "evidence": "tour_guide/services/tour_guide_services.py:add_tour_to_tour_guide"
           },
           {
@@ -4871,7 +4873,7 @@
             "evidence": "carrier/services.py:sync_data"
           },
           {
-            "fact": "On carrier sync, only the IATA code, ICAO code, and active status are updated on an existing match \u2014 the carrier's name is never overwritten by sync.",
+            "fact": "On carrier sync, only the IATA code, ICAO code, and active status are updated on an existing match — the carrier's name is never overwritten by sync.",
             "evidence": "carrier/services.py:sync_data"
           },
           {
@@ -5036,7 +5038,7 @@
       "analysis": {
         "workflows": [
           {
-            "fact": "Staff define email events \u2014 a name, subject, and content template, with a set of allowed placeholders (dynamic values) that content can reference \u2014 and connect them to a specific template on the tenant's connected email provider.",
+            "fact": "Staff define email events — a name, subject, and content template, with a set of allowed placeholders (dynamic values) that content can reference — and connect them to a specific template on the tenant's connected email provider.",
             "evidence": "email_service/models/email_event_model.py:EmailEvent,EmailEventTemplate,email_service/services/email_event_multi_language_service.py:EmailEventMultiLanguageService.create_or_update"
           },
           {
@@ -5052,11 +5054,11 @@
             "evidence": "email_service/services/email_sending/email_service.py:EmailService.send_email,get_multi_language_data,get_language_code"
           },
           {
-            "fact": "Some notifications are scheduled ahead of time instead of sent immediately \u2014 tied to a specific record (like a booking) with a send date \u2014 either on a fixed daily batch, or, for one-off dynamic dates, through an external scheduler that fires exactly on that date and time.",
+            "fact": "Some notifications are scheduled ahead of time instead of sent immediately — tied to a specific record (like a booking) with a send date — either on a fixed daily batch, or, for one-off dynamic dates, through an external scheduler that fires exactly on that date and time.",
             "evidence": "email_service/services/schedule_email_service.py:ScheduleEmailService.update_or_create_schedule_email,send_schedule_email"
           },
           {
-            "fact": "A scheduled email tied to a booking can have its send date pushed automatically when the thing it's tied to changes \u2014 for example, a payment reminder moves if the payment deadline itself moves.",
+            "fact": "A scheduled email tied to a booking can have its send date pushed automatically when the thing it's tied to changes — for example, a payment reminder moves if the payment deadline itself moves.",
             "evidence": "email_service/services/schedule_email_service.py:ScheduleEmailService.update_schedule_email_payment_reminder_send_on_date"
           },
           {
@@ -5064,13 +5066,13 @@
             "evidence": "email_service/services/email_log_service.py:EmailLogService.build_email_log_data,resend_email_from_log"
           },
           {
-            "fact": "Outside the templated-event system, staff (or an integrated chat tool) can send an ad-hoc email \u2014 for example, a chat transcript or a custom tour offer \u2014 using the same provider connection and logging.",
+            "fact": "Outside the templated-event system, staff (or an integrated chat tool) can send an ad-hoc email — for example, a chat transcript or a custom tour offer — using the same provider connection and logging.",
             "evidence": "email_service/services/chat_email_service.py:ChatEmailService.send_chat_email"
           }
         ],
         "rules": [
           {
-            "fact": "An email only actually sends if its event is both active and marked available, has a configured provider template, and has a recipient address \u2014 otherwise the attempt is rejected and logged as failed with the specific reason.",
+            "fact": "An email only actually sends if its event is both active and marked available, has a configured provider template, and has a recipient address — otherwise the attempt is rejected and logged as failed with the specific reason.",
             "evidence": "email_service/services/email_sending/email_service.py:EmailService.send_email"
           },
           {
@@ -5078,7 +5080,7 @@
             "evidence": "email_service/services/email_event_multi_language_service.py:EmailEventMultiLanguageService.create_or_update"
           },
           {
-            "fact": "Auto-translation never overwrites a translation a staff member already filled in by hand \u2014 it only fills in fields that are still empty.",
+            "fact": "Auto-translation never overwrites a translation a staff member already filled in by hand — it only fills in fields that are still empty.",
             "evidence": "email_service/services/email_event_multi_language_service.py:EmailEventMultiLanguageService._update_translation"
           },
           {
@@ -5103,7 +5105,7 @@
         ],
         "field_meanings": [
           {
-            "fact": "\"Is available\" on an event controls whether it can be used to send mail at all; \"is active\" (standard on every record) is the usual on/off toggle \u2014 both must be true for an email to actually go out.",
+            "fact": "\"Is available\" on an event controls whether it can be used to send mail at all; \"is active\" (standard on every record) is the usual on/off toggle — both must be true for an email to actually go out.",
             "evidence": "email_service/models/email_event_model.py:EmailEvent.is_available"
           },
           {
@@ -5111,13 +5113,13 @@
             "evidence": "email_service/models/email_event_dynamic_value.py:EmailEventDynamicValue"
           },
           {
-            "fact": "An event-wise recipient sets a default to/cc/bcc address for a specific event \u2014 independent of whoever the email is actually about \u2014 for example, routing an internal notification to a fixed staff mailbox.",
+            "fact": "An event-wise recipient sets a default to/cc/bcc address for a specific event — independent of whoever the email is actually about — for example, routing an internal notification to a fixed staff mailbox.",
             "evidence": "email_service/models/email_event_model.py:EventWiseRecipient"
           }
         ],
         "journeys": [
           {
-            "fact": "A customer's booking milestone (confirmation, a payment reminder, a ticket update, and similar) automatically triggers the matching notification, rendered in their preferred language with their booking's real details, and sent through the tenant's connected provider \u2014 with a full log kept either way, so staff can find and resend anything that failed.",
+            "fact": "A customer's booking milestone (confirmation, a payment reminder, a ticket update, and similar) automatically triggers the matching notification, rendered in their preferred language with their booking's real details, and sent through the tenant's connected provider — with a full log kept either way, so staff can find and resend anything that failed.",
             "evidence": "email_service/services/email_sending/email_service.py:EmailService.send_email"
           }
         ],
@@ -5176,7 +5178,7 @@
             "evidence": "survey/services/netigate.py:NetigateSurveyService.sync_surveys,upsert_survey"
           },
           {
-            "fact": "The day before a tour with an attached survey returns, the platform automatically collects every traveling passenger on that tour's bookings who has an email address, and sends their details to the survey platform to create a personalized \"sendout\" \u2014 a batch of individually addressed survey links.",
+            "fact": "The day before a tour with an attached survey returns, the platform automatically collects every traveling passenger on that tour's bookings who has an email address, and sends their details to the survey platform to create a personalized \"sendout\" — a batch of individually addressed survey links.",
             "evidence": "survey/services/survey_sendout_service.py:SurveySendoutService.sync_all_upcoming_tours,process_sendout,survey/services/survey_passenger_data_service.py:SurveyPassengerDataService.get_passenger_survey_data"
           },
           {
@@ -5219,7 +5221,7 @@
             "evidence": "survey/models.py:SurveyDispatchStatus"
           },
           {
-            "fact": "\"Activated\" on a survey reflects whether it's turned on in the survey platform itself \u2014 kept in sync whenever surveys are synced.",
+            "fact": "\"Activated\" on a survey reflects whether it's turned on in the survey platform itself — kept in sync whenever surveys are synced.",
             "evidence": "survey/services/netigate.py:NetigateSurveyService.upsert_survey"
           }
         ],
@@ -5400,7 +5402,7 @@
       "analysis": {
         "workflows": [
           {
-            "fact": "Staff group reusable custom fields into named Collections, each scoped to one form (Booking, or Booking Passenger) and \u2014 for passenger collections \u2014 one booking type (Tour or FIT); fields within a passenger collection are further organized into named Groups for display.",
+            "fact": "Staff group reusable custom fields into named Collections, each scoped to one form (Booking, or Booking Passenger) and — for passenger collections — one booking type (Tour or FIT); fields within a passenger collection are further organized into named Groups for display.",
             "evidence": "dynamic_form/models/custom_field_models.py:Collection,Group,dynamic_form/services/custom_field_collection_service.py:CollectionService.create_collection"
           },
           {
@@ -5408,11 +5410,11 @@
             "evidence": "tour_type/services/tour_type_services.py:TourTypeService.apply_default_collections,dynamic_form/services/custom_field_collection_service.py:CollectionService.get_default_collection"
           },
           {
-            "fact": "Creating a tour clones every field from its attached collection(s) onto the tour itself; editing a tour's chosen collections re-syncs its fields \u2014 adding fields from a newly attached collection and removing fields whose collection was detached \u2014 without touching tour-specific fields added by hand or fields whose collection is still attached.",
+            "fact": "Creating a tour clones every field from its attached collection(s) onto the tour itself; editing a tour's chosen collections re-syncs its fields — adding fields from a newly attached collection and removing fields whose collection was detached — without touching tour-specific fields added by hand or fields whose collection is still attached.",
             "evidence": "tour/services/tour_service.py:TourService.create,update,dynamic_form/services/custom_field_service.py:CustomFormFieldService.create_tour_custom_fields,update_tour_custom_fields"
           },
           {
-            "fact": "Editing a field's settings directly on a Collection (its master copy) can be pushed out to every Tour or Tour Type that collection is attached to, updating the matching field wherever it was cloned and adding it to any attached tour that's missing it \u2014 departed tours are always skipped so a completed tour is never changed retroactively.",
+            "fact": "Editing a field's settings directly on a Collection (its master copy) can be pushed out to every Tour or Tour Type that collection is attached to, updating the matching field wherever it was cloned and adding it to any attached tour that's missing it — departed tours are always skipped so a completed tour is never changed retroactively.",
             "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.sync_collection_custom_fields"
           },
           {
@@ -5420,7 +5422,7 @@
             "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.create_custom_field"
           },
           {
-            "fact": "When a passenger (or a booking) submits its custom field answers, each answer is saved as its own response record with a snapshot of that field's label, type, and options at the moment of submission \u2014 so editing or removing the field later doesn't change what was recorded.",
+            "fact": "When a passenger (or a booking) submits its custom field answers, each answer is saved as its own response record with a snapshot of that field's label, type, and options at the moment of submission — so editing or removing the field later doesn't change what was recorded.",
             "evidence": "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService.create_responses,_build_field_info"
           },
           {
@@ -5442,7 +5444,7 @@
             "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.create_custom_field"
           },
           {
-            "fact": "A booking-level (not passenger-level) field can never be assigned to a display group \u2014 grouping only applies to passenger fields.",
+            "fact": "A booking-level (not passenger-level) field can never be assigned to a display group — grouping only applies to passenger fields.",
             "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.create_custom_field"
           },
           {
@@ -5454,7 +5456,7 @@
             "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.sync_collection_custom_fields,_attached_target_keys"
           },
           {
-            "fact": "A required custom field must have a value submitted, and a field with a maximum length rejects any answer longer than that limit \u2014 unchanged from before.",
+            "fact": "A required custom field must have a value submitted, and a field with a maximum length rejects any answer longer than that limit — unchanged from before.",
             "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.validate_custom_field_submission"
           },
           {
@@ -5462,7 +5464,7 @@
             "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.validate_custom_field_submission"
           },
           {
-            "fact": "When staff edit a passenger's or booking's already-submitted answers, clearing a field that was flagged required when it was first answered is rejected \u2014 even if the field's own definition has since changed.",
+            "fact": "When staff edit a passenger's or booking's already-submitted answers, clearing a field that was flagged required when it was first answered is rejected — even if the field's own definition has since changed.",
             "evidence": "dynamic_form/services/custom_field_response_service.py:CustomFieldResponseService.validate_submission_against_responses"
           }
         ],
@@ -5479,11 +5481,11 @@
         ],
         "field_meanings": [
           {
-            "fact": "A field's \"portal\" says where it's meant to be filled in \u2014 the public booking widget, the passenger portal, or the staff admin.",
+            "fact": "A field's \"portal\" says where it's meant to be filled in — the public booking widget, the passenger portal, or the staff admin.",
             "evidence": "dynamic_form/constants.py"
           },
           {
-            "fact": "A Collection's \"booking type\" (Tour or FIT) scopes which kind of booking it applies to \u2014 a FIT booking with no tour falls back to the tenant's default FIT passenger collection instead of a tour's own collection.",
+            "fact": "A Collection's \"booking type\" (Tour or FIT) scopes which kind of booking it applies to — a FIT booking with no tour falls back to the tenant's default FIT passenger collection instead of a tour's own collection.",
             "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.get_passenger_fields_for_booking"
           },
           {
@@ -5493,7 +5495,7 @@
         ],
         "journeys": [
           {
-            "fact": "Staff build a reusable set of passenger questions once as a Collection, attach it to a tour type, and every tour built from that type automatically gets the same questions on its booking form \u2014 with a one-click way to push a later edit out to every tour still using that collection.",
+            "fact": "Staff build a reusable set of passenger questions once as a Collection, attach it to a tour type, and every tour built from that type automatically gets the same questions on its booking form — with a one-click way to push a later edit out to every tour still using that collection.",
             "evidence": "dynamic_form/services/custom_field_service.py:CustomFormFieldService.sync_collection_custom_fields"
           },
           {
@@ -5549,7 +5551,7 @@
       "analysis": {
         "workflows": [
           {
-            "fact": "The platform has four kinds of accounts \u2014 super admin, staff/admin, tour guide, and passenger \u2014 each defined by which role (group) they belong to, which in turn determines which admin permissions or which portal (admin site vs. passenger site) they can access.",
+            "fact": "The platform has four kinds of accounts — super admin, staff/admin, tour guide, and passenger — each defined by which role (group) they belong to, which in turn determines which admin permissions or which portal (admin site vs. passenger site) they can access.",
             "evidence": "user/services/user_service.py:UserService._set_superuser_data,_set_admin_user_data,_set_passenger_user_data,_set_tour_guide_user_data"
           }
         ],
@@ -5601,7 +5603,7 @@
       "analysis": {
         "workflows": [
           {
-            "fact": "Staff create an organization record \u2014 a company, agent, or individual entity \u2014 with contact details, address, VAT/organization number, and its own default currency and language.",
+            "fact": "Staff create an organization record — a company, agent, or individual entity — with contact details, address, VAT/organization number, and its own default currency and language.",
             "evidence": "organization/models/organization_model.py:Organization,organization/constants.py:ORGANIZATION_CHOICES"
           },
           {
@@ -5632,13 +5634,13 @@
         ],
         "field_meanings": [
           {
-            "fact": "An organization's type is Individual, Company, Agent, or Agent Direct \u2014 distinguishing ordinary customers from corporate accounts and travel agents.",
+            "fact": "An organization's type is Individual, Company, Agent, or Agent Direct — distinguishing ordinary customers from corporate accounts and travel agents.",
             "evidence": "organization/constants.py:ORGANIZATION_CHOICES"
           }
         ],
         "journeys": [
           {
-            "fact": "Staff set up an organization for a corporate customer or travel agent once, link the relevant passengers to it, and then tag bookings made on its behalf with that organization \u2014 giving a consolidated view of everyone and everything associated with it.",
+            "fact": "Staff set up an organization for a corporate customer or travel agent once, link the relevant passengers to it, and then tag bookings made on its behalf with that organization — giving a consolidated view of everyone and everything associated with it.",
             "evidence": "organization/views/organization_views.py:OrganizationPassengersListAPIView,booking/models/booking.py:Booking.organization"
           }
         ],
@@ -5688,7 +5690,7 @@
       "analysis": {
         "workflows": [
           {
-            "fact": "Each tenant has one active subscription plan, which is a list of specific add-on features and third-party integrations switched on or off \u2014 everything from the dynamic-pricing engine to survey integration to translation providers.",
+            "fact": "Each tenant has one active subscription plan, which is a list of specific add-on features and third-party integrations switched on or off — everything from the dynamic-pricing engine to survey integration to translation providers.",
             "evidence": "subscription/models.py:SubscriptionPlan"
           },
           {
@@ -5723,13 +5725,13 @@
         ],
         "field_meanings": [
           {
-            "fact": "A subscription plan's status is Active, Inactive, Expired, or Canceled \u2014 separate from any individual feature being on or off within it.",
+            "fact": "A subscription plan's status is Active, Inactive, Expired, or Canceled — separate from any individual feature being on or off within it.",
             "evidence": "subscription/constants.py:SubscriptionPlanStatus"
           }
         ],
         "journeys": [
           {
-            "fact": "A tenant subscribes to (or has enabled for them) a specific add-on, like dynamic pricing or survey integration; every request their staff or customers make is then checked against that plan, so the feature simply becomes available \u2014 or stays hidden \u2014 without any code change per tenant.",
+            "fact": "A tenant subscribes to (or has enabled for them) a specific add-on, like dynamic pricing or survey integration; every request their staff or customers make is then checked against that plan, so the feature simply becomes available — or stays hidden — without any code change per tenant.",
             "evidence": "subscription/middlewares/subscription_plan_middleware.py:SubscriptionPlanMiddleware,subscription/permissions.py:HasFeatureAccess"
           }
         ],
@@ -5785,7 +5787,7 @@
       "analysis": {
         "workflows": [
           {
-            "fact": "Staff generate operational reports over a date range \u2014 sales, transactions, payment deadlines, revenue, and invoices \u2014 choosing which columns to include, and download them as an Excel file.",
+            "fact": "Staff generate operational reports over a date range — sales, transactions, payment deadlines, revenue, and invoices — choosing which columns to include, and download them as an Excel file.",
             "evidence": "report/services/sales_report_service.py:SalesReportService.generate_sales_report_data_for_rows,report/services/revenue_report_service.py:RevenueReportService.get_revenue_report_data_rows,report/services/invoice_list_report_service.py:InvoiceListReportService.build_rows"
           },
           {
@@ -5820,7 +5822,7 @@
         "field_meanings": [],
         "journeys": [
           {
-            "fact": "Staff open the dashboard for a quick pulse on the business, then drill into a specific report \u2014 sales, payment deadlines, revenue, or invoices \u2014 filtered and column-customized to answer a specific question, and export it if they need to share or archive it.",
+            "fact": "Staff open the dashboard for a quick pulse on the business, then drill into a specific report — sales, payment deadlines, revenue, or invoices — filtered and column-customized to answer a specific question, and export it if they need to share or archive it.",
             "evidence": "report/services/dashboard_report_service.py:DashboardReportService.get_summary"
           }
         ],
@@ -5901,7 +5903,7 @@
             "evidence": "travel_information/models/travel_information_model.py:TravelInformation,travel_information/services/travel_information_service.py:TravelInformationService.get_general_travel_information_list"
           },
           {
-            "fact": "A passenger viewing their booking in the passenger portal sees a combined set of travel information assembled from every applicable source for that specific booking \u2014 general content, the tour's own details, its location, its tour type, and anything linked directly to the booking \u2014 in their preferred language.",
+            "fact": "A passenger viewing their booking in the passenger portal sees a combined set of travel information assembled from every applicable source for that specific booking — general content, the tour's own details, its location, its tour type, and anything linked directly to the booking — in their preferred language.",
             "evidence": "travel_information/services/travel_information_service.py:TravelInformationService.get_travel_information_for_booking,travel_information/views/passenger_portal_travel_information_views.py:PassengerPortalBookingTravelInformationAPIView"
           }
         ],
@@ -5911,11 +5913,11 @@
             "evidence": "todo/services/todo_services.py:TodoService.create"
           },
           {
-            "fact": "A piece of travel information can't be deactivated while it's still linked to any active tour, tour type, custom tour offer, location, itinerary template, or active booking \u2014 it has to be unlinked from all of those first.",
+            "fact": "A piece of travel information can't be deactivated while it's still linked to any active tour, tour type, custom tour offer, location, itinerary template, or active booking — it has to be unlinked from all of those first.",
             "evidence": "travel_information/services/travel_information_service.py:TravelInformationService._raise_if_linked_to_active_records"
           },
           {
-            "fact": "An internal note is assigned to a staff member; an external note is assigned to a specific passenger on the booking instead \u2014 never both at once.",
+            "fact": "An internal note is assigned to a staff member; an external note is assigned to a specific passenger on the booking instead — never both at once.",
             "evidence": "note/services/note_services.py:NoteService.prepare_data"
           }
         ],
@@ -5946,7 +5948,7 @@
             "evidence": "todo/services/todo_services.py:TodoService.create,complete_task,create_or_update_reminder"
           },
           {
-            "fact": "A passenger opens their booking in the passenger portal and sees all the practical information relevant to their specific trip \u2014 general advice, details about their tour, its location, and its type, plus anything added just for their booking \u2014 in their own language.",
+            "fact": "A passenger opens their booking in the passenger portal and sees all the practical information relevant to their specific trip — general advice, details about their tour, its location, and its type, plus anything added just for their booking — in their own language.",
             "evidence": "travel_information/views/passenger_portal_travel_information_views.py:PassengerPortalBookingTravelInformationAPIView"
           }
         ],
@@ -6009,7 +6011,7 @@
             "evidence": "reservation_service/services/reservation_service_provider_configuration_service.py:ReservationServiceProviderConfigurationService.update_or_create_configuration"
           },
           {
-            "fact": "Which of a tenant's configured connections are actually usable is filtered by their subscription plan \u2014 a connection only counts as active if the matching feature is enabled on the tenant's plan.",
+            "fact": "Which of a tenant's configured connections are actually usable is filtered by their subscription plan — a connection only counts as active if the matching feature is enabled on the tenant's plan.",
             "evidence": "reservation_service/services/reservation_service_provider_configuration_service.py:ReservationServiceProviderConfigurationService.get_subscribed_reservation_service_configuration"
           },
           {
@@ -6023,11 +6025,11 @@
         ],
         "rules": [
           {
-            "fact": "A tenant can only have one configuration per combination of service type and provider \u2014 configuring the same pair again updates the existing connection rather than creating a duplicate.",
+            "fact": "A tenant can only have one configuration per combination of service type and provider — configuring the same pair again updates the existing connection rather than creating a duplicate.",
             "evidence": "reservation_service/services/reservation_service_provider_configuration_service.py:ReservationServiceProviderConfigurationService.update_or_create_configuration"
           },
           {
-            "fact": "Removing tickets that couldn't be processed during an external sync never blocks the ones that did succeed \u2014 a failure on some records is tracked separately rather than rolling back the whole batch.",
+            "fact": "Removing tickets that couldn't be processed during an external sync never blocks the ones that did succeed — a failure on some records is tracked separately rather than rolling back the whole batch.",
             "evidence": "reservation_service/services/gds_flight_data_sync.py:GDSFlightDataSyncService.sync_flight_envelope"
           }
         ],
@@ -6118,7 +6120,7 @@
             "evidence": "accounting_service/services/accounting_provider_services.py:AccountingProviderService.configure_accounting_provider,generate_fortnox_state"
           },
           {
-            "fact": "Connecting a new provider automatically disconnects and deactivates any other provider that was previously configured \u2014 only one can be active for the tenant at a time.",
+            "fact": "Connecting a new provider automatically disconnects and deactivates any other provider that was previously configured — only one can be active for the tenant at a time.",
             "evidence": "accounting_service/services/accounting_provider_services.py:AccountingProviderService.disable_other_accounting_service_providers,accounting_service/services/accounting_provider_configuration_services.py:AccountingProviderConfigurationService.disable_all_accounting_service_config_except_requested_one"
           },
           {
@@ -6153,13 +6155,13 @@
             "evidence": "accounting_service/models/accounting_service_project_model.py:AccountingServiceProject,accounting_service/models/accounting_service_cost_center_model.py:AccountingServiceCostCenter"
           },
           {
-            "fact": "A \"scenario\" groups the specific set of accounts a business event should post to \u2014 the same event (for example, a booking) can post differently depending on which scenario applies.",
+            "fact": "A \"scenario\" groups the specific set of accounts a business event should post to — the same event (for example, a booking) can post differently depending on which scenario applies.",
             "evidence": "accounting_service/models/accounting_provider_scenario_model.py:AccountingProviderScenario,accounting_service/models/accounting_provider_account_model.py:AccountingProviderAccount"
           }
         ],
         "journeys": [
           {
-            "fact": "Staff connect their accounting software once, sync its projects/cost centers/VAT codes into the platform, and map each business event's accounts \u2014 after that, the platform posts to the books automatically without staff repeating any of this setup per transaction.",
+            "fact": "Staff connect their accounting software once, sync its projects/cost centers/VAT codes into the platform, and map each business event's accounts — after that, the platform posts to the books automatically without staff repeating any of this setup per transaction.",
             "evidence": "accounting_service/services/accounting_provider_services.py:AccountingProviderService.configure_accounting_provider"
           }
         ],
@@ -6228,11 +6230,11 @@
         ],
         "rules": [
           {
-            "fact": "A log that has already been successfully resent cannot be resent again \u2014 the system rejects a repeat attempt.",
+            "fact": "A log that has already been successfully resent cannot be resent again — the system rejects a repeat attempt.",
             "evidence": "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService.resend_accounting_log"
           },
           {
-            "fact": "Logs for the automatic post-departure event (tour or yacht) can never be resent manually \u2014 those are only ever sent again by the platform's own automatic process, not by a staff click.",
+            "fact": "Logs for the automatic post-departure event (tour or yacht) can never be resent manually — those are only ever sent again by the platform's own automatic process, not by a staff click.",
             "evidence": "accounting_service/services/resend_accounting_service_log.py:ResendAccountingLogService.resend_accounting_log"
           },
           {
@@ -6249,7 +6251,7 @@
         ],
         "field_meanings": [
           {
-            "fact": "A log's success flag reflects whether the connected accounting provider accepted the posting \u2014 not whether the underlying business event itself succeeded.",
+            "fact": "A log's success flag reflects whether the connected accounting provider accepted the posting — not whether the underlying business event itself succeeded.",
             "evidence": "accounting_service/services/accounting_provider_log_service.py:AccountingProviderLogService.update_log"
           }
         ],
@@ -6322,11 +6324,11 @@
       "analysis": {
         "workflows": [
           {
-            "fact": "Staff record a supplier invoice \u2014 the amount owed, its VAT, due date, and which cost/VAT accounts it should be split across \u2014 and can attach it to the specific bookings it covers.",
+            "fact": "Staff record a supplier invoice — the amount owed, its VAT, due date, and which cost/VAT accounts it should be split across — and can attach it to the specific bookings it covers.",
             "evidence": "supplier/services/supplier_invoice_services.py:SupplierInvoiceService.create_supplier_invoice,create_company_supplier_invoice"
           },
           {
-            "fact": "For each booking a supplier is involved in, staff (or the supplier's own system, via a company API token) register what that supplier actually charged for it, against what the platform had estimated it would cost \u2014 split by currency and by whether it was a room, an extra, or a flight itinerary.",
+            "fact": "For each booking a supplier is involved in, staff (or the supplier's own system, via a company API token) register what that supplier actually charged for it, against what the platform had estimated it would cost — split by currency and by whether it was a room, an extra, or a flight itinerary.",
             "evidence": "supplier/services/supplier_invoice_register_cost_service.py:SupplierInvoiceRegisterCostService.process_supplier_financial_cost,supplier/services/supplier_financial_cost_service.py:SupplierFinancialTotalsService.get_financial_totals"
           },
           {
@@ -6348,7 +6350,7 @@
             "evidence": "supplier/services/supplier_invoice_services.py:SupplierInvoiceService.create_supplier_invoice"
           },
           {
-            "fact": "Registering the same supplier's cost against the same booking, currency, and invoice a second time adds to the previously registered amount rather than creating a separate record \u2014 unless that combination is explicitly not allowed to be updated, in which case it's rejected as a duplicate.",
+            "fact": "Registering the same supplier's cost against the same booking, currency, and invoice a second time adds to the previously registered amount rather than creating a separate record — unless that combination is explicitly not allowed to be updated, in which case it's rejected as a duplicate.",
             "evidence": "supplier/services/supplier_invoice_register_cost_service.py:SupplierInvoiceRegisterCostService._handle_financial_cost"
           },
           {
@@ -6373,13 +6375,13 @@
             "evidence": "supplier/constants.py:SupplierInvoiceStatus"
           },
           {
-            "fact": "\"Estimate cost\" is what the platform expected a supplier to charge for a booking (from its own room/extra/flight pricing); \"invoice cost\" is what the supplier actually invoiced for it \u2014 the difference is what staff reconcile.",
+            "fact": "\"Estimate cost\" is what the platform expected a supplier to charge for a booking (from its own room/extra/flight pricing); \"invoice cost\" is what the supplier actually invoiced for it — the difference is what staff reconcile.",
             "evidence": "supplier/models/supplier_invoice_model.py:SupplierInvoiceFinancialCost"
           }
         ],
         "journeys": [
           {
-            "fact": "A booking uses a supplier for a room, an extra, or a flight; later, staff receive that supplier's invoice, record it with its cost/VAT split, and register how much of it applies to each affected booking \u2014 closing the loop between what was estimated and what was actually billed.",
+            "fact": "A booking uses a supplier for a room, an extra, or a flight; later, staff receive that supplier's invoice, record it with its cost/VAT split, and register how much of it applies to each affected booking — closing the loop between what was estimated and what was actually billed.",
             "evidence": "supplier/services/supplier_invoice_register_cost_service.py:SupplierInvoiceRegisterCostService.process_supplier_financial_cost"
           }
         ],
@@ -6439,7 +6441,7 @@
       "analysis": {
         "workflows": [
           {
-            "fact": "A staff member can start an impersonation session to see the passenger portal exactly as a specific passenger sees it, using a temporary time-limited token \u2014 useful for support and troubleshooting without needing the passenger's own credentials.",
+            "fact": "A staff member can start an impersonation session to see the passenger portal exactly as a specific passenger sees it, using a temporary time-limited token — useful for support and troubleshooting without needing the passenger's own credentials.",
             "evidence": "user/services/impersonate_passenger.py:ImpersonationPassengerService.create_impersonation_token"
           },
           {
@@ -6451,7 +6453,7 @@
             "evidence": "user/services/impersonate_passenger.py:ImpersonationPassengerService.end_impersonation_token,close_previous_sessions"
           },
           {
-            "fact": "Staff can permanently anonymise a passenger's personal data (for a GDPR data-erasure request), which scrubs their identifying details everywhere they appear \u2014 their own account, passenger profile, any booking they were a passenger on, any co-passenger record, and their payment/invoice history \u2014 while keeping a private record of what was anonymised.",
+            "fact": "Staff can permanently anonymise a passenger's personal data (for a GDPR data-erasure request), which scrubs their identifying details everywhere they appear — their own account, passenger profile, any booking they were a passenger on, any co-passenger record, and their payment/invoice history — while keeping a private record of what was anonymised.",
             "evidence": "user/services/anonymise_user_data_service.py:AnonymiseUserDataService.anonymise_user_data"
           },
           {
@@ -6461,11 +6463,11 @@
         ],
         "rules": [
           {
-            "fact": "While impersonating, a staff member can only perform read (safe) actions \u2014 any attempt to create, change, or delete something is blocked, with a small, explicit set of exceptions (like ending the session or downloading an invoice/receipt).",
+            "fact": "While impersonating, a staff member can only perform read (safe) actions — any attempt to create, change, or delete something is blocked, with a small, explicit set of exceptions (like ending the session or downloading an invoice/receipt).",
             "evidence": "user/services/impersonate_passenger.py:ImpersonationPassengerService.authorize_request,_is_whitelisted_write"
           },
           {
-            "fact": "An impersonation token only works for the specific passenger account it was issued for, and only while that session is still marked valid \u2014 an expired or already-ended session, or a token used by the wrong account, is rejected.",
+            "fact": "An impersonation token only works for the specific passenger account it was issued for, and only while that session is still marked valid — an expired or already-ended session, or a token used by the wrong account, is rejected.",
             "evidence": "user/services/impersonate_passenger.py:ImpersonationPassengerService.authorize_request,_decode_token"
           },
           {
@@ -6473,7 +6475,7 @@
             "evidence": "user/services/anonymise_user_data_service.py:AnonymiseUserDataService._validate_user_for_anonymisation"
           },
           {
-            "fact": "Anonymising a user replaces their name and email everywhere their personal data appears, but keeps the underlying booking, transaction, and invoice records themselves \u2014 only the personally identifying details are scrubbed, not the business records.",
+            "fact": "Anonymising a user replaces their name and email everywhere their personal data appears, but keeps the underlying booking, transaction, and invoice records themselves — only the personally identifying details are scrubbed, not the business records.",
             "evidence": "user/services/anonymise_user_data_service.py:AnonymiseUserDataService._get_all_transactions_for_passenger,_get_all_invoices_for_passenger"
           }
         ],
