@@ -49,3 +49,7 @@ Format: **Term** — definition in one or two sentences, primary-reader language
 **No-Flight Transfer Fee** — The fee a tour can charge a customer who books it without taking any of its flights.
 
 **Custom Flight Request** — A free-text flight request a customer submits instead of picking a listed tour flight, routed to staff to arrange manually.
+
+**Timetable** — A shuttle/transfer schedule: an active date range, the weekdays it runs, seat capacity, and the airport(s) it serves.
+
+**Stoppage** — One ordered pickup/drop-off point on a Timetable's route, with its own time and optional connection fee.

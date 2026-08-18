@@ -27,7 +27,7 @@
     "shuttle-timetable",
     "cancellation-rules"
   ],
-  "current_feature": "shuttle-timetable",
+  "current_feature": "cancellation-rules",
   "current_step": "analyze",
   "notes": {
     "run_processed_count": 0,

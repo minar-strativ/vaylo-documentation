@@ -6529,14 +6529,102 @@
         "multi-language"
       ],
       "existing_docs": [],
-      "status": "pending",
+      "status": "completed",
       "skip_reason": null,
       "doc": "docs/product/shuttle-timetable.md",
-      "documented_at_commit": null,
-      "evidence": {},
+      "documented_at_commit": "5609d882b",
+      "evidence": {
+        "what_it_does_and_how_it_works": [
+          "shuttle_timetable/services/timetable_service.py",
+          "shuttle_timetable/services/timetable_stoppage_service.py",
+          "shuttle_timetable/services/timetable_import_service.py"
+        ],
+        "who_uses_it": [
+          "shuttle_timetable/views/timetable_views.py",
+          "shuttle_timetable/views/timetable_import_views.py"
+        ],
+        "rules_and_edge_cases": [
+          "shuttle_timetable/services/timetable_service.py:TourFlightService._validate_airport_locations",
+          "shuttle_timetable/services/timetable_stoppage_service.py",
+          "shuttle_timetable/services/timetable_import_service.py"
+        ]
+      },
       "audited_at_commit": null,
       "full_audits_skipped": 0,
-      "analysis": {}
+      "analysis": {
+        "workflows": [
+          {
+            "fact": "Staff create a Timetable: name, active date range, active weekdays, seat capacity, and the airport location(s) it serves.",
+            "evidence": "shuttle_timetable/services/timetable_service.py:TimetableService.create"
+          },
+          {
+            "fact": "Each timetable has its own ordered list of Stoppages (pickup/drop-off points with a time and optional connection fee), auto-numbered on creation and reorderable afterward.",
+            "evidence": "shuttle_timetable/services/timetable_stoppage_service.py:TimetableStoppageService.create,bulk_update_stoppage_positions"
+          },
+          {
+            "fact": "Staff can bulk-import a timetable, or a timetables stoppages, from a downloadable spreadsheet template.",
+            "evidence": "shuttle_timetable/services/timetable_import_service.py:TimetableImportService.create_timetable_from_file,create_stoppages_from_file"
+          },
+          {
+            "fact": "Staff can duplicate an existing timetable, copying its airport locations, full stoppage list, and translated names into a new active timetable.",
+            "evidence": "shuttle_timetable/services/timetable_service.py:TimetableService.create_duplicate"
+          },
+          {
+            "fact": "Staff can activate or deactivate a timetable.",
+            "evidence": "shuttle_timetable/views/timetable_views.py:TimetableUpdateStatusAPIView"
+          }
+        ],
+        "rules": [
+          {
+            "fact": "Only a location set up as an airport-type location can be attached to a timetable as one of its airports.",
+            "evidence": "shuttle_timetable/services/timetable_service.py:TimetableService._validate_airport_locations"
+          },
+          {
+            "fact": "If staff do not set a timetables passenger-transfer-information update-days value, the tenants configured default is used instead.",
+            "evidence": "shuttle_timetable/services/timetable_service.py:TimetableService.create"
+          },
+          {
+            "fact": "A new stoppage without an explicit position is placed after the last existing stop; an explicit position that collides with an existing stop on the same timetable is rejected.",
+            "evidence": "shuttle_timetable/services/timetable_stoppage_service.py:TimetableStoppageService.create,_get_next_order"
+          },
+          {
+            "fact": "Reordering stoppages is rejected outright if the requested positions would leave two stops on the same timetable sharing a position.",
+            "evidence": "shuttle_timetable/services/timetable_stoppage_service.py:TimetableStoppageService._validate_no_position_collisions"
+          },
+          {
+            "fact": "Importing stoppages from a spreadsheet can either add to the timetables existing stops or fully replace them, chosen at import time.",
+            "evidence": "shuttle_timetable/services/timetable_import_service.py:TimetableImportService.create_stoppages_from_file"
+          }
+        ],
+        "validations": [
+          {
+            "fact": "A spreadsheet import fails outright (nothing is created) if its required sheet or columns are missing, or if a row name, date range, weekdays, or stop time cannot be parsed.",
+            "evidence": "shuttle_timetable/services/timetable_import_service.py:TimetableImportService._parse_timetable_sheet,_parse_stoppage_rows"
+          },
+          {
+            "fact": "An unknown airport code in an imported timetable row is rejected by name.",
+            "evidence": "shuttle_timetable/services/timetable_import_service.py:TimetableImportService._resolve_airport_locations"
+          }
+        ],
+        "permissions": [
+          {
+            "fact": "All timetable and stoppage management (create, edit, status, duplicate, import) requires staff authentication plus Django model permissions.",
+            "evidence": "shuttle_timetable/views/timetable_views.py;shuttle_timetable/views/timetable_import_views.py"
+          }
+        ],
+        "field_meanings": [
+          {
+            "fact": "active_weekdays and the active date range together define which calendar days a timetable is considered running.",
+            "evidence": "shuttle_timetable/models/timetable_model.py:Timetable"
+          },
+          {
+            "fact": "A stoppages connection_fee is an optional extra charge tied to that specific pickup/drop-off point.",
+            "evidence": "shuttle_timetable/models/timetable_stoppage_model.py:TimetableStoppage"
+          }
+        ],
+        "journeys": [],
+        "side_effects": []
+      }
     },
     {
       "id": "cancellation-rules",
